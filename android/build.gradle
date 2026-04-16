@@ -1,0 +1,17 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
+
+android {
+    compileSdkVersion 33
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 33
+    }
+}
+
+dependencies {
+    // nap ssp SDK dependency (placeholder)
+    // implementation 'io.github.nasmedia-tech:admixer-ssp:1.0.21'
+}
