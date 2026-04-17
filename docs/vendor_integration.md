@@ -182,3 +182,22 @@ The consuming iOS app will still need:
 3. Confirm iOS `AdMixerMediation` symbols and sample app flow.
 4. Wire iOS initialize/banner/interstitial/rewarded against real classes.
 5. Verify both inside a host React Native app, not the library in isolation.
+
+## AppBridge sample notes (local developer samples)
+
+There is an AppBridge sample in the workspace that contains additional integration guidance and hybrid webview bridging examples. Useful files:
+
+- `/Users/gwangy.claw/Developer/NapSspAppBridgeSample/docs/quickstart.md`
+- `/Users/gwangy.claw/Developer/NapSspAppBridgeSample/docs/hybrid-webview.md`
+- `/Users/gwangy.claw/Developer/NapSspAppBridgeSample/ios/Sources/NapSspIOSSample/HybridEventBridge.swift`
+- `/Users/gwangy.claw/Developer/NapSspAppBridgeSample/ios/Sources/NapSspIOSSample/NapSspInitializer.swift`
+- Android samples under `/Users/gwangy.claw/Developer/_nap_refs/AOS-AdMixerSSP-TestApp/` (AdView/Interstitial/Rewarded examples)
+
+Actionable takeaways from AppBridge sample
+
+- Hybrid bridge message format: events are posted as JSON objects with fields like `event`, `adUnitId`, `payload`, and `timestamp`. Follow the same minimal shape when emitting RN DeviceEvents so hybrid/web consumers can reuse the same handlers.
+- Initializer pattern: build a single `AdInfo`/config object from JS config then call the platform initialize method once with the media key + ad unit list.
+- Lifecycle: Respect host activity/view controller lifecycle and call banner `onResume`/`onPause`/`onDestroy` equivalents from RN view manager lifecycle hooks.
+- ATT: AppBridge has utilities to request ATT; reuse the same timing guidance and expose `requestTrackingAuthorization()` from JS.
+
+Add these references to your app-level integration docs and ensure RN bridge events follow the simple JSON envelope for easier hybrid compatibility.
