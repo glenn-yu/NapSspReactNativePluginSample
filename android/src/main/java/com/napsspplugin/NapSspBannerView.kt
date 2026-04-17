@@ -132,6 +132,34 @@ internal class NapSspBannerView(context: Context) : FrameLayout(context) {
 
         currentState = NapSspLoadState.LOADING
         NapSspSdkBridge.markBannerState(normalizedAdUnitId, NapSspLoadState.LOADING)
+
+        // Try vendor SDK attach and load first. If vendor SDK is not present or fails, fall back to placeholder behavior.
+        var vendorLoaded = false
+        try {
+            tryAttachVendorAdView()
+            applyAdUnitToVendor(normalizedAdUnitId)
+            vendorLoaded = true
+        } catch (_: Throwable) {
+            vendorLoaded = false
+        }
+
+        if (vendorLoaded) {
+            currentState = NapSspLoadState.LOADED
+            NapSspSdkBridge.markBannerState(normalizedAdUnitId, NapSspLoadState.LOADED)
+            NapSspEventEmitter.emitViewEvent(
+                this,
+                NapSspContracts.VIEW_EVENT_AD_LOADED,
+                mapOf(
+                    "adUnitId" to normalizedAdUnitId,
+                    "size" to size,
+                    "format" to NapSspContracts.FORMAT_BANNER,
+                    "source" to "vendor",
+                ),
+            )
+            return
+        }
+
+        // fallback placeholder behavior
         currentState = NapSspLoadState.LOADED
         NapSspSdkBridge.markBannerState(normalizedAdUnitId, NapSspLoadState.LOADED)
         NapSspEventEmitter.emitViewEvent(
@@ -154,6 +182,65 @@ internal class NapSspBannerView(context: Context) : FrameLayout(context) {
             "MEDIUM_RECTANGLE",
             "SMART_BANNER" -> true
             else -> false
+        }
+    }
+
+    private fun tryAttachVendorAdView() {
+        if (adViewInstance != null) return
+        try {
+            val buildConfigClass = Class.forName("com.napsspplugin.BuildConfig")
+            val enabled = try { buildConfigClass.getField("NAP_SSP_VENDOR_SDK_ENABLED").getBoolean(null) } catch (_: Throwable) { false }
+            if (!enabled) return
+
+            val adViewClass = Class.forName("com.nasmedia.admixerssp.ads.AdView")
+            val ctor = adViewClass.getConstructor(android.content.Context::class.java)
+            val adView = ctor.newInstance(context)
+            adViewInstance = adView
+            post {
+                removeAllViews()
+                val lp = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                addView(adView as android.view.View, lp)
+            }
+
+            // wire listener
+            try {
+                val listenerInterface = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
+                val proxy = java.lang.reflect.Proxy.newProxyInstance(
+                    listenerInterface.classLoader,
+                    arrayOf(listenerInterface)
+                ) { _, method, args ->
+                    when (method.name) {
+                        "onReceivedAd" -> emitEvent(NapSspContracts.VIEW_EVENT_AD_LOADED, mapOf("adUnitId" to adUnitId))
+                        "onFailedToReceiveAd" -> emitEvent(NapSspContracts.VIEW_EVENT_AD_FAILED, mapOf("adUnitId" to adUnitId, "error" to (args?.get(2)?.toString() ?: "")))
+                        "onEventAd" -> emitEvent(NapSspContracts.VIEW_EVENT_AD_CLICKED, mapOf("adUnitId" to adUnitId, "event" to (args?.get(1)?.toString() ?: "")))
+                    }
+                    null
+                }
+                val setListener = adViewClass.getMethod("setAdViewListener", listenerInterface)
+                setListener.invoke(adView, proxy)
+            } catch (_: Throwable) {
+            }
+        } catch (_: Throwable) {
+        }
+    }
+
+    private fun applyAdUnitToVendor(unit: String) {
+        val adView = adViewInstance ?: return
+        try {
+            val adInfoBuilderClass = Class.forName("com.nasmedia.admixerssp.ads.AdInfo\$Builder")
+            val adInfoBuilderCtor = adInfoBuilderClass.getConstructor(String::class.java)
+            val builder = adInfoBuilderCtor.newInstance(unit)
+            try {
+                val setIsUseMediation = adInfoBuilderClass.getMethod("setIsUseMediation", Boolean::class.java)
+                setIsUseMediation.invoke(builder, true)
+            } catch (_: Throwable) {}
+            val build = adInfoBuilderClass.getMethod("build")
+            val adInfo = build.invoke(builder)
+            val setAdInfo = adView.javaClass.getMethod("setAdInfo", adInfo.javaClass)
+            setAdInfo.invoke(adView, adInfo)
+            try { adView.javaClass.getMethod("loadAd").invoke(adView) } catch (_: Throwable) {}
+        } catch (_: Throwable) {
+            throw RuntimeException("vendor attach failed")
         }
     }
 
