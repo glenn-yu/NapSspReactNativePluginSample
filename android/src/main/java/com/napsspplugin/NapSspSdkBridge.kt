@@ -20,6 +20,51 @@ internal object NapSspSdkBridge {
         latestConfig = config.requireValid()
         logLevel = config.logLevel ?: logLevel
         coppaEnabled = config.coppa
+
+        // If the vendor SDK is enabled at build time, try to initialize it.
+        // Use reflection so this module can compile without the vendor SDK present (compileOnly).
+        try {
+            val vendorEnabled = try {
+                Class.forName("com.napsspplugin.BuildConfig").getField("NAP_SSP_VENDOR_SDK_ENABLED").getBoolean(null)
+            } catch (_: Throwable) {
+                false
+            }
+
+            if (vendorEnabled) {
+                try {
+                    val adMixerClass = Class.forName("com.nasmedia.admixerssp.common.AdMixer")
+                    val getInstance = adMixerClass.getMethod("getInstance")
+                    val adMixer = getInstance.invoke(null)
+                    val initialize = adMixerClass.getMethod("initialize", android.content.Context::class.java, String::class.java, List::class.java)
+                    val ctx = null // Context not available here; host app should call vendor init as well
+                    // We cannot safely call initialize without a Context. Instead, attempt to call registerAdapter if present.
+                    val registerAdapter = adMixerClass.getMethod("registerAdapter", String::class.java)
+                    val adapters = listOf(
+                        "ADAPTER_ADMANAGER",
+                        "ADAPTER_ADFIT",
+                        "ADAPTER_MOBWITH",
+                        "ADAPTER_PANGLE",
+                        "ADAPTER_APPLOVIN",
+                        "ADAPTER_UNITY"
+                    )
+                    for (adapterConst in adapters) {
+                        try {
+                            val field = adMixerClass.getField(adapterConst)
+                            val adapterName = field.get(null) as? String
+                            if (adapterName != null) {
+                                registerAdapter.invoke(adMixer, adapterName)
+                            }
+                        } catch (_: Throwable) {
+                            // ignore missing adapter constants
+                        }
+                    }
+                } catch (e: Throwable) {
+                    // vendor SDK present but reflection failed; leave placeholder behavior
+                }
+            }
+        } catch (_: Throwable) {
+            // reflection guard - silently ignore
+        }
     }
 
     fun setLogLevel(level: String) {
