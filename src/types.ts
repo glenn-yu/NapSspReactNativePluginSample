@@ -33,6 +33,20 @@ export interface NapSspConfig {
   coppa?: boolean;
 }
 
+export interface NapSspStatus {
+  initialized: boolean;
+  placeholderMode?: boolean;
+  vendorMode?: boolean;
+  mediationFlags?: Record<string, boolean>;
+  loadedAds?: {
+    banners?: readonly string[];
+    interstitials?: readonly string[];
+    rewarded?: readonly string[];
+  };
+  attStatus?: string;
+  details?: Record<string, unknown>;
+}
+
 export interface AdError {
   code: string;
   message: string;

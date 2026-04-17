@@ -1,10 +1,11 @@
-import { createNativeModuleMissingError, getNativeModule } from './nativeBridge';
-import type { LogLevel, NapSspConfig } from './types';
+import { createNativeModuleMissingError, getNativeModuleFromNames, NativeModuleNames } from './nativeBridge';
+import type { LogLevel, NapSspConfig, NapSspStatus } from './types';
 
 interface NapSspNativeModule {
   initialize?: (config: NapSspConfig) => Promise<void>;
   setLogLevel?: (level: LogLevel) => void;
   setCoppa?: (enabled: boolean) => void;
+  getStatus?: () => Promise<NapSspStatus> | NapSspStatus;
 }
 
 function cloneConfig(config: NapSspConfig): NapSspConfig {
@@ -22,9 +23,9 @@ class NapSspAd {
   static async initialize(config: NapSspConfig): Promise<void> {
     this.validateConfig(config);
 
-    const nativeModule = getNativeModule<NapSspNativeModule>('NapSspModule');
+    const nativeModule = getNativeModuleFromNames<NapSspNativeModule>(NativeModuleNames.napSsp);
     if (!nativeModule?.initialize) {
-      throw createNativeModuleMissingError('initialization', 'NapSspModule');
+      throw createNativeModuleMissingError('initialization', NativeModuleNames.napSsp);
     }
 
     await nativeModule.initialize(config);
@@ -41,14 +42,14 @@ class NapSspAd {
   }
 
   static setLogLevel(level: LogLevel): void {
-    const nativeModule = getNativeModule<NapSspNativeModule>('NapSspModule');
+    const nativeModule = getNativeModuleFromNames<NapSspNativeModule>(NativeModuleNames.napSsp);
     if (typeof nativeModule?.setLogLevel === 'function') {
       nativeModule.setLogLevel(level);
     }
   }
 
   static setCoppa(enabled: boolean): void {
-    const nativeModule = getNativeModule<NapSspNativeModule>('NapSspModule');
+    const nativeModule = getNativeModuleFromNames<NapSspNativeModule>(NativeModuleNames.napSsp);
     if (typeof nativeModule?.setCoppa === 'function') {
       nativeModule.setCoppa(enabled);
     }
@@ -60,6 +61,19 @@ class NapSspAd {
 
   static getConfig(): NapSspConfig | undefined {
     return this._config ? cloneConfig(this._config) : undefined;
+  }
+
+  static async getStatus(): Promise<NapSspStatus> {
+    const nativeModule = getNativeModuleFromNames<NapSspNativeModule>(NativeModuleNames.napSsp);
+    if (typeof nativeModule?.getStatus === 'function') {
+      return await Promise.resolve(nativeModule.getStatus());
+    }
+
+    return {
+      initialized: this._initialized,
+      placeholderMode: true,
+      details: this._config ? { configuredAdUnitCount: this._config.adUnitIds.length } : undefined,
+    };
   }
 
   private static validateConfig(config: NapSspConfig): void {

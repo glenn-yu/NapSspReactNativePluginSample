@@ -15,6 +15,7 @@ export type {
   LogLevel,
   MediationConfig,
   NapSspConfig,
+  NapSspStatus,
   RewardItem,
   RewardedAdEventMap,
 } from './types';

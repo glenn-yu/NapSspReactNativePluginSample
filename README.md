@@ -49,6 +49,9 @@ await NapSspAd.initialize({
   logLevel: 'info',
   coppa: false,
 });
+
+const status = await NapSspAd.getStatus();
+console.log(status.placeholderMode ? 'placeholder runtime' : 'vendor runtime');
 ```
 
 ### Banner ads
@@ -104,6 +107,7 @@ These events are currently driven by the JS wrapper layer and will be connected 
 - Vendor Android dependencies are gated behind the Gradle property `napSsp.enableVendorSdk=true` so the placeholder bridge can build without the private SDKs present
 - iOS native SDK integration is still placeholder-only
 - The example app is intentionally defensive and will show placeholder/failure text until the native modules are linked in an app
+- `NapSspAd.getStatus()` exposes the current placeholder/native readiness snapshot when the host bridge provides it
 - CI validates TypeScript and the JS build only; it does not build the native projects yet
 
 ## Roadmap / status docs
