@@ -29,6 +29,8 @@ ios/DerivedData
 .expo/*
 .expo-shared/*
 .metro/*
+example/ExampleHostApp/.bundle/
+example/ExampleHostApp/node_modules/
 
 # Logs
 npm-debug.log*

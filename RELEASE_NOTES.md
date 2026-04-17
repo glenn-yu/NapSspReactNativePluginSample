@@ -1,21 +1,25 @@
 # Release notes
 
-## Current release status
-This repository is still a scaffold/sample project, not a publish-ready SDK wrapper.
+## 0.1.1 overview
+This update moves the project beyond an initial scaffold and into a usable React Native integration sample for Nap SSP across Android and iOS.
 
-### Shipped in this update
-- A typed JS/TS API surface for init, banner, interstitial, and rewarded ads
-- Runtime checks and clearer errors when native modules are missing
-- Example app scaffolding that explains the current placeholder state
-- CI/build commands that validate the TypeScript surface
+### Included in 0.1.1
+- JS/TS API for initialization, banner, native, inline video, interstitial, rewarded, and interstitial video ads
+- Android native package updates for modules and view managers across supported ad formats
+- iOS native bridge updates for modules and view managers across supported ad formats
+- Example host app (`example/ExampleHostApp`) for local validation
+- iOS SPM support and expanded native integration documentation
+- Example Jest smoke test and improved local run scripts
 
-### Remaining blockers
-- Android native bridge methods still need real SDK integration
-- iOS native bridge methods still need real SDK integration
-- Integration tests cannot be meaningful until the native bridge exists
+### Verified in this repository
+- Root package typecheck and build via `npm run verify`
+- Example host app Jest smoke test via `cd example/ExampleHostApp && npm test -- --runInBand`
 
-### Publishing checklist
-- Verify the Android and iOS module names match the JS wrappers
-- Run `npm run verify`
-- Build and run the example on both platforms
-- Update the version number and package metadata before publishing
+### Known environment requirements
+- Android local execution requires Java/JDK, Android SDK, and `adb`
+- iOS local execution requires macOS, Xcode, and CocoaPods
+
+### Remaining cautions before wider release
+- Confirm real-device ad loading with valid production or test ad unit IDs
+- Verify mediation-specific SDK dependencies in host apps for both Android and iOS
+- Keep package, podspec, changelog, and release metadata version-aligned before publishing the next release
