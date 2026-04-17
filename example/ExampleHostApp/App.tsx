@@ -32,6 +32,13 @@ const TEST_CONFIG = {
 
 function App(): JSX.Element {
   const [statusText, setStatusText] = useState('Waiting for SDK initialization...');
+  const isNative = isNativeModuleAvailable([
+    'NapSspModule',
+    'NapSspBannerView',
+    'NapSspNativeAdView',
+    'NapSspVideoAdView',
+    'NapSspInterstitialVideo',
+  ]);
 
   useEffect(() => {
     let isMounted = true;
@@ -155,26 +162,38 @@ function App(): JSX.Element {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>1. 배너 광고 (Banner)</Text>
           <View style={styles.adContainer}>
-            <BannerAd
-              adUnitId={TEST_CONFIG.bannerId}
-              size="BANNER_320x50"
-              onAdLoaded={() => console.log('배너 로드 성공')}
-              onAdFailedToLoad={(e) => console.log('배너 실패:', e.message)}
-            />
+            {isNative ? (
+              <BannerAd
+                adUnitId={TEST_CONFIG.bannerId}
+                size="BANNER_320x50"
+                onAdLoaded={() => console.log('배너 로드 성공')}
+                onAdFailedToLoad={(e) => console.log('배너 실패:', e.message)}
+              />
+            ) : (
+              <Text style={{color: '#6B7280'}}>Native banner not available (placeholder)</Text>
+            )}
           </View>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>2. 네이티브 광고 (Native Ad)</Text>
           <View style={styles.adContainer}>
-            <NativeAd adUnitId={TEST_CONFIG.nativeAdId} />
+            {isNative ? (
+              <NativeAd adUnitId={TEST_CONFIG.nativeAdId} />
+            ) : (
+              <Text style={{color: '#6B7280'}}>Native ad not available (placeholder)</Text>
+            )}
           </View>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>3. 동영상 광고 뷰 (Video Ad)</Text>
           <View style={styles.adContainer}>
-            <VideoAd adUnitId={TEST_CONFIG.videoAdId} />
+            {isNative ? (
+              <VideoAd adUnitId={TEST_CONFIG.videoAdId} />
+            ) : (
+              <Text style={{color: '#6B7280'}}>Video ad not available (placeholder)</Text>
+            )}
           </View>
         </View>
 
