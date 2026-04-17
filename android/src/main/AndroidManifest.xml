@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.gwangy">
-</manifest>
+    package="com.gwangy">
+
     <!-- Library-only manifest: host apps should provide real ad network meta-data. -->
     <application />
+
 </manifest>

@@ -1,6 +1,6 @@
 # Keep the plugin bridge, modules, and placeholder view classes available to host apps.
--keep class com.napsspplugin.** { *; }
--dontwarn com.napsspplugin.**
+-keep class com.gwangy.** { *; }
+-dontwarn com.gwangy.**
 
 # React Native bridge classes are referenced from JavaScript and the package registry.
 -keep class com.facebook.react.** { *; }

@@ -17,6 +17,7 @@ internal class NapSspBannerView(context: Context) : FrameLayout(context) {
     }
 
     private var currentState: NapSspLoadState = NapSspLoadState.IDLE
+    private var adViewInstance: android.view.View? = null
 
     var adUnitId: String? = null
         set(value) {
@@ -83,6 +84,7 @@ internal class NapSspBannerView(context: Context) : FrameLayout(context) {
             )
         }
         currentState = NapSspLoadState.DESTROYED
+        adViewInstance = null
         if (!adUnitId.isNullOrBlank()) {
             NapSspSdkBridge.clearBanner(adUnitId)
         }
@@ -188,14 +190,12 @@ internal class NapSspBannerView(context: Context) : FrameLayout(context) {
     private fun tryAttachVendorAdView() {
         if (adViewInstance != null) return
         try {
-            val buildConfigClass = Class.forName("com.napsspplugin.BuildConfig")
-            val enabled = try { buildConfigClass.getField("NAP_SSP_VENDOR_SDK_ENABLED").getBoolean(null) } catch (_: Throwable) { false }
-            if (!enabled) return
+            if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) return
 
             val adViewClass = Class.forName("com.nasmedia.admixerssp.ads.AdView")
             val ctor = adViewClass.getConstructor(android.content.Context::class.java)
             val adView = ctor.newInstance(context)
-            adViewInstance = adView
+            adViewInstance = adView as android.view.View
             post {
                 removeAllViews()
                 val lp = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
@@ -210,9 +210,29 @@ internal class NapSspBannerView(context: Context) : FrameLayout(context) {
                     arrayOf(listenerInterface)
                 ) { _, method, args ->
                     when (method.name) {
-                        "onReceivedAd" -> emitEvent(NapSspContracts.VIEW_EVENT_AD_LOADED, mapOf("adUnitId" to adUnitId))
-                        "onFailedToReceiveAd" -> emitEvent(NapSspContracts.VIEW_EVENT_AD_FAILED, mapOf("adUnitId" to adUnitId, "error" to (args?.get(2)?.toString() ?: "")))
-                        "onEventAd" -> emitEvent(NapSspContracts.VIEW_EVENT_AD_CLICKED, mapOf("adUnitId" to adUnitId, "event" to (args?.get(1)?.toString() ?: "")))
+                        "onReceivedAd" -> NapSspEventEmitter.emitViewEvent(
+                            this@NapSspBannerView,
+                            NapSspContracts.VIEW_EVENT_AD_LOADED,
+                            mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
+                        )
+                        "onFailedToReceiveAd" -> NapSspEventEmitter.emitViewEvent(
+                            this@NapSspBannerView,
+                            NapSspContracts.VIEW_EVENT_AD_FAILED,
+                            mapOf(
+                                "adUnitId" to adUnitId,
+                                "format" to NapSspContracts.FORMAT_BANNER,
+                                "error" to (args?.get(2)?.toString() ?: ""),
+                            ),
+                        )
+                        "onEventAd" -> NapSspEventEmitter.emitViewEvent(
+                            this@NapSspBannerView,
+                            NapSspContracts.VIEW_EVENT_AD_CLICKED,
+                            mapOf(
+                                "adUnitId" to adUnitId,
+                                "format" to NapSspContracts.FORMAT_BANNER,
+                                "event" to (args?.get(1)?.toString() ?: ""),
+                            ),
+                        )
                     }
                     null
                 }

@@ -19,9 +19,19 @@ It is intentionally honest about what is still placeholder and what is ready to 
   - `load(adUnitId)`
   - `show(adUnitId)`
   - `destroy(adUnitId)`
+- `NapSspInterstitialVideo`
+  - `load(adUnitId)`
+  - `show(adUnitId)`
+  - `destroy(adUnitId)`
 - `NapSspBannerView`
   - props: `adUnitId`, `size`
   - events: `onAdLoaded`, `onAdFailedToLoad`, `onAdClicked`, `onAdOpened`, `onAdClosed`
+- `NapSspNativeAdView`
+  - props: `adUnitId`
+  - events: `onAdLoaded`, `onAdFailedToLoad`, `onAdClicked`, `onAdOpened`, `onAdClosed`
+- `NapSspVideoAdView`
+  - props: `adUnitId`, `isRetry`
+  - events: `onAdLoaded`, `onAdFailedToLoad`, `onAdClicked`, `onAdOpened`, `onAdClosed`, `onAdCompleted`, `onAdSkipped`
 
 ## Install / build
 

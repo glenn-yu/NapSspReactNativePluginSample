@@ -5,7 +5,8 @@ KT Nasmedia Nap SSP SDK를 React Native에서 쓰기 위한 플러그인입니�
 - 버전: `0.1.2`
 - 지원 목표: Android / iOS
 - 제공 형태: Native Module + Native View
-- 현재 중심 기능: 초기화, 배너, 전면, 리워드, 네이티브, 비디오
+- 현재 중심 기능: 초기화, 배너, 전면, 전면 동영상, 리워드, 네이티브, 비디오
+- 예제 앱은 위 주요 흐름을 모두 커버하면서, 네이티브 브리지 없이도 화면이 렌더되는 플레이스홀더 모드도 보여줍니다.
 
 ## 가장 먼저 할 일
 
@@ -36,7 +37,14 @@ export default function App() {
   useEffect(() => {
     NapSspAd.initialize({
       mediaKey: '발급받은_MEDIA_KEY',
-      adUnitIds: ['BANNER_ID', 'INTER_ID', 'REWARD_ID'],
+      adUnitIds: [
+        'BANNER_ID',
+        'INTER_ID',
+        'REWARD_ID',
+        'NATIVE_ID',
+        'VIDEO_ID',
+        'INTER_VIDEO_ID',
+      ],
       logLevel: 'debug',
     });
   }, []);
@@ -253,12 +261,12 @@ const showRewardedAd = async () => {
   // 보상 지급 이벤트 (SDK 스펙에 따라 item 데이터는 제공되지 않을 수 있음)
   reward.addAdEventListener('onRewarded', () => {
     console.log('🎉 보상 지급 이벤트 발생!');
+    // SDK의 rewarded 이벤트는 payload 없이 호출됩니다.
     // 정확한 보상 처리는 S2S 콜백 이용 권장
   });
 
   reward.addAdEventListener('closed', () => {
-    // 주의: 보상을 받지 않고 중간에 닫아도 호출됩니다. 
-    // 보상 처리는 반드시 'onRewarded' 이벤트에서 해야 합니다.
+    // 주의: 보상을 받지 않고 중간에 닫아도 호출됩니다.
     console.log('리워드 광고 창이 닫혔습니다.');
   });
 

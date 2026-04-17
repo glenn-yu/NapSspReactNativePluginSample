@@ -24,11 +24,7 @@ internal object NapSspSdkBridge {
         // If the vendor SDK is enabled at build time, try to initialize it.
         // Use reflection so this module can compile without the vendor SDK present (compileOnly).
         try {
-            val vendorEnabled = try {
-                Class.forName("com.napsspplugin.BuildConfig").getField("NAP_SSP_VENDOR_SDK_ENABLED").getBoolean(null)
-            } catch (_: Throwable) {
-                false
-            }
+            val vendorEnabled = BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED
 
             if (vendorEnabled) {
                 try {

@@ -7,7 +7,10 @@ This folder contains the React Native iOS bridge for `react-native-nap-ssp`.
 - `NapSspModule`
 - `NapSspInterstitial`
 - `NapSspRewarded`
+- `NapSspInterstitialVideo`
 - `NapSspBannerView`
+- `NapSspNativeAdView`
+- `NapSspVideoAdView`
 
 ## Notes
 

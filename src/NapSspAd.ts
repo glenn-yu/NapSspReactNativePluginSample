@@ -7,6 +7,7 @@ interface NapSspNativeModule {
   setLogLevel?: (level: LogLevel) => void;
   setCoppa?: (enabled: boolean) => void;
   getStatus?: () => Promise<NapSspStatus> | NapSspStatus;
+  requestTrackingAuthorization?: () => Promise<string> | string;
 }
 
 function cloneConfig(config: NapSspConfig): NapSspConfig {
@@ -78,6 +79,15 @@ class NapSspAd {
       placeholderMode: true,
       details: this._config ? { configuredAdUnitCount: this._config.adUnitIds.length } : undefined,
     };
+  }
+
+  static async requestTrackingAuthorization(): Promise<string> {
+    const nativeModule = getNativeModuleFromNames<NapSspNativeModule>(NativeModuleNames.napSsp);
+    if (typeof nativeModule?.requestTrackingAuthorization === 'function') {
+      return await Promise.resolve(nativeModule.requestTrackingAuthorization());
+    }
+
+    return 'unavailable';
   }
 
   private static validateConfig(config: NapSspConfig): void {

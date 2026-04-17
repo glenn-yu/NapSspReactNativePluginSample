@@ -25,3 +25,21 @@ jobs:
         run: npm run typecheck
       - name: Build package
         run: npm run build
+      - name: Run smoke test
+        run: npm run smoke:test
+
+  verify-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+      - name: Install example dependencies
+        run: npm install
+        working-directory: example/ExampleHostApp
+      - name: Run example tests
+        run: npm test -- --runInBand
+        working-directory: example/ExampleHostApp
