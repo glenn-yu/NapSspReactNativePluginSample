@@ -62,7 +62,7 @@ export class RewardedAd {
     event: K,
     handler: (payload: RewardedAdEventMap[K]) => void,
   ): () => void;
-  addAdEventListener(event: RewardedEventName, handler: (payload: unknown) => void): () => void {
+  addAdEventListener(event: RewardedEventName, handler: (...args: any[]) => void): () => void {
     const normalizedEvent = event === 'onRewarded' ? 'rewarded' : event;
     return this.emitter.on(normalizedEvent as keyof RewardedAdEventMap, handler as never);
   }

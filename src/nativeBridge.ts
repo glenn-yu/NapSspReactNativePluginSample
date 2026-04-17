@@ -25,10 +25,12 @@ export function getNativeModuleFromNames<T extends Record<string, any>>(moduleNa
   return undefined;
 }
 
+function asModuleNames(moduleNameOrNames: string | readonly string[]): readonly string[] {
+  return typeof moduleNameOrNames === 'string' ? [moduleNameOrNames] : moduleNameOrNames;
+}
+
 export function isNativeModuleAvailable(moduleNameOrNames: string | readonly string[]): boolean {
-  return Array.isArray(moduleNameOrNames)
-    ? getNativeModuleFromNames(moduleNameOrNames) !== undefined
-    : getNativeModule(moduleNameOrNames) !== undefined;
+  return getNativeModuleFromNames(asModuleNames(moduleNameOrNames)) !== undefined;
 }
 
 export function createNativeModuleMissingError(
@@ -48,17 +50,18 @@ export async function callNative<T>(
   moduleNameOrNames: string | readonly string[],
   method: string,
   args: readonly unknown[] = [],
-  feature = Array.isArray(moduleNameOrNames) ? moduleNameOrNames.join(' / ') : moduleNameOrNames,
+  feature?: string,
 ): Promise<T> {
-  const module = Array.isArray(moduleNameOrNames)
-    ? getNativeModuleFromNames<Record<string, (...methodArgs: any[]) => Promise<T> | T>>(moduleNameOrNames)
-    : getNativeModule<Record<string, (...methodArgs: any[]) => Promise<T> | T>>(moduleNameOrNames);
+  const resolvedFeature = feature ?? asModuleNames(moduleNameOrNames).join(' / ');
+  const module = getNativeModuleFromNames<Record<string, (...methodArgs: any[]) => Promise<T> | T>>(
+    asModuleNames(moduleNameOrNames),
+  );
 
   const fn = module?.[method];
 
   if (typeof fn !== 'function') {
-    throw createNativeModuleMissingError(feature, moduleNameOrNames);
+    throw createNativeModuleMissingError(resolvedFeature, moduleNameOrNames);
   }
 
-  return await fn(...args);
+  return await Promise.resolve(fn(...args));
 }
