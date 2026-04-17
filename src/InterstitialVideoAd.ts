@@ -1,27 +1,25 @@
 import { TypedEventEmitter, globalEvents } from './events';
 import { createNativeModuleMissingError, getNativeModuleFromNames, NativeModuleNames } from './nativeBridge';
 import { normalizeAdError } from './errors';
-import type { RewardItem, RewardedAdEventMap, RewardedAdOptions } from './types';
+import type { InterstitialVideoAdEventMap, InterstitialVideoAdOptions } from './types';
 
-interface NativeRewardedModule {
-  load?: (adUnitId: string, options?: RewardedAdOptions) => Promise<void>;
+interface NativeInterstitialVideoModule {
+  load?: (adUnitId: string, options?: InterstitialVideoAdOptions) => Promise<void>;
   show?: (adUnitId: string) => Promise<void>;
   destroy?: (adUnitId: string) => void;
 }
 
-export type RewardedEventName = keyof RewardedAdEventMap | 'onRewarded';
-
-export class RewardedAd {
+export class InterstitialVideoAd {
   public readonly adUnitId: string;
-  private readonly options?: RewardedAdOptions;
+  private readonly options?: InterstitialVideoAdOptions;
 
   private _loaded = false;
-  private readonly emitter = new TypedEventEmitter<RewardedAdEventMap>();
+  private readonly emitter = new TypedEventEmitter<InterstitialVideoAdEventMap>();
   private readonly subscriptions: Array<() => void> = [];
 
-  constructor(adUnitId: string, options?: RewardedAdOptions) {
+  constructor(adUnitId: string, options?: InterstitialVideoAdOptions) {
     if (!adUnitId || adUnitId.trim().length === 0) {
-      throw new Error('RewardedAd requires a non-empty adUnitId.');
+      throw new Error('InterstitialVideoAd requires a non-empty adUnitId.');
     }
 
     this.adUnitId = adUnitId;
@@ -37,7 +35,8 @@ export class RewardedAd {
       'onAdClosed',
       'onAdClicked',
       'onAdImpression',
-      'onRewarded',
+      'onVideoCompleted',
+      'onVideoSkipped'
     ];
 
     events.forEach((eventName) => {
@@ -68,12 +67,11 @@ export class RewardedAd {
           case 'onAdImpression':
             this.emitter.emit('impression', undefined);
             break;
-          case 'onRewarded':
-            this.emitter.emit('rewarded', {
-              type: payload.type || 'reward',
-              amount: payload.amount || 0,
-              currency: payload.currency,
-            });
+          case 'onVideoCompleted':
+            this.emitter.emit('completed', undefined);
+            break;
+          case 'onVideoSkipped':
+            this.emitter.emit('skipped', undefined);
             break;
         }
       });
@@ -82,15 +80,15 @@ export class RewardedAd {
   }
 
   async load(): Promise<void> {
-    const nativeModule = getNativeModuleFromNames<NativeRewardedModule>(NativeModuleNames.rewarded);
+    const nativeModule = getNativeModuleFromNames<NativeInterstitialVideoModule>(NativeModuleNames.interstitialVideo);
     if (!nativeModule?.load) {
-      throw createNativeModuleMissingError('rewarded ads', NativeModuleNames.rewarded);
+      throw createNativeModuleMissingError('interstitial video ads', NativeModuleNames.interstitialVideo);
     }
 
     try {
       await nativeModule.load(this.adUnitId, this.options);
     } catch (error) {
-      const adError = normalizeAdError(error, 'rewarded_load_failed');
+      const adError = normalizeAdError(error, 'interstitial_video_load_failed');
       this.emitter.emit('loadFailed', adError);
       throw adError;
     }
@@ -98,30 +96,27 @@ export class RewardedAd {
 
   async show(): Promise<void> {
     if (!this._loaded) {
-      throw new Error(`Rewarded ad "${this.adUnitId}" has not been loaded.`);
+      throw new Error(`Interstitial video ad "${this.adUnitId}" has not been loaded.`);
     }
 
-    const nativeModule = getNativeModuleFromNames<NativeRewardedModule>(NativeModuleNames.rewarded);
+    const nativeModule = getNativeModuleFromNames<NativeInterstitialVideoModule>(NativeModuleNames.interstitialVideo);
     if (!nativeModule?.show) {
-      throw createNativeModuleMissingError('rewarded ads', NativeModuleNames.rewarded);
+      throw createNativeModuleMissingError('interstitial video ads', NativeModuleNames.interstitialVideo);
     }
 
     await nativeModule.show(this.adUnitId);
     this._loaded = false;
   }
 
-  addAdEventListener(event: 'onRewarded', handler: (reward: RewardItem) => void): () => void;
-  addAdEventListener<K extends keyof RewardedAdEventMap>(
-    event: K,
-    handler: (payload: RewardedAdEventMap[K]) => void,
-  ): () => void;
-  addAdEventListener(event: RewardedEventName, handler: (...args: any[]) => void): () => void {
-    const normalizedEvent = event === 'onRewarded' ? 'rewarded' : event;
-    return this.emitter.on(normalizedEvent as keyof RewardedAdEventMap, handler as never);
-  }
-
   isLoaded(): boolean {
     return this._loaded;
+  }
+
+  addAdEventListener<K extends keyof InterstitialVideoAdEventMap>(
+    event: K,
+    handler: (payload: InterstitialVideoAdEventMap[K]) => void,
+  ): () => void {
+    return this.emitter.on(event, handler);
   }
 
   destroy(): void {
@@ -130,7 +125,7 @@ export class RewardedAd {
     this.subscriptions.forEach((cleanup) => cleanup());
     this.subscriptions.length = 0;
 
-    const nativeModule = getNativeModuleFromNames<NativeRewardedModule>(NativeModuleNames.rewarded);
+    const nativeModule = getNativeModuleFromNames<NativeInterstitialVideoModule>(NativeModuleNames.interstitialVideo);
     nativeModule?.destroy?.(this.adUnitId);
   }
 }

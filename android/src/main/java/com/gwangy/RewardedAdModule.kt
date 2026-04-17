@@ -17,7 +17,7 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
     }
 
     @ReactMethod
-    fun load(adUnitId: String, promise: Promise) {
+    fun load(adUnitId: String, options: com.facebook.react.bridge.ReadableMap?, promise: Promise) {
         val normalizedAdUnitId = adUnitId.trim()
         if (normalizedAdUnitId.isEmpty()) {
             promise.reject("NAP_SSP_INVALID_AD_UNIT", "Rewarded adUnitId is required")

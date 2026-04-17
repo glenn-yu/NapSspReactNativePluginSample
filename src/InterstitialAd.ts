@@ -1,26 +1,74 @@
-import { TypedEventEmitter } from './events';
+import { TypedEventEmitter, globalEvents } from './events';
 import { createNativeModuleMissingError, getNativeModuleFromNames, NativeModuleNames } from './nativeBridge';
 import { normalizeAdError } from './errors';
-import type { InterstitialAdEventMap } from './types';
+import type { InterstitialAdEventMap, InterstitialAdOptions } from './types';
 
 interface NativeInterstitialModule {
-  load?: (adUnitId: string) => Promise<void>;
+  load?: (adUnitId: string, options?: InterstitialAdOptions) => Promise<void>;
   show?: (adUnitId: string) => Promise<void>;
   destroy?: (adUnitId: string) => void;
 }
 
 export class InterstitialAd {
   public readonly adUnitId: string;
+  private readonly options?: InterstitialAdOptions;
 
   private _loaded = false;
   private readonly emitter = new TypedEventEmitter<InterstitialAdEventMap>();
+  private readonly subscriptions: Array<() => void> = [];
 
-  constructor(adUnitId: string) {
+  constructor(adUnitId: string, options?: InterstitialAdOptions) {
     if (!adUnitId || adUnitId.trim().length === 0) {
       throw new Error('InterstitialAd requires a non-empty adUnitId.');
     }
 
     this.adUnitId = adUnitId;
+    this.options = options;
+    this.setupEventListeners();
+  }
+
+  private setupEventListeners(): void {
+    const events = [
+      'onAdLoaded',
+      'onAdFailedToLoad',
+      'onAdOpened',
+      'onAdClosed',
+      'onAdClicked',
+      'onAdImpression',
+    ];
+
+    events.forEach((eventName) => {
+      const cleanup = globalEvents.addListener(eventName, (payload: any) => {
+        if (payload?.adUnitId !== this.adUnitId) {
+          return;
+        }
+
+        switch (eventName) {
+          case 'onAdLoaded':
+            this._loaded = true;
+            this.emitter.emit('loaded', undefined);
+            break;
+          case 'onAdFailedToLoad':
+            this._loaded = false;
+            this.emitter.emit('loadFailed', normalizeAdError(payload));
+            break;
+          case 'onAdOpened':
+            this.emitter.emit('opened', undefined);
+            break;
+          case 'onAdClosed':
+            this._loaded = false;
+            this.emitter.emit('closed', undefined);
+            break;
+          case 'onAdClicked':
+            this.emitter.emit('clicked', undefined);
+            break;
+          case 'onAdImpression':
+            this.emitter.emit('impression', undefined);
+            break;
+        }
+      });
+      this.subscriptions.push(cleanup);
+    });
   }
 
   async load(): Promise<void> {
@@ -30,9 +78,7 @@ export class InterstitialAd {
     }
 
     try {
-      await nativeModule.load(this.adUnitId);
-      this._loaded = true;
-      this.emitter.emit('loaded', undefined);
+      await nativeModule.load(this.adUnitId, this.options);
     } catch (error) {
       const adError = normalizeAdError(error, 'interstitial_load_failed');
       this.emitter.emit('loadFailed', adError);
@@ -52,8 +98,6 @@ export class InterstitialAd {
 
     await nativeModule.show(this.adUnitId);
     this._loaded = false;
-    this.emitter.emit('opened', undefined);
-    this.emitter.emit('closed', undefined);
   }
 
   isLoaded(): boolean {
@@ -70,6 +114,8 @@ export class InterstitialAd {
   destroy(): void {
     this._loaded = false;
     this.emitter.removeAllListeners();
+    this.subscriptions.forEach((cleanup) => cleanup());
+    this.subscriptions.length = 0;
 
     const nativeModule = getNativeModuleFromNames<NativeInterstitialModule>(NativeModuleNames.interstitial);
     nativeModule?.destroy?.(this.adUnitId);

@@ -1,3 +1,4 @@
+import { globalEvents } from './events';
 import { createNativeModuleMissingError, getNativeModuleFromNames, NativeModuleNames } from './nativeBridge';
 import type { LogLevel, NapSspConfig, NapSspStatus } from './types';
 
@@ -27,6 +28,9 @@ class NapSspAd {
     if (!nativeModule?.initialize) {
       throw createNativeModuleMissingError('initialization', NativeModuleNames.napSsp);
     }
+
+    // Setup global event bridge before calling native initialize
+    globalEvents.setup(NativeModuleNames.napSsp[0]);
 
     await nativeModule.initialize(config);
     this._initialized = true;

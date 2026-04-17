@@ -12,7 +12,20 @@ let package = Package(
             name: "NapSspPlugin",
             path: "./",
             exclude: ["NapSspPlugin.podspec"],
-            sources: ["NapSspModule.swift","NapSspSupport.swift","BannerView.swift","BannerViewManager.swift","InterstitialModule.swift","RewardedModule.swift","NapSspBridge.m"],
+            sources: [
+                "NapSspModule.swift",
+                "NapSspSupport.swift",
+                "BannerView.swift",
+                "BannerViewManager.swift",
+                "InterstitialModule.swift",
+                "RewardedModule.swift",
+                "NativeAdView.swift",
+                "NativeAdViewManager.swift",
+                "VideoAdView.swift",
+                "VideoAdViewManager.swift",
+                "InterstitialVideoModule.swift",
+                "NapSspBridge.m"
+            ],
             publicHeadersPath: "."
         ),
         // If you prefer to reference the vendor binary via SPM, consumers can add a binaryTarget in their Package.swift:

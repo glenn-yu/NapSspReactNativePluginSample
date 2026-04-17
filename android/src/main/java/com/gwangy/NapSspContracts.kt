@@ -4,7 +4,10 @@ internal object NapSspContracts {
     const val MODULE_NAME = "NapSspModule"
     const val INTERSTITIAL_MODULE_NAME = "NapSspInterstitial"
     const val REWARDED_MODULE_NAME = "NapSspRewarded"
+    const val INTERSTITIAL_VIDEO_MODULE_NAME = "NapSspInterstitialVideo"
     const val BANNER_VIEW_NAME = "NapSspBannerView"
+    const val NATIVE_AD_VIEW_NAME = "NapSspNativeAdView"
+    const val VIDEO_AD_VIEW_NAME = "NapSspVideoAdView"
 
     const val EVENT_AD_LOADED = "onAdLoaded"
     const val EVENT_AD_FAILED = "onAdFailedToLoad"
@@ -24,8 +27,11 @@ internal object NapSspContracts {
     const val FORMAT_BANNER = "banner"
     const val FORMAT_INTERSTITIAL = "interstitial"
     const val FORMAT_REWARDED = "rewarded"
+    const val FORMAT_NATIVE_AD = "native"
+    const val FORMAT_VIDEO = "video"
+    const val FORMAT_INTERSTITIAL_VIDEO = "interstitial_video"
 
-    val SUPPORTED_FORMATS = listOf(FORMAT_BANNER, FORMAT_INTERSTITIAL, FORMAT_REWARDED)
+    val SUPPORTED_FORMATS = listOf(FORMAT_BANNER, FORMAT_INTERSTITIAL, FORMAT_REWARDED, FORMAT_NATIVE_AD, FORMAT_VIDEO, FORMAT_INTERSTITIAL_VIDEO)
     val SUPPORTED_EVENTS = listOf(
         EVENT_AD_LOADED,
         EVENT_AD_FAILED,
@@ -34,6 +40,8 @@ internal object NapSspContracts {
         EVENT_AD_CLOSED,
         EVENT_AD_IMPRESSION,
         EVENT_REWARDED,
+        "onVideoCompleted",
+        "onVideoSkipped"
     )
 
     fun moduleConstants(moduleName: String): Map<String, Any?> = linkedMapOf(

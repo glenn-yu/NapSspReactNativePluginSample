@@ -8,6 +8,17 @@ export type BannerSize =
   | 'MEDIUM_RECTANGLE'
   | 'SMART_BANNER';
 
+export interface NativeAdProps {
+  adUnitId: string;
+  onAdLoaded?: () => void;
+  onAdFailedToLoad?: (error: AdError) => void;
+  onAdClicked?: () => void;
+  onAdOpened?: () => void;
+  onAdClosed?: () => void;
+  style?: import('react-native').StyleProp<import('react-native').ViewStyle>;
+  testID?: string;
+}
+
 export interface MediationConfig {
   adManager?: {
     googleAppId?: string;
@@ -61,6 +72,24 @@ export interface RewardItem {
   currency?: string;
 }
 
+export interface InterstitialAdOptions {
+  type?: 'basic' | 'popup' | 'countDown';
+  disableBackKey?: boolean;
+  buttonLeftText?: string;
+  buttonLeftColor?: string;
+  buttonRightText?: string;
+  buttonRightColor?: string;
+  buttonFrameColor?: string;
+  countDownType?: 'gauge' | 'text';
+  countDownTime?: number; // 2~5 seconds
+  closeButtonTouchAreaRatio?: number; // iOS only, 0.2~1.0
+}
+
+export interface RewardedAdOptions {
+  customParams?: Record<string, string>;
+  mute?: boolean; // Android only
+}
+
 export interface InterstitialAdEventMap {
   loaded: void;
   loadFailed: AdError;
@@ -73,3 +102,28 @@ export interface InterstitialAdEventMap {
 export interface RewardedAdEventMap extends InterstitialAdEventMap {
   rewarded: RewardItem;
 }
+
+export interface VideoAdProps {
+  adUnitId: string;
+  isRetry?: boolean; // Android only, false by default
+  onAdLoaded?: () => void;
+  onAdFailedToLoad?: (error: AdError) => void;
+  onAdClicked?: () => void;
+  onAdOpened?: () => void;
+  onAdClosed?: () => void;
+  onAdCompleted?: () => void;
+  onAdSkipped?: () => void;
+  style?: import('react-native').StyleProp<import('react-native').ViewStyle>;
+  testID?: string;
+}
+
+export interface InterstitialVideoAdOptions {
+  timeout?: number; // Android: 0 means server defined, default 20
+  maxRetryCountInSlot?: number; // Android: -1 infinite, 0 none, n times
+}
+
+export interface InterstitialVideoAdEventMap extends InterstitialAdEventMap {
+  completed: void;
+  skipped: void;
+}
+

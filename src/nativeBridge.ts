@@ -2,9 +2,12 @@ import { NativeModules, Platform } from 'react-native';
 
 export const NativeModuleNames = {
   napSsp: ['NapSspModule'],
-  interstitial: ['InterstitialModule', 'NapSspInterstitial'],
-  rewarded: ['RewardedModule', 'NapSspRewardedModule', 'NapSspRewarded'],
-  banner: ['BannerView', 'NapSspBannerView'],
+  interstitial: ['NapSspInterstitial'],
+  rewarded: ['NapSspRewarded'],
+  banner: ['NapSspBannerView'],
+  nativeAd: ['NapSspNativeAdView'],
+  videoAd: ['NapSspVideoAdView'],
+  interstitialVideo: ['NapSspInterstitialVideo'],
 } as const;
 
 export function getNativeModule<T extends Record<string, any>>(moduleName: string): T | undefined {

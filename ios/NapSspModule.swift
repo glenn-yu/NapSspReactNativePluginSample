@@ -2,10 +2,32 @@ import Foundation
 import React
 
 @objc(NapSspModule)
-class NapSspModule: NSObject {
+class NapSspModule: RCTEventEmitter {
+  public static var shared: NapSspModule?
+
+  override init() {
+    super.init()
+    NapSspModule.shared = self
+  }
+
   @objc
-  static func requiresMainQueueSetup() -> Bool {
+  override static func requiresMainQueueSetup() -> Bool {
     false
+  }
+
+  override func supportedEvents() -> [String]! {
+    return [
+      "onAdLoaded",
+      "onAdFailedToLoad",
+      "onAdOpened",
+      "onAdClosed",
+      "onAdClicked",
+      "onAdImpression",
+      "onRewarded",
+      "onVideoCompleted",
+      "onVideoSkipped",
+      "napSsp_status"
+    ]
   }
 
   @objc
@@ -13,6 +35,9 @@ class NapSspModule: NSObject {
     do {
       let status = try NapSspRuntime.shared.initialize(with: config)
       resolve(status)
+      
+      // Emit status event
+      sendEvent(withName: "napSsp_status", body: status)
     } catch let error as NapSspError {
       reject(error.errorCode, error.errorDescription ?? error.errorCode, nil)
     } catch {
@@ -39,6 +64,13 @@ class NapSspModule: NSObject {
   func requestTrackingAuthorization(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     NapSspRuntime.shared.requestTrackingAuthorization { status in
       resolve(status)
+    }
+  }
+
+  // Internal helper to emit events from other modules
+  func emitEvent(name: String, payload: [String: Any]) {
+    if bridge != nil {
+      sendEvent(withName: name, body: payload)
     }
   }
 }

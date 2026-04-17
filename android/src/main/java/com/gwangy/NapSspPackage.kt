@@ -11,12 +11,15 @@ class NapSspPackage : ReactPackage {
             NapSspModule(reactContext),
             InterstitialModule(reactContext),
             RewardedAdModule(reactContext),
+            InterstitialVideoModule(reactContext),
         )
     }
 
     override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
         return listOf(
             BannerViewManager(),
+            NativeAdViewManager(),
+            VideoAdViewManager(),
         )
     }
 }
