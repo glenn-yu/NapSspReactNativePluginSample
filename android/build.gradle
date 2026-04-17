@@ -4,6 +4,13 @@ plugins {
 }
 
 def enableVendorSdk = (project.findProperty('napSsp.enableVendorSdk') ?: 'false').toString().toBoolean()
+def enabledMediations = ((project.findProperty('napSsp.mediations') ?: '') as String)
+    .split(',')
+    .collect { it.trim() }
+    .findAll { !it.isEmpty() }
+    .toSet()
+
+def mediationEnabled = { String name -> enabledMediations.isEmpty() || enabledMediations.contains(name) }
 
 def napSspSdkCoordinates = [
     core: 'io.github.nasmedia-tech:admixer-ssp:1.0.21',
@@ -70,10 +77,21 @@ dependencies {
     if (enableVendorSdk) {
         implementation napSspSdkCoordinates.adsIdentifier
         implementation napSspSdkCoordinates.core
-        implementation napSspSdkCoordinates.adManager
-        implementation napSspSdkCoordinates.adFit
-        implementation napSspSdkCoordinates.pangle
-        implementation napSspSdkCoordinates.appLovin
-        implementation napSspSdkCoordinates.unity
+
+        if (mediationEnabled('admanager')) {
+            implementation napSspSdkCoordinates.adManager
+        }
+        if (mediationEnabled('adfit')) {
+            implementation napSspSdkCoordinates.adFit
+        }
+        if (mediationEnabled('pangle')) {
+            implementation napSspSdkCoordinates.pangle
+        }
+        if (mediationEnabled('applovin')) {
+            implementation napSspSdkCoordinates.appLovin
+        }
+        if (mediationEnabled('unity')) {
+            implementation napSspSdkCoordinates.unity
+        }
     }
 }

@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name         = 'NapSspPlugin'
   s.version      = '0.1.0'
-  s.summary      = 'React Native plugin placeholder for NapSsp'
+  s.summary      = 'React Native scaffold for KT Nasmedia nap ssp SDK'
   s.homepage     = 'https://github.com/glenn-yu/NapSspReactNativePluginSample'
   s.license      = { :type => 'MIT' }
   s.author       = { 'glenn-yu' => 'gwangy.claw@example.com' }
@@ -17,5 +17,27 @@ Pod::Spec.new do |s|
     'CLANG_ENABLE_MODULES' => 'YES',
     'APPLICATION_EXTENSION_API_ONLY' => 'NO'
   }
+
   s.dependency 'React-Core'
+  s.dependency 'AdMixerMediation'
+
+  s.subspec 'GAM' do |ss|
+    ss.dependency 'AdMixerMediationGAM'
+  end
+
+  s.subspec 'AdFit' do |ss|
+    ss.dependency 'AdMixerMediationAdFit'
+  end
+
+  s.subspec 'Pangle' do |ss|
+    ss.dependency 'AdMixerMediationPangle'
+  end
+
+  s.subspec 'AppLovin' do |ss|
+    ss.dependency 'AdMixerMediationAppLovin'
+  end
+
+  s.subspec 'UnityAds' do |ss|
+    ss.dependency 'AdMixerMediationUnityAds'
+  end
 end

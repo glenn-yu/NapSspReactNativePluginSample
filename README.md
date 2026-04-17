@@ -112,6 +112,7 @@ These events are currently driven by the JS wrapper layer and will be connected 
 
 ## Roadmap / status docs
 - [`docs/nap_ssp_plan.txt`](./docs/nap_ssp_plan.txt)
+- [`docs/vendor_integration.md`](./docs/vendor_integration.md)
 - [`CHANGELOG.md`](./CHANGELOG.md)
 - [`RELEASE_NOTES.md`](./RELEASE_NOTES.md)
 - [`TODO.md`](./TODO.md)
