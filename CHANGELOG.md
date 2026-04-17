@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.2
+
+### Changed
+- Added the full `ExampleHostApp` React Native test application to the repository for reproducible local validation
+- Refreshed release documentation to match the current Android, iOS, and JS/TS integration state
+- Restored `InterstitialAdOptions` type support used by the public interstitial API
+- Aligned rewarded example usage with the current event contract
+- Improved Android and iOS example run scripts with prerequisite checks
+- Synced package metadata, README, and iOS podspec to `0.1.2`
+
+### Verified
+- `npm run verify`
+- `cd example/ExampleHostApp && npm test -- --runInBand`
+
+### Known limitations
+- Android example execution requires a local JDK/Java runtime and Android SDK setup
+- iOS example execution requires CocoaPods and Xcode command line tools
+- Real ad loading behavior still depends on valid media keys, ad unit IDs, and vendor SDK installation in the host app
+
 ## 0.1.1
 
 ### Added
@@ -12,17 +31,5 @@
 - Jest smoke-test setup for the example host app
 
 ### Changed
-- Restored `InterstitialAdOptions` type support used by the public interstitial API
-- Aligned rewarded example usage with the current event contract
-- Improved Android and iOS example run scripts with prerequisite checks
 - Updated README wording to better reflect current implementation maturity
 - Synced iOS podspec version to `0.1.1`
-
-### Verified
-- `npm run verify`
-- `cd example/ExampleHostApp && npm test -- --runInBand`
-
-### Known limitations
-- Android example execution requires a local JDK/Java runtime and Android SDK setup
-- iOS example execution requires CocoaPods and Xcode command line tools
-- Real ad loading behavior still depends on valid media keys, ad unit IDs, and vendor SDK installation in the host app

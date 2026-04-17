@@ -1,4 +1,4 @@
-# 🚀 React Native Nap SSP 플러그인 (v0.1.1)
+# 🚀 React Native Nap SSP 플러그인 (v0.1.2)
 
 KT Nasmedia의 Nap SSP SDK를 React Native 앱에 쉽게 통합하여 광고 수익화를 시작할 수 있는 공식 비공식 플러그인입니다. 
 

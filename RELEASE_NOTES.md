@@ -1,15 +1,15 @@
 # Release notes
 
-## 0.1.1 overview
-This update moves the project beyond an initial scaffold and into a usable React Native integration sample for Nap SSP across Android and iOS.
+## 0.1.2 overview
+This release packages the repository in a more reproducible state, with the full example host app committed and release metadata aligned for the next publish step.
 
-### Included in 0.1.1
-- JS/TS API for initialization, banner, native, inline video, interstitial, rewarded, and interstitial video ads
-- Android native package updates for modules and view managers across supported ad formats
-- iOS native bridge updates for modules and view managers across supported ad formats
-- Example host app (`example/ExampleHostApp`) for local validation
-- iOS SPM support and expanded native integration documentation
-- Example Jest smoke test and improved local run scripts
+### Included in 0.1.2
+- Full `example/ExampleHostApp` React Native host app committed to the repository
+- Refreshed changelog and release notes to match the current project state
+- `InterstitialAdOptions` restored for the public TypeScript API
+- Example rewarded flow aligned with the current event contract
+- Example Android and iOS helper scripts improved with prerequisite checks
+- Package metadata, README, and podspec version alignment to `0.1.2`
 
 ### Verified in this repository
 - Root package typecheck and build via `npm run verify`
@@ -22,4 +22,4 @@ This update moves the project beyond an initial scaffold and into a usable React
 ### Remaining cautions before wider release
 - Confirm real-device ad loading with valid production or test ad unit IDs
 - Verify mediation-specific SDK dependencies in host apps for both Android and iOS
-- Keep package, podspec, changelog, and release metadata version-aligned before publishing the next release
+- Run final npm publish steps only after registry credentials are prepared
