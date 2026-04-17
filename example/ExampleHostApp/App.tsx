@@ -92,8 +92,8 @@ function App(): JSX.Element {
   const showRewarded = async () => {
     try {
       const r = new RewardedAd('TEST_REWARDED');
-      r.addAdEventListener('onRewarded', (reward) => {
-        Alert.alert('Rewarded', JSON.stringify(reward));
+      r.addAdEventListener('onRewarded', () => {
+        Alert.alert('Rewarded', 'Reward event received');
       });
       await r.load();
       await r.show();

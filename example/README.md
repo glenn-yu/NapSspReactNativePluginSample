@@ -6,45 +6,72 @@ This folder contains a minimal React Native app that demonstrates the public JS/
 - `NapSspAd.initialize()` usage
 - `BannerAd` rendering and placeholder fallback
 - `InterstitialAd` load/show calls with safe error handling
+- `RewardedAd` load/show calls with safe error handling
 - Native availability checks via `isNativeModuleAvailable()`
+
+## Structure
+- `ExampleHostApp/`: standalone React Native test app inside this repository
+- `ExampleHostApp/scripts/run-android-emulator.sh`: Android build, install, launch helper
+- `ExampleHostApp/scripts/run-ios-sim.sh`: iOS CocoaPods + simulator helper
+
+## Prerequisites
+
+### Android
+- Java/JDK installed and `java -version` works
+- Android SDK + platform-tools installed
+- `adb` available on `PATH`
+- Running emulator or connected Android device
+
+### iOS
+- macOS
+- Xcode and command line tools (`xcodebuild` available)
+- CocoaPods installed (`pod` available)
 
 ## Run notes
 
-The example is intentionally lightweight and does not pretend the native SDK bridge is finished yet.
+The example is intentionally lightweight and should be treated as a host verification app, not as proof that every native dependency is already installed on your machine.
 
-Android emulator (recommended for local testing)
+### Android emulator (recommended for local testing)
 
-1. Ensure Android SDK, emulator, and `adb` are installed and available on PATH.
-2. From repo root:
+From repo root:
 
 ```bash
 npm ci
 npm run build
-cd example
-npx react-native run-android
+cd example/ExampleHostApp
+./scripts/run-android-emulator.sh
 ```
 
-To test with the vendor SDK enabled in Android (host app build):
+If you want to test vendor SDK mode in the Android host app build:
 
 ```bash
-# from the Android host app project that consumes this plugin
+cd example/ExampleHostApp/android
 ./gradlew assembleDebug -PnapSsp.enableVendorSdk=true -PnapSsp.mediations=admanager,adfit
 ```
 
-iOS simulator (requires macOS + Xcode)
+### iOS simulator
 
-1. From repo root:
+From repo root:
 
 ```bash
 npm ci
 npm run build
-cd example/ios
-pod install
-cd ..
-npx react-native run-ios --simulator "iPhone 14"
+cd example/ExampleHostApp
+./scripts/run-ios-sim.sh
 ```
 
-Notes
+## Testing
 
-- The example app uses placeholder native modules by default. To exercise real vendor SDK flows, enable vendor SDK in the host Android build and add appropriate subspecs for iOS in the Podfile.
-- If you do not have real mediaKey/adUnitIds, the placeholder runtime will simulate ad load/open events so you can verify JS event paths and UI behavior.
+Run the example app Jest smoke test:
+
+```bash
+cd example/ExampleHostApp
+npm test -- --runInBand
+```
+
+Note: the Jest test uses lightweight mocks for the plugin exports so the example UI can render without a native bridge in CI or local Node-only environments.
+
+## Notes
+- The example app uses placeholder/native-safe behavior by default. To exercise real vendor SDK flows, enable vendor SDK in the host Android build and add the required iOS pods/packages.
+- If you do not have real `mediaKey` or `adUnitId` values, placeholder mode is still useful for verifying JS event paths and UI behavior.
+- If Android fails immediately, check JDK setup first. If iOS fails immediately, check CocoaPods first.

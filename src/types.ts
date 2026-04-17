@@ -66,6 +66,13 @@ export interface AdError {
   details?: Record<string, unknown>;
 }
 
+export interface InterstitialAdOptions {
+  type?: 'default' | 'popup';
+  countDownTime?: number;
+  buttonLeftText?: string;
+  buttonRightText?: string;
+}
+
 export interface RewardedAdOptions {
   customParams?: Record<string, string>;
   mute?: boolean; // Android only
