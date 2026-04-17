@@ -16,26 +16,27 @@ internal class NapSspBannerView(context: Context) : FrameLayout(context) {
         setPadding(24, 24, 24, 24)
     }
 
+    private var currentState: NapSspLoadState = NapSspLoadState.IDLE
+
     var adUnitId: String? = null
         set(value) {
-            field = value
+            field = value?.trim()?.takeIf { it.isNotEmpty() }
             updatePlaceholderText()
-            if (autoLoad) {
-                simulateLoad()
-            }
+            maybeAutoLoad()
         }
 
     var size: String = "BANNER_320x50"
         set(value) {
-            field = value.ifBlank { "BANNER_320x50" }
+            field = value?.trim()?.takeIf { it.isNotEmpty() } ?: "BANNER_320x50"
             updatePlaceholderText()
+            maybeAutoLoad()
         }
 
     var autoLoad: Boolean = true
         set(value) {
             field = value
-            if (value && !adUnitId.isNullOrBlank()) {
-                simulateLoad()
+            if (value) {
+                maybeAutoLoad()
             }
         }
 
@@ -50,46 +51,123 @@ internal class NapSspBannerView(context: Context) : FrameLayout(context) {
         isClickable = true
         isFocusable = true
         setOnClickListener {
-            NapSspEventEmitter.emitViewEvent(
-                this,
-                "topAdClicked",
-                mapOf("adUnitId" to adUnitId, "format" to "banner"),
-            )
+            val adUnitId = adUnitId
+            if (!adUnitId.isNullOrBlank() && currentState == NapSspLoadState.LOADED) {
+                NapSspSdkBridge.markBannerState(adUnitId, NapSspLoadState.SHOWN)
+                NapSspEventEmitter.emitViewEvent(
+                    this,
+                    NapSspContracts.VIEW_EVENT_AD_CLICKED,
+                    mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
+                )
+                NapSspEventEmitter.emitViewEvent(
+                    this,
+                    NapSspContracts.VIEW_EVENT_AD_OPENED,
+                    mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
+                )
+            }
         }
         updatePlaceholderText()
     }
 
     fun reload() {
-        simulateLoad()
+        maybeAutoLoad(force = true)
     }
 
     fun destroyBanner() {
+        val adUnitId = adUnitId
+        if (!adUnitId.isNullOrBlank() && currentState == NapSspLoadState.LOADED) {
+            NapSspEventEmitter.emitViewEvent(
+                this,
+                NapSspContracts.VIEW_EVENT_AD_CLOSED,
+                mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
+            )
+        }
+        currentState = NapSspLoadState.DESTROYED
+        if (!adUnitId.isNullOrBlank()) {
+            NapSspSdkBridge.clearBanner(adUnitId)
+        }
         removeAllViews()
     }
 
-    private fun simulateLoad() {
-        if (adUnitId.isNullOrBlank()) {
+    private fun maybeAutoLoad(force: Boolean = false) {
+        if (!autoLoad && !force) {
             return
         }
 
+        val normalizedAdUnitId = adUnitId
+        if (normalizedAdUnitId.isNullOrBlank()) {
+            currentState = NapSspLoadState.FAILED
+            NapSspEventEmitter.emitViewEvent(
+                this,
+                NapSspContracts.VIEW_EVENT_AD_FAILED,
+                mapOf(
+                    "adUnitId" to null,
+                    "format" to NapSspContracts.FORMAT_BANNER,
+                    "code" to "NAP_SSP_INVALID_AD_UNIT",
+                    "message" to "Banner adUnitId is required",
+                ),
+            )
+            return
+        }
+
+        if (!isSupportedSize(size)) {
+            currentState = NapSspLoadState.FAILED
+            NapSspSdkBridge.markBannerState(normalizedAdUnitId, NapSspLoadState.FAILED)
+            NapSspEventEmitter.emitViewEvent(
+                this,
+                NapSspContracts.VIEW_EVENT_AD_FAILED,
+                mapOf(
+                    "adUnitId" to normalizedAdUnitId,
+                    "format" to NapSspContracts.FORMAT_BANNER,
+                    "code" to "NAP_SSP_INVALID_BANNER_SIZE",
+                    "message" to "Unsupported banner size: $size",
+                ),
+            )
+            return
+        }
+
+        if (!force && currentState == NapSspLoadState.LOADED) {
+            return
+        }
+
+        currentState = NapSspLoadState.LOADING
+        NapSspSdkBridge.markBannerState(normalizedAdUnitId, NapSspLoadState.LOADING)
+        currentState = NapSspLoadState.LOADED
+        NapSspSdkBridge.markBannerState(normalizedAdUnitId, NapSspLoadState.LOADED)
         NapSspEventEmitter.emitViewEvent(
             this,
-            "topAdLoaded",
+            NapSspContracts.VIEW_EVENT_AD_LOADED,
             mapOf(
-                "adUnitId" to adUnitId,
+                "adUnitId" to normalizedAdUnitId,
                 "size" to size,
-                "format" to "banner",
+                "format" to NapSspContracts.FORMAT_BANNER,
             ),
         )
+    }
+
+    private fun isSupportedSize(value: String): Boolean {
+        return when (value) {
+            "BANNER_320x50",
+            "BANNER_320x100",
+            "BANNER_300x250",
+            "LARGE_BANNER",
+            "MEDIUM_RECTANGLE",
+            "SMART_BANNER" -> true
+            else -> false
+        }
     }
 
     private fun updatePlaceholderText() {
         placeholderTextView.text = buildString {
             append("NapSsp banner placeholder\n")
-            append("adUnitId=")
+            append("state=")
+            append(currentState.name)
+            append("\nadUnitId=")
             append(adUnitId ?: "<unset>")
             append("\nsize=")
             append(size)
+            append("\nautoLoad=")
+            append(autoLoad)
         }
     }
 }

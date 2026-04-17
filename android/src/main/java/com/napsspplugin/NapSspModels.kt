@@ -17,6 +17,7 @@ internal data class NapSspMediationConfig(
     val appLovin: Map<String, Any?>? = null,
     val unityAds: Map<String, Any?>? = null,
     val adFitEnabled: Boolean = false,
+    val mobwithEnabled: Boolean = false,
 )
 
 internal enum class NapSspLoadState {
@@ -40,15 +41,25 @@ internal fun ReadableMap.toNapSspConfig(): NapSspConfig {
         null
     }
 
-    val logLevel = if (hasKey("logLevel") && !isNull("logLevel")) getString("logLevel") else null
+    val logLevel = if (hasKey("logLevel") && !isNull("logLevel")) getString("logLevel")?.trim() else null
     val coppa = if (hasKey("coppa") && !isNull("coppa")) getBoolean("coppa") else false
 
     return NapSspConfig(
         mediaKey = mediaKey,
-        adUnitIds = adUnitIds,
+        adUnitIds = adUnitIds.distinct(),
         mediations = mediations,
-        logLevel = logLevel,
+        logLevel = logLevel?.takeIf { it.isNotEmpty() },
         coppa = coppa,
+    )
+}
+
+internal fun NapSspConfig.requireValid(): NapSspConfig {
+    require(mediaKey.isNotBlank()) { "mediaKey is required" }
+    require(adUnitIds.isNotEmpty()) { "adUnitIds must contain at least one item" }
+    return copy(
+        mediaKey = mediaKey.trim(),
+        adUnitIds = adUnitIds.map { it.trim() }.filter { it.isNotEmpty() }.distinct(),
+        logLevel = logLevel?.trim()?.takeIf { it.isNotEmpty() },
     )
 }
 
@@ -59,15 +70,14 @@ private fun ReadableMap.toMediationConfig(): NapSspMediationConfig {
         appLovin = readNestedMap("appLovin"),
         unityAds = readNestedMap("unityAds"),
         adFitEnabled = if (hasKey("adFit") && !isNull("adFit")) getBoolean("adFit") else false,
+        mobwithEnabled = if (hasKey("mobwith") && !isNull("mobwith")) getBoolean("mobwith") else false,
     )
 }
 
 private fun ReadableMap.readNestedMap(key: String): Map<String, Any?>? {
     if (!hasKey(key) || isNull(key)) return null
     val value = getMap(key) ?: return null
-    val result = mutableMapOf<String, Any?>()
-    value.toHashMap().forEach { (nestedKey, nestedValue) -> result[nestedKey] = nestedValue }
-    return result
+    return value.toHashMap().mapValues { (_, nestedValue) -> nestedValue }
 }
 
 private fun ReadableMap.readStringList(key: String): List<String> {

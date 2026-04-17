@@ -12,17 +12,18 @@ internal object NapSspSdkBridge {
     @Volatile
     private var coppaEnabled: Boolean = false
 
+    private val bannerStates = ConcurrentHashMap<String, NapSspLoadState>()
     private val interstitialStates = ConcurrentHashMap<String, NapSspLoadState>()
     private val rewardedStates = ConcurrentHashMap<String, NapSspLoadState>()
 
     fun initialize(config: NapSspConfig) {
-        latestConfig = config
+        latestConfig = config.requireValid()
         logLevel = config.logLevel ?: logLevel
         coppaEnabled = config.coppa
     }
 
     fun setLogLevel(level: String) {
-        logLevel = level
+        logLevel = level.trim().ifEmpty { logLevel }
     }
 
     fun setCoppa(enabled: Boolean) {
@@ -30,6 +31,17 @@ internal object NapSspSdkBridge {
     }
 
     fun getConfiguration(): NapSspConfig? = latestConfig
+
+    fun markBannerState(adUnitId: String, state: NapSspLoadState) {
+        bannerStates[adUnitId] = state
+    }
+
+    fun getBannerState(adUnitId: String): NapSspLoadState =
+        bannerStates[adUnitId] ?: NapSspLoadState.IDLE
+
+    fun clearBanner(adUnitId: String) {
+        bannerStates.remove(adUnitId)
+    }
 
     fun markInterstitialState(adUnitId: String, state: NapSspLoadState) {
         interstitialStates[adUnitId] = state
@@ -53,17 +65,41 @@ internal object NapSspSdkBridge {
         rewardedStates.remove(adUnitId)
     }
 
-    fun describeStatus(): Map<String, Any?> = mapOf(
-        "initialized" to (latestConfig != null),
-        "coppa" to coppaEnabled,
-        "logLevel" to logLevel,
-        "configuredAdUnitIds" to (latestConfig?.adUnitIds ?: emptyList<String>()),
-    )
+    fun describeStatus(): Map<String, Any?> {
+        val config = latestConfig
+        val runtime = linkedMapOf<String, Any?>(
+            "bannerStates" to bannerStates.mapValues { it.value.name },
+            "interstitialStates" to interstitialStates.mapValues { it.value.name },
+            "rewardedStates" to rewardedStates.mapValues { it.value.name },
+        )
+
+        if (config != null) {
+            runtime["mediaKeyHash"] = config.mediaKey.hashCode()
+            runtime["mediationConfigured"] = config.mediations != null
+            runtime["mediationFlags"] = mapOf(
+                "adFitEnabled" to (config.mediations?.adFitEnabled == true),
+                "mobwithEnabled" to (config.mediations?.mobwithEnabled == true),
+                "pangleConfigured" to (config.mediations?.pangle != null),
+                "appLovinConfigured" to (config.mediations?.appLovin != null),
+                "unityConfigured" to (config.mediations?.unityAds != null),
+                "adManagerConfigured" to (config.mediations?.adManager != null),
+            )
+        }
+
+        return NapSspContracts.statusSnapshot(
+            initialized = config != null,
+            logLevel = logLevel,
+            coppaEnabled = coppaEnabled,
+            configuredAdUnitIds = config?.adUnitIds ?: emptyList(),
+            runtimeState = runtime,
+        )
+    }
 
     fun reset() {
         latestConfig = null
         logLevel = "info"
         coppaEnabled = false
+        bannerStates.clear()
         interstitialStates.clear()
         rewardedStates.clear()
     }

@@ -7,7 +7,12 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
 
 class NapSspModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-    override fun getName(): String = "NapSspModule"
+    override fun getName(): String = NapSspContracts.MODULE_NAME
+
+    override fun getConstants(): MutableMap<String, Any>? {
+        @Suppress("UNCHECKED_CAST")
+        return NapSspContracts.moduleConstants(NapSspContracts.MODULE_NAME).toMutableMap() as MutableMap<String, Any>
+    }
 
     @ReactMethod
     fun initialize(config: ReadableMap, promise: Promise) {
@@ -16,7 +21,7 @@ class NapSspModule(private val reactContext: ReactApplicationContext) : ReactCon
             NapSspSdkBridge.initialize(parsedConfig)
             NapSspEventEmitter.emitModuleEvent(
                 reactContext,
-                "napSsp_initialized",
+                NapSspContracts.EVENT_STATUS,
                 NapSspSdkBridge.describeStatus(),
             )
             promise.resolve(null)

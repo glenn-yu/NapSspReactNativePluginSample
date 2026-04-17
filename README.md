@@ -2,14 +2,14 @@
 
 TypeScript-first sample scaffold for the KT Nasmedia nap ssp React Native plugin.
 
-> Status: the JS/TS surface is improved, and the bridge wrappers now line up with the placeholder native names. Android and iOS SDK integrations are still placeholder-only.
+> Status: the JS/TS surface is improved, and the bridge wrappers now line up with the placeholder native names. Android now exposes a structured placeholder bridge with status metadata and event plumbing; the real vendor SDK calls are still opt-in.
 
 ## What is in this repo
 - Typed public API for initialization, banner ads, interstitial ads, and rewarded ads
-- A bridge layer that validates inputs and reports missing native modules clearly
+- A bridge layer that validates inputs, reports missing native modules clearly, and exposes native status metadata
 - A banner fallback component for environments where the native view is not linked yet
 - An example app that demonstrates the intended usage pattern
-- Docs for current status, TODOs, and release notes
+- Docs for current status, TODOs, Android integration assumptions, and release notes
 
 ## Install
 
@@ -101,6 +101,7 @@ These events are currently driven by the JS wrapper layer and will be connected 
 ## Current limitations
 
 - Android now has the package/module/view scaffolding in place, but the official nap ssp SDK entry points still need to be wired to the vendor APIs
+- Vendor Android dependencies are gated behind the Gradle property `napSsp.enableVendorSdk=true` so the placeholder bridge can build without the private SDKs present
 - iOS native SDK integration is still placeholder-only
 - The example app is intentionally defensive and will show placeholder/failure text until the native modules are linked in an app
 - CI validates TypeScript and the JS build only; it does not build the native projects yet

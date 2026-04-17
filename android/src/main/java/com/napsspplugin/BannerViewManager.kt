@@ -5,7 +5,7 @@ import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
 
 class BannerViewManager : SimpleViewManager<NapSspBannerView>() {
-    override fun getName(): String = "NapSspBannerView"
+    override fun getName(): String = NapSspContracts.BANNER_VIEW_NAME
 
     override fun createViewInstance(reactContext: ThemedReactContext): NapSspBannerView = NapSspBannerView(reactContext)
 
@@ -16,12 +16,12 @@ class BannerViewManager : SimpleViewManager<NapSspBannerView>() {
 
     @ReactProp(name = "adUnitId")
     fun setAdUnitId(view: NapSspBannerView, adUnitId: String?) {
-        view.adUnitId = adUnitId?.trim().orEmpty()
+        view.adUnitId = adUnitId
     }
 
     @ReactProp(name = "size")
     fun setSize(view: NapSspBannerView, size: String?) {
-        view.size = size?.trim().orEmpty()
+        view.size = size
     }
 
     @ReactProp(name = "autoLoad", defaultBoolean = true)
@@ -31,11 +31,11 @@ class BannerViewManager : SimpleViewManager<NapSspBannerView>() {
 
     override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Any> {
         return mutableMapOf(
-            "topAdLoaded" to mapOf("registrationName" to "onAdLoaded"),
-            "topAdFailed" to mapOf("registrationName" to "onAdFailedToLoad"),
-            "topAdClicked" to mapOf("registrationName" to "onAdClicked"),
-            "topAdOpened" to mapOf("registrationName" to "onAdOpened"),
-            "topAdClosed" to mapOf("registrationName" to "onAdClosed"),
+            NapSspContracts.VIEW_EVENT_AD_LOADED to mapOf("registrationName" to "onAdLoaded"),
+            NapSspContracts.VIEW_EVENT_AD_FAILED to mapOf("registrationName" to "onAdFailedToLoad"),
+            NapSspContracts.VIEW_EVENT_AD_CLICKED to mapOf("registrationName" to "onAdClicked"),
+            NapSspContracts.VIEW_EVENT_AD_OPENED to mapOf("registrationName" to "onAdOpened"),
+            NapSspContracts.VIEW_EVENT_AD_CLOSED to mapOf("registrationName" to "onAdClosed"),
         )
     }
 }

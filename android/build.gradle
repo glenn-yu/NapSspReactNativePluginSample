@@ -3,6 +3,18 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+def enableVendorSdk = (project.findProperty('napSsp.enableVendorSdk') ?: 'false').toString().toBoolean()
+
+def napSspSdkCoordinates = [
+    core: 'io.github.nasmedia-tech:admixer-ssp:1.0.21',
+    adManager: 'io.github.nasmedia-tech:admixer-admanager:1.0.14',
+    adFit: 'io.github.nasmedia-tech:admixer-adfit:1.0.10',
+    pangle: 'io.github.nasmedia-tech:admixer-pangle:1.0.10',
+    appLovin: 'io.github.nasmedia-tech:admixer-applovin:1.0.8',
+    unity: 'io.github.nasmedia-tech:admixer-unity:1.0.6',
+    adsIdentifier: 'com.google.android.gms:play-services-ads-identifier:18.9.0',
+]
+
 android {
     namespace 'com.napsspplugin'
     compileSdk 34
@@ -12,6 +24,14 @@ android {
         targetSdk 34
         consumerProguardFiles 'consumer-rules.pro'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        buildConfigField 'boolean', 'NAP_SSP_VENDOR_SDK_ENABLED', enableVendorSdk.toString()
+        buildConfigField 'String', 'NAP_SSP_CORE_COORDINATE', "\"${napSspSdkCoordinates.core}\""
+        buildConfigField 'String', 'NAP_SSP_AD_MANAGER_COORDINATE', "\"${napSspSdkCoordinates.adManager}\""
+        buildConfigField 'String', 'NAP_SSP_ADFIT_COORDINATE', "\"${napSspSdkCoordinates.adFit}\""
+        buildConfigField 'String', 'NAP_SSP_PANGLE_COORDINATE', "\"${napSspSdkCoordinates.pangle}\""
+        buildConfigField 'String', 'NAP_SSP_APP_LOVIN_COORDINATE', "\"${napSspSdkCoordinates.appLovin}\""
+        buildConfigField 'String', 'NAP_SSP_UNITY_COORDINATE', "\"${napSspSdkCoordinates.unity}\""
+        buildConfigField 'String', 'NAP_SSP_ADS_IDENTIFIER_COORDINATE', "\"${napSspSdkCoordinates.adsIdentifier}\""
     }
 
     compileOptions {
@@ -35,6 +55,7 @@ android {
 repositories {
     google()
     mavenCentral()
+    // Required once the host app opts into the real vendor SDK dependencies.
     maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }
     maven { url 'https://artifact.bytedance.com/repository/pangle/' }
 }
@@ -45,14 +66,14 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation 'com.google.android.gms:play-services-ads-identifier:18.9.0'
 
-    // Core nap ssp / mediation artifacts are declared as compileOnly until the
-    // exact Android SDK entry points are wired against the official APIs.
-    compileOnly 'io.github.nasmedia-tech:admixer-ssp:1.0.21'
-    compileOnly 'io.github.nasmedia-tech:admixer-admanager:1.0.14'
-    compileOnly 'io.github.nasmedia-tech:admixer-adfit:1.0.10'
-    compileOnly 'io.github.nasmedia-tech:admixer-pangle:1.0.10'
-    compileOnly 'io.github.nasmedia-tech:admixer-applovin:1.0.8'
-    compileOnly 'io.github.nasmedia-tech:admixer-unity:1.0.6'
+    if (enableVendorSdk) {
+        implementation napSspSdkCoordinates.adsIdentifier
+        implementation napSspSdkCoordinates.core
+        implementation napSspSdkCoordinates.adManager
+        implementation napSspSdkCoordinates.adFit
+        implementation napSspSdkCoordinates.pangle
+        implementation napSspSdkCoordinates.appLovin
+        implementation napSspSdkCoordinates.unity
+    }
 }

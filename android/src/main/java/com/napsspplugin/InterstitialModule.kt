@@ -9,7 +9,12 @@ import java.util.concurrent.ConcurrentHashMap
 class InterstitialModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     private val loadedAdUnitIds = ConcurrentHashMap<String, Boolean>()
 
-    override fun getName(): String = "NapSspInterstitial"
+    override fun getName(): String = NapSspContracts.INTERSTITIAL_MODULE_NAME
+
+    override fun getConstants(): MutableMap<String, Any>? {
+        @Suppress("UNCHECKED_CAST")
+        return NapSspContracts.moduleConstants(NapSspContracts.INTERSTITIAL_MODULE_NAME).toMutableMap() as MutableMap<String, Any>
+    }
 
     @ReactMethod
     fun load(adUnitId: String, promise: Promise) {
@@ -23,8 +28,8 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
         NapSspSdkBridge.markInterstitialState(normalizedAdUnitId, NapSspLoadState.LOADED)
         NapSspEventEmitter.emitModuleEvent(
             reactContext,
-            "onAdLoaded",
-            mapOf("adUnitId" to normalizedAdUnitId, "format" to "interstitial"),
+            NapSspContracts.EVENT_AD_LOADED,
+            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL),
         )
         promise.resolve(null)
     }
@@ -45,13 +50,13 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
         NapSspSdkBridge.markInterstitialState(normalizedAdUnitId, NapSspLoadState.SHOWN)
         NapSspEventEmitter.emitModuleEvent(
             reactContext,
-            "onAdOpened",
-            mapOf("adUnitId" to normalizedAdUnitId, "format" to "interstitial"),
+            NapSspContracts.EVENT_AD_OPENED,
+            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL),
         )
         NapSspEventEmitter.emitModuleEvent(
             reactContext,
-            "onAdClosed",
-            mapOf("adUnitId" to normalizedAdUnitId, "format" to "interstitial"),
+            NapSspContracts.EVENT_AD_CLOSED,
+            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL),
         )
         loadedAdUnitIds.remove(normalizedAdUnitId)
         NapSspSdkBridge.clearInterstitial(normalizedAdUnitId)

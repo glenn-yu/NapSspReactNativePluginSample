@@ -9,7 +9,12 @@ import java.util.concurrent.ConcurrentHashMap
 class RewardedAdModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     private val loadedAdUnitIds = ConcurrentHashMap<String, Boolean>()
 
-    override fun getName(): String = "NapSspRewarded"
+    override fun getName(): String = NapSspContracts.REWARDED_MODULE_NAME
+
+    override fun getConstants(): MutableMap<String, Any>? {
+        @Suppress("UNCHECKED_CAST")
+        return NapSspContracts.moduleConstants(NapSspContracts.REWARDED_MODULE_NAME).toMutableMap() as MutableMap<String, Any>
+    }
 
     @ReactMethod
     fun load(adUnitId: String, promise: Promise) {
@@ -23,8 +28,8 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
         NapSspSdkBridge.markRewardedState(normalizedAdUnitId, NapSspLoadState.LOADED)
         NapSspEventEmitter.emitModuleEvent(
             reactContext,
-            "onAdLoaded",
-            mapOf("adUnitId" to normalizedAdUnitId, "format" to "rewarded"),
+            NapSspContracts.EVENT_AD_LOADED,
+            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_REWARDED),
         )
         promise.resolve(null)
     }
@@ -45,23 +50,23 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
         NapSspSdkBridge.markRewardedState(normalizedAdUnitId, NapSspLoadState.SHOWN)
         NapSspEventEmitter.emitModuleEvent(
             reactContext,
-            "onAdOpened",
-            mapOf("adUnitId" to normalizedAdUnitId, "format" to "rewarded"),
+            NapSspContracts.EVENT_AD_OPENED,
+            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_REWARDED),
         )
         NapSspEventEmitter.emitModuleEvent(
             reactContext,
-            "onRewarded",
+            NapSspContracts.EVENT_REWARDED,
             mapOf(
                 "adUnitId" to normalizedAdUnitId,
-                "format" to "rewarded",
+                "format" to NapSspContracts.FORMAT_REWARDED,
                 "type" to "reward",
                 "amount" to 1,
             ),
         )
         NapSspEventEmitter.emitModuleEvent(
             reactContext,
-            "onAdClosed",
-            mapOf("adUnitId" to normalizedAdUnitId, "format" to "rewarded"),
+            NapSspContracts.EVENT_AD_CLOSED,
+            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_REWARDED),
         )
         loadedAdUnitIds.remove(normalizedAdUnitId)
         NapSspSdkBridge.clearRewarded(normalizedAdUnitId)

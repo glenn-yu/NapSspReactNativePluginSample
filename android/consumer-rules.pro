@@ -1,3 +1,4 @@
+# Keep the plugin bridge, modules, and placeholder view classes available to host apps.
 -keep class com.napsspplugin.** { *; }
 -dontwarn com.napsspplugin.**
 
@@ -5,7 +6,5 @@
 -keep class com.facebook.react.** { *; }
 -dontwarn com.facebook.react.**
 
-# The official nap ssp / mediation SDK packages are intentionally resolved at build time.
-# Keep warnings quiet until the concrete SDK APIs are wired.
--dontwarn io.github.nasmedia-tech.**
--dontwarn com.google.android.gms.**
+# Vendor SDK class names are intentionally omitted until the official Android API
+# surface is wired. Add concrete keep rules here once the real nap ssp symbols are linked.
