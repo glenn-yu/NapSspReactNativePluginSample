@@ -66,25 +66,6 @@ export interface AdError {
   details?: Record<string, unknown>;
 }
 
-export interface RewardItem {
-  type: string;
-  amount: number;
-  currency?: string;
-}
-
-export interface InterstitialAdOptions {
-  type?: 'basic' | 'popup' | 'countDown';
-  disableBackKey?: boolean;
-  buttonLeftText?: string;
-  buttonLeftColor?: string;
-  buttonRightText?: string;
-  buttonRightColor?: string;
-  buttonFrameColor?: string;
-  countDownType?: 'gauge' | 'text';
-  countDownTime?: number; // 2~5 seconds
-  closeButtonTouchAreaRatio?: number; // iOS only, 0.2~1.0
-}
-
 export interface RewardedAdOptions {
   customParams?: Record<string, string>;
   mute?: boolean; // Android only
@@ -100,7 +81,7 @@ export interface InterstitialAdEventMap {
 }
 
 export interface RewardedAdEventMap extends InterstitialAdEventMap {
-  rewarded: RewardItem;
+  rewarded: void;
 }
 
 export interface VideoAdProps {

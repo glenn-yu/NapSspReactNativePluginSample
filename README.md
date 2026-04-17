@@ -198,10 +198,10 @@ const showRewardedAd = async () => {
     mute: true // (안드로이드 전용) 시작 시 음소거
   });
   
-  // 가장 중요한 '보상 지급' 이벤트 리스너! (공식 가이드의 EARNEDREWARD 동일)
-  reward.addAdEventListener('onRewarded', (item) => {
-    console.log(`🎉 보상 획득! 타입: ${item.type}, 수량: ${item.amount}`);
-    // 여기서 유저에게 아이템을 지급하는 로직을 작성하세요.
+  // 보상 지급 이벤트 (SDK 스펙에 따라 item 데이터는 제공되지 않을 수 있음)
+  reward.addAdEventListener('onRewarded', () => {
+    console.log('🎉 보상 지급 이벤트 발생!');
+    // 정확한 보상 처리는 S2S 콜백 이용 권장
   });
 
   reward.addAdEventListener('closed', () => {

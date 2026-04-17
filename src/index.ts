@@ -24,6 +24,5 @@ export type {
   MediationConfig,
   NapSspConfig,
   NapSspStatus,
-  RewardItem,
   RewardedAdEventMap,
 } from './types';
