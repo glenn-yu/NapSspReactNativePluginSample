@@ -1,14 +1,18 @@
-# 🚀 React Native Nap SSP 플러그인 (v0.1.2)
+# React Native Nap SSP 플러그인
 
-KT Nasmedia의 Nap SSP SDK를 React Native 앱에 쉽게 통합하여 광고 수익화를 시작할 수 있는 공식 비공식 플러그인입니다. 
+KT Nasmedia Nap SSP SDK를 React Native에서 쓰기 위한 플러그인입니다.
 
-Android와 iOS용 Native SDK 연동을 목표로 하며, 현재 6가지 광고 포맷을 중심으로 React Native 인터페이스를 제공합니다.
+- 버전: `0.1.2`
+- 지원 목표: Android / iOS
+- 제공 형태: Native Module + Native View
+- 현재 중심 기능: 초기화, 배너, 전면, 리워드, 네이티브, 비디오
 
-> **참고**: 이 플러그인은 아직 개발 단계입니다. 실제 SDK 연동과 플랫폼별 빌드를 위해 추가적인 네이티브 설정과 환경 구성이 필요할 수 있습니다.
+## 가장 먼저 할 일
 
----
-
-## 📦 1. 설치하기
+1. 패키지 설치
+2. Android/iOS 네이티브 설정 추가
+3. `NapSspAd.initialize()` 호출
+4. `BannerAd` 또는 `InterstitialAd`부터 확인
 
 ```bash
 npm install react-native-nap-ssp
@@ -16,7 +20,55 @@ npm install react-native-nap-ssp
 yarn add react-native-nap-ssp
 ```
 
-> **주의:** 이 플러그인은 React Native 0.72 이상 버전을 권장합니다.
+> 권장: React Native 0.72 이상
+
+---
+
+## 5분 안에 실행하기
+
+### 1) 앱 시작 시 초기화
+
+```tsx
+import React, { useEffect } from 'react';
+import { NapSspAd } from 'react-native-nap-ssp';
+
+export default function App() {
+  useEffect(() => {
+    NapSspAd.initialize({
+      mediaKey: '발급받은_MEDIA_KEY',
+      adUnitIds: ['BANNER_ID', 'INTER_ID', 'REWARD_ID'],
+      logLevel: 'debug',
+    });
+  }, []);
+
+  return null;
+}
+```
+
+### 2) 배너 하나 띄우기
+
+```tsx
+import React from 'react';
+import { BannerAd } from 'react-native-nap-ssp';
+
+export default function Screen() {
+  return <BannerAd adUnitId="BANNER_ID" size="BANNER_320x50" />;
+}
+```
+
+### 3) 전면 광고 띄우기
+
+```tsx
+import { InterstitialAd } from 'react-native-nap-ssp';
+
+const interstitial = new InterstitialAd('INTER_ID');
+await interstitial.load();
+await interstitial.show();
+```
+
+---
+
+## 초보자를 위한 필수 설정
 
 ---
 
@@ -216,6 +268,18 @@ const showRewardedAd = async () => {
 ```
 
 ---
+
+## ✅ 테스트와 검증
+
+이 저장소에는 네이티브 없이도 JS API가 깨지지 않는지 확인하는 smoke test가 들어 있습니다.
+
+```bash
+npm run verify
+```
+
+- `typecheck`: TypeScript 타입 확인
+- `build`: `lib/` 생성 확인
+- `smoke:test`: 공개 API 및 기본 초기화 흐름 확인
 
 ## ❓ 자주 묻는 질문 (FAQ)
 
