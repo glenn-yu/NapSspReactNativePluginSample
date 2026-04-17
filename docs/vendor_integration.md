@@ -11,6 +11,38 @@ This document captures the exact next step for moving the plugin from placeholde
 
 ## Android
 
+### Confirmed SDK symbols from the official sample app
+
+The Android sample confirms these concrete APIs/classes:
+
+- Initialization
+  - `com.nasmedia.admixerssp.common.AdMixer`
+  - `AdMixer.getInstance().initialize(context, mediaKey, adUnits)`
+  - `AdMixer.registerAdapter(AdMixer.ADAPTER_ADMANAGER)` and related adapter constants
+  - `AdMixer.setTagForChildDirectedTreatment(...)`
+  - `com.nasmedia.admixerssp.common.AdMixerLog`
+- Banner
+  - `com.nasmedia.admixerssp.ads.AdView`
+  - `com.nasmedia.admixerssp.ads.AdInfo.Builder(adUnitId)`
+  - `setAdInfo(...)`, `setAlwaysShowAdView(...)`, `setAdViewListener(...)`
+  - lifecycle: `onResume()`, `onPause()`, `onDestroy()`
+- Interstitial
+  - `com.nasmedia.admixerssp.ads.InterstitialAd`
+  - `loadInterstitial()`, `showInterstitial()`, `closeInterstitial()`, `stopInterstitial()`
+  - `hasInterstitial`
+  - optional popup config: `PopupInterstitialAdOption`
+- Rewarded video
+  - `com.nasmedia.admixerssp.ads.RewardInterstitialVideoAd`
+  - `loadRewardVideoAd()`, `showRewardVideoAd()`, `closeRewardVideoAd()`, `stopRewardVideoAd()`
+  - `hasInterstitial`
+  - reward custom params through `AdInfo.Builder(...).setCustomParams(...)`
+- Shared callbacks
+  - `AdListener`
+  - `onReceivedAd(...)`
+  - `onFailedToReceiveAd(...)`
+  - `onEventAd(...)`
+  - `AdEvent.CLICK`, `AdEvent.DISPLAYED`, `AdEvent.CLOSE`, `AdEvent.SKIPPED`, etc.
+
 ### Current dependency model
 
 The Android library supports two modes:
@@ -50,8 +82,15 @@ Supported mediation keys:
 
 ### Exact remaining Android work
 
-- Replace `NapSspSdkBridge` placeholder state with real SDK initialization.
-- Implement mediation adapter registration logic from the parsed JS config.
+- Replace `NapSspSdkBridge` placeholder state with real SDK initialization using:
+  - `AdMixerLog.logLevel`
+  - `AdMixer.setTagForChildDirectedTreatment(...)`
+  - `AdMixer.getInstance().initialize(...)`
+  - `AdMixer.registerAdapter(...)`
+- Build `AdInfo` from JS config per format and wire:
+  - `AdView`
+  - `InterstitialAd`
+  - `RewardInterstitialVideoAd`
 - Map native banner callbacks to RN events:
   - `onAdLoaded`
   - `onAdFailedToLoad`
@@ -69,6 +108,27 @@ The consuming Android app will still need app-level metadata such as:
 - Any network-specific IDs/keys required by the chosen mediation stack
 
 ## iOS
+
+### Confirmed SDK symbols from the official sample app
+
+The iOS sample confirms these concrete APIs/classes:
+
+- Initialization
+  - `AMMediation.shared.setDebugEnabled(isEnabled:)`
+  - `AMMediation.shared.initialize(mediaKey:adunitID:)`
+- Optional mediation SDK bootstrap at app level
+  - `MobileAds.shared.start()`
+  - `PAGSdk.start(with:completionHandler:)`
+  - `ALSdk.shared().initialize(with:completionHandler:)`
+  - `UnityAds.initialize(...)`
+- Banner
+  - `AMMBannerView(rootViewController:)`
+  - `adUnitID`
+  - `delegate`
+  - `load()`
+  - delegate callbacks: `onSuccessBanner()`, `onFailBanner()`
+
+The sample repo should still be mined for concrete interstitial/rewarded symbols next, but the initialization path is now confirmed.
 
 ### Current dependency model
 
@@ -98,7 +158,10 @@ end
 
 ### Exact remaining iOS work
 
-- Replace `NapSspRuntime` placeholder state with real `AdMixerMediation` initialization and ad object lifecycle.
+- Replace `NapSspRuntime` placeholder state with real `AdMixerMediation` initialization via:
+  - `AMMediation.shared.setDebugEnabled(isEnabled:)`
+  - `AMMediation.shared.initialize(mediaKey:adunitID:)`
+- Replace the placeholder banner with `AMMBannerView` and bridge banner delegate callbacks.
 - Bind interstitial/rewarded load and present callbacks to the JS event surface.
 - Wire reward callbacks to the JS `onRewarded` event.
 - Confirm actual pod names / version compatibility against vendor docs and samples.
