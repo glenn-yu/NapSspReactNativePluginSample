@@ -1,141 +1,92 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, {useEffect} from 'react';
 import {
+  Alert,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
+  TouchableOpacity,
   View,
-  Button,
-  Alert,
 } from 'react-native';
-import { NapSspAd, BannerAd, InterstitialAd, RewardedAd, isNativeModuleAvailable } from '../../src';
-
 import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  BannerAd,
+  InterstitialAd,
+  NapSspAd,
+  RewardedAd,
+  isNativeModuleAvailable,
+} from '../../src';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+const TEST_CONFIG = {
+  mediaKey: 'TEST_MEDIA_KEY',
+  bannerId: 'TEST_BANNER',
+  interstitialId: 'TEST_INTERSTITIAL',
+  rewardedId: 'TEST_REWARDED',
+};
 
 function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  const handleInitialize = async () => {
-    try {
-      await NapSspAd.initialize({
-        mediaKey: 'TEST_MEDIA_KEY',
-        adUnitIds: ['TEST_BANNER', 'TEST_INTERSTITIAL', 'TEST_REWARDED'],
-        logLevel: 'debug',
-      });
-      Alert.alert('Initialized');
-    } catch (e:any) {
-      Alert.alert('Initialize failed', e?.message || String(e));
-    }
-  };
+  useEffect(() => {
+    NapSspAd.initialize({
+      mediaKey: TEST_CONFIG.mediaKey,
+      adUnitIds: [TEST_CONFIG.bannerId, TEST_CONFIG.interstitialId, TEST_CONFIG.rewardedId],
+      logLevel: 'debug',
+    }).catch((error: unknown) => {
+      console.warn('NapSsp initialize failed', error);
+    });
+  }, []);
 
   const showInterstitial = async () => {
     try {
-      const inter = new InterstitialAd('TEST_INTERSTITIAL');
-      await inter.load();
-      await inter.show();
-      Alert.alert('Interstitial shown');
-    } catch (e:any) {
-      Alert.alert('Interstitial error', e?.message || String(e));
+      const interstitial = new InterstitialAd(TEST_CONFIG.interstitialId);
+      await interstitial.load();
+      await interstitial.show();
+    } catch (error: any) {
+      Alert.alert('Interstitial', error?.message ?? 'Failed to show interstitial');
     }
   };
 
   const showRewarded = async () => {
     try {
-      const r = new RewardedAd('TEST_REWARDED');
-      r.addAdEventListener('onRewarded', () => {
+      const rewarded = new RewardedAd(TEST_CONFIG.rewardedId);
+      rewarded.addAdEventListener('onRewarded', () => {
         Alert.alert('Rewarded', 'Reward event received');
       });
-      await r.load();
-      await r.show();
-    } catch (e:any) {
-      Alert.alert('Rewarded error', e?.message || String(e));
+      await rewarded.load();
+      await rewarded.show();
+    } catch (error: any) {
+      Alert.alert('Rewarded', error?.message ?? 'Failed to show rewarded ad');
     }
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            padding: 20,
-          }}>
-          <Section title="Test Controls">
-            <View style={{ marginBottom: 8 }}>
-              <Button title="Initialize SDK" onPress={handleInitialize} />
-            </View>
-            <View style={{ marginBottom: 8 }}>
-              <Button title="Show Interstitial" onPress={showInterstitial} />
-            </View>
-            <View style={{ marginBottom: 8 }}>
-              <Button title="Show Rewarded" onPress={showRewarded} />
-            </View>
-          </Section>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.title}>NapSsp Example Host App</Text>
+        <Text style={styles.subtitle}>
+          Beginner-friendly check for initialize, banner, interstitial, and rewarded flows.
+        </Text>
 
-          <Section title="Banner (placeholder/native)">
-            <BannerAd adUnitId="TEST_BANNER" size="BANNER_320x50" />
-          </Section>
+        <View style={styles.card}>
+          <Text style={styles.label}>Status</Text>
+          <Text style={styles.value}>Initializing / placeholder mode</Text>
+          <Text style={styles.note}>
+            Native modules available: {String(isNativeModuleAvailable(['NapSspModule', 'NapSspBannerView']))}
+          </Text>
+        </View>
 
-          <Section title="Debug">
-            <Text>Native modules available: {JSON.stringify(isNativeModuleAvailable(['NapSspModule','NapSspInterstitial','NapSspRewarded','NapSspBannerView']))}</Text>
-          </Section>
+        <View style={styles.card}>
+          <Text style={styles.label}>Banner</Text>
+          <BannerAd adUnitId={TEST_CONFIG.bannerId} size="BANNER_320x50" />
+        </View>
+
+        <View style={styles.actions}>
+          <TouchableOpacity style={styles.button} onPress={showInterstitial}>
+            <Text style={styles.buttonText}>Show Interstitial</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={showRewarded}>
+            <Text style={styles.buttonText}>Show Rewarded</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -143,20 +94,60 @@ function App(): JSX.Element {
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    backgroundColor: '#F7F7F8',
   },
-  sectionTitle: {
-    fontSize: 24,
+  content: {
+    padding: 20,
+    gap: 16,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  subtitle: {
+    color: '#4B5563',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    gap: 8,
+  },
+  label: {
+    color: '#6B7280',
+    fontSize: 12,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+  },
+  value: {
+    color: '#111827',
+    fontSize: 16,
     fontWeight: '600',
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  note: {
+    color: '#6B7280',
+    fontSize: 12,
   },
-  highlight: {
+  actions: {
+    gap: 12,
+  },
+  button: {
+    alignItems: 'center',
+    backgroundColor: '#2563EB',
+    borderRadius: 10,
+    paddingVertical: 14,
+  },
+  secondaryButton: {
+    backgroundColor: '#F97316',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: '700',
   },
 });

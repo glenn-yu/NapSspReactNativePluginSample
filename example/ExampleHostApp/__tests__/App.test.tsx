@@ -4,14 +4,41 @@
 
 import 'react-native';
 import React from 'react';
+import renderer from 'react-test-renderer';
 import App from '../App';
 
-// Note: import explicitly to use the types shiped with jest.
-import {it} from '@jest/globals';
+jest.mock('../../../src', () => {
+  const mockReact = require('react');
+  const {View} = require('react-native');
 
-// Note: test renderer must be required after react-native.
-import renderer from 'react-test-renderer';
+  class MockInterstitialAd {
+    async load() {}
+    async show() {}
+    addAdEventListener() {
+      return () => {};
+    }
+  }
 
-it('renders correctly', () => {
-  renderer.create(<App />);
+  class MockRewardedAd {
+    async load() {}
+    async show() {}
+    addAdEventListener() {
+      return () => {};
+    }
+  }
+
+  return {
+    NapSspAd: {
+      initialize: jest.fn().mockResolvedValue(undefined),
+    },
+    BannerAd: (props: any) => mockReact.createElement(View, props),
+    InterstitialAd: MockInterstitialAd,
+    RewardedAd: MockRewardedAd,
+    isNativeModuleAvailable: jest.fn().mockReturnValue(false),
+  };
+});
+
+it('renders the beginner-friendly host screen', () => {
+  const tree = renderer.create(<App />).toJSON();
+  expect(tree).toBeTruthy();
 });
