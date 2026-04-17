@@ -1,136 +1,191 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
-import { BannerAd, InterstitialAd, NapSspAd, NativeModuleNames, isNativeModuleAvailable } from 'react-native-nap-ssp';
+import React, { useEffect, useState } from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Alert,
+} from 'react-native';
 
-export default function App() {
-  const [status, setStatus] = useState('Booting sample…');
-  const [nativeReady, setNativeReady] = useState(false);
+// 플러그인에서 필요한 기능들을 불러옵니다.
+import {
+  NapSspAd,
+  BannerAd,
+  InterstitialAd,
+  RewardedAd,
+} from 'react-native-nap-ssp';
 
-  const interstitial = useMemo(() => new InterstitialAd('TEST_INTERSTITIAL'), []);
+// 테스트를 위한 설정값들입니다. (실제 서비스 시에는 발급받은 키를 사용하세요)
+const TEST_CONFIG = {
+  mediaKey: 'TEST_MEDIA_KEY',
+  bannerId: 'BANNER_TEST_ID',
+  interstitialId: 'INTERSTITIAL_TEST_ID',
+  rewardedId: 'REWARDED_TEST_ID',
+};
 
+const App = () => {
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // 1. 앱이 켜질 때 광고 SDK를 초기화합니다.
   useEffect(() => {
-    setNativeReady(
-      isNativeModuleAvailable(NativeModuleNames.napSsp) &&
-        isNativeModuleAvailable(NativeModuleNames.interstitial) &&
-        isNativeModuleAvailable(NativeModuleNames.banner),
-    );
+    const initSDK = async () => {
+      try {
+        console.log('SDK 초기화 시작...');
+        await NapSspAd.initialize({
+          mediaKey: TEST_CONFIG.mediaKey,
+          adUnitIds: [TEST_CONFIG.bannerId, TEST_CONFIG.interstitialId, TEST_CONFIG.rewardedId],
+          logLevel: 'debug',
+        });
+        setIsInitialized(true);
+        console.log('SDK 초기화 완료!');
+      } catch (error) {
+        console.error('초기화 중 오류 발생:', error);
+      }
+    };
 
-    NapSspAd.initialize({
-      mediaKey: 'YOUR_MEDIA_KEY',
-      adUnitIds: ['TEST_BANNER', 'TEST_INTERSTITIAL'],
-      logLevel: 'info',
-      coppa: false,
-    })
-      .then(() => setStatus('NapSspAd.initialize() completed.'))
-      .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : String(error);
-        setStatus(`Initialization skipped: ${message}`);
-      });
+    initSDK();
   }, []);
 
-  const loadInterstitial = async () => {
+  // 2. 전면 광고를 보여주는 함수입니다.
+  const handleShowInterstitial = async () => {
+    const interstitial = new InterstitialAd(TEST_CONFIG.interstitialId);
     try {
+      console.log('전면 광고 로드 중...');
       await interstitial.load();
-      setStatus('Interstitial loaded.');
+      console.log('전면 광고 표시!');
+      await interstitial.show();
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      setStatus(`Load failed: ${message}`);
+      Alert.alert('알림', '전면 광고를 불러오지 못했습니다.');
     }
   };
 
-  const showInterstitial = async () => {
+  // 3. 보상형 광고를 보여주는 함수입니다.
+  const handleShowRewarded = async () => {
+    const rewarded = new RewardedAd(TEST_CONFIG.rewardedId);
+    
+    // 사용자가 광고 시청을 완료했을 때 이벤트를 등록합니다.
+    rewarded.addAdEventListener('onRewarded', (reward) => {
+      Alert.alert('보상 획득!', `${reward.type}을(를) ${reward.amount}개 받았습니다.`);
+    });
+
     try {
-      await interstitial.show();
-      setStatus('Interstitial shown.');
+      console.log('보상형 광고 로드 중...');
+      await rewarded.load();
+      console.log('보상형 광고 표시!');
+      await rewarded.show();
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      setStatus(`Show failed: ${message}`);
+      Alert.alert('알림', '보상형 광고를 불러오지 못했습니다.');
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>NapSsp React Native Plugin</Text>
-        <Text style={styles.subtitle}>JS/TS scaffold and example app</Text>
-        <Text style={styles.status}>{status}</Text>
-        <Text style={styles.note}>
-          Native bridge ready: {nativeReady ? 'yes' : 'no'}
-        </Text>
-
-        <BannerAd adUnitId="TEST_BANNER" style={styles.banner} />
-
-        <View style={styles.actions}>
-          <Pressable style={styles.button} onPress={loadInterstitial}>
-            <Text style={styles.buttonText}>Load interstitial</Text>
-          </Pressable>
-          <Pressable style={styles.button} onPress={showInterstitial}>
-            <Text style={styles.buttonText}>Show interstitial</Text>
-          </Pressable>
+      <StatusBar barStyle="dark-content" />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        
+        <View style={styles.header}>
+          <Text style={styles.title}>Nap SSP 광고 테스트</Text>
+          <Text style={styles.status}>
+            상태: {isInitialized ? '✅ 초기화 완료' : '⏳ 초기화 중...'}
+          </Text>
         </View>
 
-        <Text style={styles.footer}>
-          This sample demonstrates the public API surface before the native modules are wired.
-        </Text>
-      </View>
+        {/* --- 배너 광고 섹션 --- */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>1. 배너 광고 (Banner)</Text>
+          <View style={styles.adContainer}>
+            <BannerAd
+              adUnitId={TEST_CONFIG.bannerId}
+              size="BANNER_320x50"
+              onAdLoaded={() => console.log('배너 로드 성공')}
+              onAdFailedToLoad={(e) => console.log('배너 실패:', e.message)}
+            />
+          </View>
+        </View>
+
+        {/* --- 전면 광고 섹션 --- */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>2. 전면 광고 (Interstitial)</Text>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={handleShowInterstitial}
+          >
+            <Text style={styles.buttonText}>전면 광고 보기</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* --- 보상형 광고 섹션 --- */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>3. 보상형 광고 (Rewarded)</Text>
+          <TouchableOpacity 
+            style={[styles.button, { backgroundColor: '#FF9500' }]} 
+            onPress={handleShowRewarded}
+          >
+            <Text style={styles.buttonText}>보상형 광고 보기</Text>
+          </TouchableOpacity>
+        </View>
+
+      </ScrollView>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F5F5F7',
   },
-  content: {
-    flex: 1,
+  scrollContent: {
+    padding: 20,
+  },
+  header: {
+    marginBottom: 30,
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
   },
   title: {
-    color: '#0F172A',
     fontSize: 24,
-    fontWeight: '700',
-  },
-  subtitle: {
-    color: '#334155',
-    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#1D1D1F',
   },
   status: {
-    color: '#1D4ED8',
-    fontSize: 13,
-    textAlign: 'center',
-  },
-  note: {
-    color: '#64748B',
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  banner: {
     marginTop: 8,
+    color: '#86868B',
   },
-  actions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginTop: 12,
+  section: {
+    marginBottom: 40,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 15,
+    color: '#3A3A3C',
+  },
+  adContainer: {
+    backgroundColor: '#FFFFFF',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    // 그림자 효과
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   button: {
-    backgroundColor: '#2563EB',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    backgroundColor: '#007AFF',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  footer: {
-    color: '#475569',
-    fontSize: 12,
-    marginTop: 8,
-    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
+
+export default App;

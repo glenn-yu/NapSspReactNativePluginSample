@@ -1,4 +1,4 @@
-package com.napsspplugin
+package com.gwangy
 
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap

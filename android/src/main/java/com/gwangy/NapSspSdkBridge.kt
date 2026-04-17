@@ -1,4 +1,4 @@
-package com.napsspplugin
+package com.gwangy
 
 import java.util.concurrent.ConcurrentHashMap
 
@@ -16,7 +16,7 @@ internal object NapSspSdkBridge {
     private val interstitialStates = ConcurrentHashMap<String, NapSspLoadState>()
     private val rewardedStates = ConcurrentHashMap<String, NapSspLoadState>()
 
-    fun initialize(config: NapSspConfig) {
+    fun initialize(context: android.content.Context, config: NapSspConfig) {
         latestConfig = config.requireValid()
         logLevel = config.logLevel ?: logLevel
         coppaEnabled = config.coppa
@@ -36,8 +36,8 @@ internal object NapSspSdkBridge {
                     val getInstance = adMixerClass.getMethod("getInstance")
                     val adMixer = getInstance.invoke(null)
                     val initialize = adMixerClass.getMethod("initialize", android.content.Context::class.java, String::class.java, List::class.java)
-                    val ctx = null // Context not available here; host app should call vendor init as well
-                    // We cannot safely call initialize without a Context. Instead, attempt to call registerAdapter if present.
+                    initialize.invoke(adMixer, context.applicationContext, config.mediaKey, config.adUnitIds)
+                    
                     val registerAdapter = adMixerClass.getMethod("registerAdapter", String::class.java)
                     val adapters = listOf(
                         "ADAPTER_ADMANAGER",

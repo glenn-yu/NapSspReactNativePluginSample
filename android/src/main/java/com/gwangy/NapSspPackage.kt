@@ -1,4 +1,4 @@
-package com.napsspplugin
+package com.gwangy
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule

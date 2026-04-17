@@ -23,7 +23,7 @@ def napSspSdkCoordinates = [
 ]
 
 android {
-    namespace 'com.napsspplugin'
+    namespace 'com.gwangy'
     compileSdk 34
 
     defaultConfig {

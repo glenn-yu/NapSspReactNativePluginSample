@@ -1,4 +1,4 @@
-package com.napsspplugin
+package com.gwangy
 
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -18,7 +18,7 @@ class NapSspModule(private val reactContext: ReactApplicationContext) : ReactCon
     fun initialize(config: ReadableMap, promise: Promise) {
         try {
             val parsedConfig = config.toNapSspConfig()
-            NapSspSdkBridge.initialize(parsedConfig)
+            NapSspSdkBridge.initialize(reactApplicationContext, parsedConfig)
             NapSspEventEmitter.emitModuleEvent(
                 reactContext,
                 NapSspContracts.EVENT_STATUS,

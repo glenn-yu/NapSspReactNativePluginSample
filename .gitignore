@@ -1,6 +1,44 @@
+# Dependencies
 node_modules/
+
+# Build outputs
 lib/
+dist/
+build/
+react-native-nap-ssp-*.tgz
+
+# Security (CRITICAL)
+.npmrc
+
+# Android
+.gradle
+android/build
+android/.gradle
+android/app/build
+*.keystore
+!debug.keystore
+
+# iOS
+ios/Pods
+ios/build
+ios/*.xcresult
+ios/DerivedData
+.ls_id_cache
+
+# React Native / Metro
+.expo/*
+.expo-shared/*
+.metro/*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 *.log
-example/node_modules/
-example/.expo/
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# TypeScript
+tsconfig.tsbuildinfo

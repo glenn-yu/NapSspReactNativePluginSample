@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.napsspplugin">
-
+          package="com.gwangy">
+</manifest>
     <!-- Library-only manifest: host apps should provide real ad network meta-data. -->
     <application />
 </manifest>

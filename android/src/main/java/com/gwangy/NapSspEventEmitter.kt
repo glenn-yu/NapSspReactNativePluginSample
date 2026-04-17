@@ -1,4 +1,4 @@
-package com.napsspplugin
+package com.gwangy
 
 import android.view.View
 import com.facebook.react.bridge.Arguments

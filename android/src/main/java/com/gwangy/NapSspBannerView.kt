@@ -1,4 +1,4 @@
-package com.napsspplugin
+package com.gwangy
 
 import android.content.Context
 import android.graphics.Color

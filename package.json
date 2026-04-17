@@ -1,12 +1,18 @@
 {
   "name": "react-native-nap-ssp",
   "version": "0.1.0",
-  "description": "React Native plugin scaffold for KT Nasmedia nap ssp SDK",
+  "description": "React Native plugin for KT Nasmedia nap ssp SDK",
+  "author": "gwangy",
+  "license": "MIT",
+  "homepage": "https://github.com/glenn-yu/react-native-nap-ssp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glenn-yu/react-native-nap-ssp.git"
+  },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "lib",
-    "src",
     "android",
     "ios",
     "README.md",
@@ -15,11 +21,12 @@
     "TODO.md"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "clean": "rm -rf lib",
+    "build": "npx tsc -p tsconfig.json",
+    "prepare": "npm run build",
+    "clean": "node -e \"const fs = require('fs'); if (fs.existsSync('lib')) fs.rmSync('lib', { recursive: true, force: true })\"",
     "lint": "npm run typecheck",
     "test": "npm run typecheck",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "npx tsc -p tsconfig.json --noEmit",
     "verify": "npm run typecheck && npm run build",
     "start:example": "npm --prefix example start"
   },

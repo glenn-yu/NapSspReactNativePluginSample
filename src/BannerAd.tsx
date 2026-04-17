@@ -60,13 +60,20 @@ const NativeBannerComponent = resolveNativeBannerComponent();
 
 export default function BannerAd(props: BannerAdProps) {
   const size = props.size ?? 'BANNER_320x50';
+  const dimensions = FALLBACK_DIMENSIONS[size];
+
+  // Merge default dimensions with user-provided styles.
+  const containerStyle = [
+    { width: dimensions.width, height: dimensions.height },
+    props.style,
+  ];
 
   if (NativeBannerComponent) {
     return (
       <NativeBannerComponent
         adUnitId={props.adUnitId}
         size={size}
-        style={props.style}
+        style={containerStyle}
         testID={props.testID}
         onAdLoaded={props.onAdLoaded}
         onAdFailedToLoad={
@@ -79,15 +86,12 @@ export default function BannerAd(props: BannerAdProps) {
     );
   }
 
-  const fallback = FALLBACK_DIMENSIONS[size];
-
   return (
     <View
       accessibilityRole="image"
       style={[
         styles.placeholder,
-        { width: fallback.width, height: fallback.height },
-        props.style,
+        containerStyle,
       ]}
     >
       <Text style={styles.title}>NapSsp Banner</Text>

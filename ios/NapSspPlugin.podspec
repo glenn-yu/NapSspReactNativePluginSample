@@ -2,12 +2,12 @@ Pod::Spec.new do |s|
   s.name         = 'NapSspPlugin'
   s.version      = '0.1.0'
   s.summary      = 'React Native scaffold for KT Nasmedia nap ssp SDK'
-  s.homepage     = 'https://github.com/glenn-yu/NapSspReactNativePluginSample'
-  s.license      = { :type => 'MIT' }
-  s.author       = { 'glenn-yu' => 'gwangy.claw@example.com' }
+  s.homepage     = 'https://github.com/glenn-yu/react-native-nap-ssp'
+  s.license      = { :type => 'MIT', :file => 'LICENSE' }
+  s.author       = { 'gwangy' => 'gwangy@example.com' }
   s.platform     = :ios, '13.0'
   s.static_framework = true
-  s.source       = { :git => 'https://github.com/glenn-yu/NapSspReactNativePluginSample.git', :tag => s.version.to_s }
+  s.source       = { :git => 'https://github.com/glenn-yu/react-native-nap-ssp.git', :tag => s.version.to_s }
   s.source_files = 'ios/**/*.{h,m,swift}'
   s.swift_version = '5.0'
   s.frameworks = 'Foundation', 'UIKit', 'AdSupport', 'StoreKit'

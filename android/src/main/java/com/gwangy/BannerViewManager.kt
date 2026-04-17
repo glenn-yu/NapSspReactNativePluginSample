@@ -1,4 +1,4 @@
-package com.napsspplugin
+package com.gwangy
 
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext

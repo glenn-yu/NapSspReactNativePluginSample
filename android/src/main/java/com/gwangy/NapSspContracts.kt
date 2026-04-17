@@ -1,4 +1,4 @@
-package com.napsspplugin
+package com.gwangy
 
 internal object NapSspContracts {
     const val MODULE_NAME = "NapSspModule"
