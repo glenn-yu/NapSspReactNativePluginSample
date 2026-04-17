@@ -1,15 +1,103 @@
 import React from 'react';
-import { View } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  requireNativeComponent,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
+import { NativeModuleNames } from './nativeBridge';
+import type { AdError, BannerSize } from './types';
 
-interface Props {
+export interface BannerAdProps {
   adUnitId: string;
-  size?: string;
+  size?: BannerSize;
   onAdLoaded?: () => void;
-  onAdFailedToLoad?: (err: any) => void;
-  style?: any;
+  onAdFailedToLoad?: (error: AdError) => void;
+  onAdClicked?: () => void;
+  onAdOpened?: () => void;
+  onAdClosed?: () => void;
+  style?: StyleProp<ViewStyle>;
+  testID?: string;
 }
 
-export default function BannerAd(_props: Props) {
-  // Placeholder native component wrapper
-  return <View style={{ width: 320, height: 50 }} />;
+type NativeBannerProps = BannerAdProps & {
+  style?: StyleProp<ViewStyle>;
+};
+
+const FALLBACK_DIMENSIONS: Record<BannerSize, { width: number; height: number }> = {
+  BANNER_320x50: { width: 320, height: 50 },
+  BANNER_320x100: { width: 320, height: 100 },
+  BANNER_300x250: { width: 300, height: 250 },
+  LARGE_BANNER: { width: 320, height: 100 },
+  MEDIUM_RECTANGLE: { width: 300, height: 250 },
+  SMART_BANNER: { width: 320, height: 50 },
+};
+
+function resolveNativeBannerComponent(): React.ComponentType<NativeBannerProps> | null {
+  for (const componentName of NativeModuleNames.banner) {
+    try {
+      return requireNativeComponent<NativeBannerProps>(componentName);
+    } catch {
+      // Try the next known native component name.
+    }
+  }
+
+  return null;
 }
+
+const NativeBannerComponent = resolveNativeBannerComponent();
+
+export default function BannerAd(props: BannerAdProps) {
+  const size = props.size ?? 'BANNER_320x50';
+
+  if (NativeBannerComponent) {
+    return <NativeBannerComponent {...props} />;
+  }
+
+  const fallback = FALLBACK_DIMENSIONS[size];
+
+  return (
+    <View
+      accessibilityRole="image"
+      style={[
+        styles.placeholder,
+        { width: fallback.width, height: fallback.height },
+        props.style,
+      ]}
+    >
+      <Text style={styles.title}>NapSsp Banner</Text>
+      <Text style={styles.subtitle}>{props.adUnitId}</Text>
+      <Text style={styles.note}>{Platform.OS} native view not linked yet</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  placeholder: {
+    alignItems: 'center',
+    backgroundColor: '#EEF2FF',
+    borderColor: '#CBD5E1',
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  title: {
+    color: '#1E293B',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  subtitle: {
+    color: '#475569',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  note: {
+    color: '#64748B',
+    fontSize: 10,
+    marginTop: 4,
+  },
+});

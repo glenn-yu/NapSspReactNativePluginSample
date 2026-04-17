@@ -1,17 +1,35 @@
 {
   "name": "react-native-nap-ssp",
   "version": "0.1.0",
-  "description": "React Native plugin for KT Nasmedia nap ssp SDK (sample)",
-  "main": "lib/commonjs/index.js",
-  "types": "lib/types/index.d.ts",
-  "files": ["src", "ios", "android"],
+  "description": "React Native plugin scaffold for KT Nasmedia nap ssp SDK",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "src",
+    "android",
+    "ios",
+    "README.md",
+    "CHANGELOG.md",
+    "RELEASE_NOTES.md",
+    "TODO.md"
+  ],
   "scripts": {
-    "build": "echo 'build placeholder'",
-    "test": "echo 'no tests'",
-    "lint": "echo 'no lint'"
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf lib",
+    "lint": "npm run typecheck",
+    "test": "npm run typecheck",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "verify": "npm run typecheck && npm run build",
+    "start:example": "npm --prefix example start"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-native": ">=0.72.0"
+  },
+  "devDependencies": {
+    "react": "18.2.0",
+    "react-native": "0.72.0",
+    "typescript": "^5.5.4"
   }
 }

@@ -1,6 +1,64 @@
-// Lightweight mock bridge to call native modules when available
-import { NativeModules } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 
-export const NativeNapSsp = NativeModules.NapSspModule || {};
-export const NativeInterstitial = NativeModules.NapSspInterstitial || {};
-export const NativeBannerView = NativeModules.NapSspBannerView || {};
+export const NativeModuleNames = {
+  napSsp: ['NapSspModule'],
+  interstitial: ['InterstitialModule', 'NapSspInterstitial'],
+  rewarded: ['RewardedModule', 'NapSspRewardedModule'],
+  banner: ['BannerView', 'NapSspBannerView'],
+} as const;
+
+export function getNativeModule<T extends Record<string, any>>(moduleName: string): T | undefined {
+  const module = NativeModules[moduleName] as T | undefined;
+  if (!module || Object.keys(module).length === 0) {
+    return undefined;
+  }
+  return module;
+}
+
+export function getNativeModuleFromNames<T extends Record<string, any>>(moduleNames: readonly string[]): T | undefined {
+  for (const moduleName of moduleNames) {
+    const module = getNativeModule<T>(moduleName);
+    if (module) {
+      return module;
+    }
+  }
+  return undefined;
+}
+
+export function isNativeModuleAvailable(moduleNameOrNames: string | readonly string[]): boolean {
+  return Array.isArray(moduleNameOrNames)
+    ? getNativeModuleFromNames(moduleNameOrNames) !== undefined
+    : getNativeModule(moduleNameOrNames) !== undefined;
+}
+
+export function createNativeModuleMissingError(
+  feature: string,
+  moduleNameOrNames: string | readonly string[],
+): Error {
+  const moduleLabel = Array.isArray(moduleNameOrNames)
+    ? moduleNameOrNames.join(' / ')
+    : moduleNameOrNames;
+
+  return new Error(
+    `NapSsp ${feature} is not linked. Expected native module "${moduleLabel}" to be registered on ${Platform.OS}.`,
+  );
+}
+
+export async function callNative<T>(
+  moduleNameOrNames: string | readonly string[],
+  method: string,
+  args: readonly unknown[] = [],
+  feature = Array.isArray(moduleNameOrNames) ? moduleNameOrNames.join(' / ') : moduleNameOrNames,
+): Promise<T> {
+  const module = Array.isArray(moduleNameOrNames)
+    ? getNativeModuleFromNames<Record<string, (...methodArgs: any[]) => Promise<T> | T>>(moduleNameOrNames)
+    : getNativeModule<Record<string, (...methodArgs: any[]) => Promise<T> | T>>(moduleNameOrNames);
+
+  const fn = module?.[method];
+
+  if (typeof fn !== 'function') {
+    throw createNativeModuleMissingError(feature, moduleNameOrNames);
+  }
+
+  return await fn(...args);
+}
