@@ -11,7 +11,14 @@ RCT_EXTERN_METHOD(requestTrackingAuthorization:(RCTPromiseResolveBlock)resolve r
 
 @interface RCT_EXTERN_MODULE(NapSspInterstitial, NSObject)
 RCT_EXTERN_METHOD(load:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(show:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(show:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(destroy:(NSString *)adUnitId)
+@end
+
+@interface RCT_EXTERN_MODULE(NapSspRewarded, NSObject)
+RCT_EXTERN_METHOD(load:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(show:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(destroy:(NSString *)adUnitId)
 @end
 
 @interface RCT_EXTERN_MODULE(NapSspBannerView, RCTViewManager)

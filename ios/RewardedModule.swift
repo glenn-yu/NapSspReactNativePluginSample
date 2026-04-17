@@ -1,8 +1,8 @@
 import Foundation
 import React
 
-@objc(NapSspInterstitial)
-class InterstitialModule: NSObject {
+@objc(NapSspRewarded)
+class RewardedModule: NSObject {
   @objc
   static func requiresMainQueueSetup() -> Bool { false }
 
@@ -10,12 +10,12 @@ class InterstitialModule: NSObject {
   func load(_ adUnitId: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.main.async {
       do {
-        let status = try NapSspRuntime.shared.registerInterstitialLoad(adUnitId: adUnitId)
+        let status = try NapSspRuntime.shared.registerRewardedLoad(adUnitId: adUnitId)
         resolve(status)
       } catch let error as NapSspError {
         reject(error.errorCode, error.errorDescription ?? error.errorCode, nil)
       } catch {
-        reject("napssp_interstitial_load_failed", error.localizedDescription, error)
+        reject("napssp_rewarded_load_failed", error.localizedDescription, error)
       }
     }
   }
@@ -28,8 +28,8 @@ class InterstitialModule: NSObject {
         return
       }
 
-      guard let payload = NapSspRuntime.shared.consumeInterstitialPresentation(adUnitId: adUnitId) else {
-        reject(NapSspError.adNotLoaded("No interstitial has been loaded yet.").errorCode, "No interstitial has been loaded yet.", nil)
+      guard let payload = NapSspRuntime.shared.consumeRewardedPresentation(adUnitId: adUnitId) else {
+        reject(NapSspError.adNotLoaded("No rewarded ad has been loaded yet.").errorCode, "No rewarded ad has been loaded yet.", nil)
         return
       }
 
@@ -39,8 +39,8 @@ class InterstitialModule: NSObject {
 
   @objc
   func destroy(_ adUnitId: String) {
-    // The placeholder runtime keeps only ephemeral state, so there is no extra
-    // native resource to release yet. This keeps the bridge aligned with the JS API.
+    // The placeholder runtime only keeps in-memory state, so releasing a rewarded
+    // ad is just a no-op for now. This method exists so the bridge matches the JS API.
     _ = adUnitId
   }
 }

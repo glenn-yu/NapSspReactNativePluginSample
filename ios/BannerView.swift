@@ -52,19 +52,36 @@ final class BannerView: UIView {
 
   override func didMoveToWindow() {
     super.didMoveToWindow()
+
+    if window == nil {
+      loadWorkItem?.cancel()
+      return
+    }
+
     reloadIfNeeded()
   }
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    containerView.frame = bounds.insetBy(dx: 0, dy: 0)
+    containerView.frame = bounds
+
     let inset: CGFloat = 12
     badgeLabel.sizeToFit()
-    badgeLabel.frame = CGRect(x: inset, y: inset, width: min(bounds.width - inset * 2, badgeLabel.bounds.width), height: badgeLabel.bounds.height)
+    badgeLabel.frame = CGRect(
+      x: inset,
+      y: inset,
+      width: min(bounds.width - inset * 2, badgeLabel.bounds.width),
+      height: badgeLabel.bounds.height
+    )
 
     titleLabel.frame = CGRect(x: inset, y: badgeLabel.frame.maxY + 8, width: bounds.width - inset * 2, height: 20)
     detailLabel.frame = CGRect(x: inset, y: titleLabel.frame.maxY + 4, width: bounds.width - inset * 2, height: 18)
-    placeholderButton.frame = CGRect(x: inset, y: max(detailLabel.frame.maxY + 8, bounds.height - 34), width: bounds.width - inset * 2, height: 24)
+    placeholderButton.frame = CGRect(
+      x: inset,
+      y: max(detailLabel.frame.maxY + 8, bounds.height - 34),
+      width: bounds.width - inset * 2,
+      height: 24
+    )
 
     let sizeInfo = NapSspRuntime.shared.bannerSize(for: size as String)
     containerView.layer.cornerRadius = max(8, min(bounds.height, sizeInfo.height) / 16)
@@ -134,7 +151,7 @@ final class BannerView: UIView {
     }
 
     guard NapSspRuntime.shared.isInitialized else {
-      emitFailure(code: .notInitialized)
+      emitFailure(code: .notInitialized, adUnitId: currentAdUnitId)
       return
     }
 
@@ -143,6 +160,7 @@ final class BannerView: UIView {
     titleLabel.text = "Loading banner…"
     detailLabel.text = "adUnitId: \(currentAdUnitId)"
     containerView.backgroundColor = UIColor.systemGray6
+    containerView.layer.borderColor = UIColor.systemGray3.cgColor
 
     let workItem = DispatchWorkItem { [weak self] in
       self?.finishLoading(adUnitId: currentAdUnitId)
@@ -173,14 +191,14 @@ final class BannerView: UIView {
     reloadIfNeeded()
   }
 
-  private func emitFailure(code: NapSspError) {
+  private func emitFailure(code: NapSspError, adUnitId: String) {
     isLoaded = false
     titleLabel.text = "Banner load failed"
     let message = code.errorDescription ?? "Banner load failed"
     detailLabel.text = message
     containerView.backgroundColor = UIColor.systemRed.withAlphaComponent(0.08)
     containerView.layer.borderColor = UIColor.systemRed.cgColor
-    onAdFailedToLoad?(errorPayload(code: code, message: message))
+    onAdFailedToLoad?(errorPayload(code: code, adUnitId: adUnitId, message: message))
   }
 
   @objc private func handleTap() {
@@ -207,8 +225,10 @@ final class BannerView: UIView {
     ]
   }
 
-  private func errorPayload(code: NapSspError, message: String) -> [String: Any] {
+  private func errorPayload(code: NapSspError, adUnitId: String, message: String) -> [String: Any] {
     [
+      "adUnitId": adUnitId,
+      "size": size as String,
       "code": code.errorCode,
       "message": message,
     ]

@@ -8,8 +8,10 @@ Pod::Spec.new do |s|
   s.platform     = :ios, '13.0'
   s.static_framework = true
   s.source       = { :git => 'https://github.com/glenn-yu/NapSspReactNativePluginSample.git', :tag => s.version.to_s }
-  s.source_files = 'ios/**/*.{swift,m}'
+  s.source_files = 'ios/**/*.{h,m,swift}'
   s.swift_version = '5.0'
+  s.frameworks = 'Foundation', 'UIKit', 'AdSupport', 'StoreKit'
+  s.weak_frameworks = 'AppTrackingTransparency'
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     'CLANG_ENABLE_MODULES' => 'YES',

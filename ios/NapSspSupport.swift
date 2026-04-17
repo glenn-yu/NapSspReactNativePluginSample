@@ -7,6 +7,12 @@ import AppTrackingTransparency
 
 extension Notification.Name {
   static let napSspDidInitialize = Notification.Name("com.napssp.didInitialize")
+  static let napSspInterstitialDidLoad = Notification.Name("com.napssp.interstitial.didLoad")
+  static let napSspInterstitialDidPresent = Notification.Name("com.napssp.interstitial.didPresent")
+  static let napSspRewardedDidLoad = Notification.Name("com.napssp.rewarded.didLoad")
+  static let napSspRewardedDidPresent = Notification.Name("com.napssp.rewarded.didPresent")
+  static let napSspRewardedDidEarn = Notification.Name("com.napssp.rewarded.didEarn")
+  static let napSspTrackingAuthorizationDidChange = Notification.Name("com.napssp.att.didChange")
 }
 
 struct NapSspConfiguration {
@@ -17,20 +23,25 @@ struct NapSspConfiguration {
   let coppa: Bool
 
   init(dictionary: NSDictionary) throws {
-    guard let mediaKey = dictionary["mediaKey"] as? String, !mediaKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+    guard let mediaKey = dictionary["mediaKey"] as? String,
+      !mediaKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    else {
       throw NapSspError.invalidConfiguration("Missing required field 'mediaKey'.")
     }
 
-    guard let adUnitIds = dictionary["adUnitIds"] as? [String], !adUnitIds.isEmpty else {
+    guard let rawAdUnitIds = dictionary["adUnitIds"] as? [Any], !rawAdUnitIds.isEmpty else {
       throw NapSspError.invalidConfiguration("Missing required field 'adUnitIds'.")
     }
 
-    let mediations = (dictionary["mediations"] as? [String: Any]) ?? [:]
+    let mediations = Self.normalizeMediationConfiguration(dictionary["mediations"])
     let logLevel = (dictionary["logLevel"] as? String)?.lowercased() ?? "info"
     let coppa = dictionary["coppa"] as? Bool ?? false
 
     self.mediaKey = mediaKey.trimmingCharacters(in: .whitespacesAndNewlines)
-    self.adUnitIds = adUnitIds.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+    self.adUnitIds = rawAdUnitIds
+      .compactMap { $0 as? String }
+      .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+      .filter { !$0.isEmpty }
     self.mediations = mediations
     self.logLevel = logLevel
     self.coppa = coppa
@@ -48,6 +59,43 @@ struct NapSspConfiguration {
       "logLevel": logLevel,
       "coppa": coppa,
     ]
+  }
+
+  private static func normalizeMediationConfiguration(_ value: Any?) -> [String: Any] {
+    guard let dictionary = value as? [String: Any] else { return [:] }
+
+    var result: [String: Any] = [:]
+    for (key, rawValue) in dictionary {
+      switch rawValue {
+      case let nested as [String: Any]:
+        let sanitized = nested.reduce(into: [String: Any]()) { partialResult, element in
+          if !(element.value is NSNull) {
+            partialResult[element.key] = element.value
+          }
+        }
+        if !sanitized.isEmpty {
+          result[key] = sanitized
+        }
+      case let bool as Bool:
+        result[key] = bool
+      case let string as String:
+        let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty {
+          result[key] = trimmed
+        }
+      case let array as [Any]:
+        let cleaned = array.compactMap { $0 as? String }.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+        if !cleaned.isEmpty {
+          result[key] = cleaned
+        }
+      case is NSNull:
+        continue
+      default:
+        result[key] = rawValue
+      }
+    }
+
+    return result
   }
 }
 
@@ -103,6 +151,27 @@ struct NapSspBannerSize {
   }
 }
 
+struct NapSspReward {
+  let type: String
+  let amount: Double
+  let currency: String?
+
+  static let placeholder = NapSspReward(type: "placeholder-points", amount: 1, currency: "points")
+
+  var dictionaryRepresentation: [String: Any] {
+    var payload: [String: Any] = [
+      "type": type,
+      "amount": amount,
+    ]
+
+    if let currency {
+      payload["currency"] = currency
+    }
+
+    return payload
+  }
+}
+
 final class NapSspRuntime {
   static let shared = NapSspRuntime()
 
@@ -111,8 +180,11 @@ final class NapSspRuntime {
   private var initializedAt: Date?
   private var logLevel: String = "info"
   private var coppaEnabled: Bool = false
+  private var trackingAuthorizationStatus: String?
   private var lastInterstitialAdUnitId: String?
   private var loadedInterstitialAdUnitIds: Set<String> = []
+  private var lastRewardedAdUnitId: String?
+  private var loadedRewardedAdUnitIds: Set<String> = []
 
   private init() {}
 
@@ -129,7 +201,9 @@ final class NapSspRuntime {
       logLevel = config.logLevel
       coppaEnabled = config.coppa
       loadedInterstitialAdUnitIds.removeAll()
+      loadedRewardedAdUnitIds.removeAll()
       lastInterstitialAdUnitId = nil
+      lastRewardedAdUnitId = nil
 
       return currentStatusLocked(extra: [
         "message": "NapSsp placeholder runtime initialized.",
@@ -174,45 +248,98 @@ final class NapSspRuntime {
       throw NapSspError.invalidConfiguration("Interstitial adUnitId must not be empty.")
     }
 
-    return stateQueue.sync {
+    let payload = stateQueue.sync {
       lastInterstitialAdUnitId = trimmed
       loadedInterstitialAdUnitIds.insert(trimmed)
       return [
         "adUnitId": trimmed,
         "loaded": true,
         "source": "placeholder",
-        "loadedAt": ISO8601DateFormatter().string(from: Date()),
+        "loadedAt": Self.iso8601String(from: Date()),
       ]
     }
-  }
 
-  func canPresentInterstitial(adUnitId: String? = nil) -> Bool {
-    stateQueue.sync {
-      if let adUnitId, !adUnitId.isEmpty {
-        return loadedInterstitialAdUnitIds.contains(adUnitId)
-      }
-      if let last = lastInterstitialAdUnitId {
-        return loadedInterstitialAdUnitIds.contains(last)
-      }
-      return false
-    }
+    NotificationCenter.default.post(name: .napSspInterstitialDidLoad, object: nil, userInfo: payload)
+    return payload
   }
 
   func consumeInterstitialPresentation(adUnitId: String? = nil) -> [String: Any]? {
-    stateQueue.sync {
-      let target = (adUnitId?.isEmpty == false ? adUnitId : lastInterstitialAdUnitId)
-      guard let target, loadedInterstitialAdUnitIds.contains(target) else {
+    let payload = stateQueue.sync {
+      let target = adUnitId?.trimmingCharacters(in: .whitespacesAndNewlines)
+      let resolvedTarget = (target?.isEmpty == false ? target : lastInterstitialAdUnitId)
+      guard let resolvedTarget, loadedInterstitialAdUnitIds.contains(resolvedTarget) else {
         return nil
       }
 
-      loadedInterstitialAdUnitIds.remove(target)
+      loadedInterstitialAdUnitIds.remove(resolvedTarget)
       return [
-        "adUnitId": target,
+        "adUnitId": resolvedTarget,
         "presented": true,
         "source": "placeholder",
-        "presentedAt": ISO8601DateFormatter().string(from: Date()),
+        "presentedAt": Self.iso8601String(from: Date()),
       ]
     }
+
+    guard let payload else { return nil }
+
+    NotificationCenter.default.post(name: .napSspInterstitialDidPresent, object: nil, userInfo: payload)
+    return payload
+  }
+
+  func registerRewardedLoad(adUnitId: String) throws -> [String: Any] {
+    try validateInitialized()
+    let trimmed = adUnitId.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else {
+      throw NapSspError.invalidConfiguration("Rewarded adUnitId must not be empty.")
+    }
+
+    let payload = stateQueue.sync {
+      lastRewardedAdUnitId = trimmed
+      loadedRewardedAdUnitIds.insert(trimmed)
+      return [
+        "adUnitId": trimmed,
+        "loaded": true,
+        "source": "placeholder",
+        "loadedAt": Self.iso8601String(from: Date()),
+      ]
+    }
+
+    NotificationCenter.default.post(name: .napSspRewardedDidLoad, object: nil, userInfo: payload)
+    return payload
+  }
+
+  func consumeRewardedPresentation(adUnitId: String? = nil) -> [String: Any]? {
+    let payload = stateQueue.sync {
+      let target = adUnitId?.trimmingCharacters(in: .whitespacesAndNewlines)
+      let resolvedTarget = (target?.isEmpty == false ? target : lastRewardedAdUnitId)
+      guard let resolvedTarget, loadedRewardedAdUnitIds.contains(resolvedTarget) else {
+        return nil
+      }
+
+      loadedRewardedAdUnitIds.remove(resolvedTarget)
+      return [
+        "adUnitId": resolvedTarget,
+        "presented": true,
+        "reward": NapSspReward.placeholder.dictionaryRepresentation,
+        "source": "placeholder",
+        "presentedAt": Self.iso8601String(from: Date()),
+      ]
+    }
+
+    guard let payload else { return nil }
+
+    NotificationCenter.default.post(name: .napSspRewardedDidPresent, object: nil, userInfo: payload)
+    if let adUnitId = payload["adUnitId"] as? String {
+      NotificationCenter.default.post(
+        name: .napSspRewardedDidEarn,
+        object: nil,
+        userInfo: [
+          "adUnitId": adUnitId,
+          "reward": NapSspReward.placeholder.dictionaryRepresentation,
+        ]
+      )
+    }
+    return payload
   }
 
   func bannerSize(for rawValue: String?) -> NapSspBannerSize {
@@ -221,19 +348,27 @@ final class NapSspRuntime {
 
   func requestTrackingAuthorization(completion: @escaping (String) -> Void) {
     #if canImport(AppTrackingTransparency)
-    if #available(iOS 14, *) {
+    if #available(iOS 14.5, *) {
       let status = ATTrackingManager.trackingAuthorizationStatus
       guard status == .notDetermined else {
+        let stringStatus = Self.string(from: status)
+        stateQueue.sync { trackingAuthorizationStatus = stringStatus }
         DispatchQueue.main.async {
-          completion(Self.string(from: status))
+          NotificationCenter.default.post(name: .napSspTrackingAuthorizationDidChange, object: nil, userInfo: ["status": stringStatus])
+          completion(stringStatus)
         }
         return
       }
 
       DispatchQueue.main.async {
         ATTrackingManager.requestTrackingAuthorization { newStatus in
+          let stringStatus = Self.string(from: newStatus)
+          self.stateQueue.sync {
+            self.trackingAuthorizationStatus = stringStatus
+          }
           DispatchQueue.main.async {
-            completion(Self.string(from: newStatus))
+            NotificationCenter.default.post(name: .napSspTrackingAuthorizationDidChange, object: nil, userInfo: ["status": stringStatus])
+            completion(stringStatus)
           }
         }
       }
@@ -255,6 +390,7 @@ final class NapSspRuntime {
       "logLevel": logLevel,
       "coppa": coppaEnabled,
       "loadedInterstitialAdUnitIds": Array(loadedInterstitialAdUnitIds),
+      "loadedRewardedAdUnitIds": Array(loadedRewardedAdUnitIds),
     ]
 
     if let configuration {
@@ -264,7 +400,11 @@ final class NapSspRuntime {
     }
 
     if let initializedAt {
-      payload["initializedAt"] = ISO8601DateFormatter().string(from: initializedAt)
+      payload["initializedAt"] = Self.iso8601String(from: initializedAt)
+    }
+
+    if let trackingAuthorizationStatus {
+      payload["trackingAuthorizationStatus"] = trackingAuthorizationStatus
     }
 
     extra.forEach { payload[$0.key] = $0.value }
@@ -278,8 +418,12 @@ final class NapSspRuntime {
     return "\(prefix)…\(suffix)"
   }
 
+  private static func iso8601String(from date: Date) -> String {
+    ISO8601DateFormatter().string(from: date)
+  }
+
   #if canImport(AppTrackingTransparency)
-  @available(iOS 14, *)
+  @available(iOS 14.5, *)
   private static func string(from status: ATTrackingManager.AuthorizationStatus) -> String {
     switch status {
     case .authorized:
