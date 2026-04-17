@@ -6,25 +6,25 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import java.util.concurrent.ConcurrentHashMap
 
-class InterstitialModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class RewardedAdModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     private val loadedAdUnitIds = ConcurrentHashMap<String, Boolean>()
 
-    override fun getName(): String = "NapSspInterstitial"
+    override fun getName(): String = "NapSspRewarded"
 
     @ReactMethod
     fun load(adUnitId: String, promise: Promise) {
         val normalizedAdUnitId = adUnitId.trim()
         if (normalizedAdUnitId.isEmpty()) {
-            promise.reject("NAP_SSP_INVALID_AD_UNIT", "Interstitial adUnitId is required")
+            promise.reject("NAP_SSP_INVALID_AD_UNIT", "Rewarded adUnitId is required")
             return
         }
 
         loadedAdUnitIds[normalizedAdUnitId] = true
-        NapSspSdkBridge.markInterstitialState(normalizedAdUnitId, NapSspLoadState.LOADED)
+        NapSspSdkBridge.markRewardedState(normalizedAdUnitId, NapSspLoadState.LOADED)
         NapSspEventEmitter.emitModuleEvent(
             reactContext,
             "onAdLoaded",
-            mapOf("adUnitId" to normalizedAdUnitId, "format" to "interstitial"),
+            mapOf("adUnitId" to normalizedAdUnitId, "format" to "rewarded"),
         )
         promise.resolve(null)
     }
@@ -33,28 +33,38 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
     fun show(adUnitId: String, promise: Promise) {
         val normalizedAdUnitId = adUnitId.trim()
         if (normalizedAdUnitId.isEmpty()) {
-            promise.reject("NAP_SSP_INVALID_AD_UNIT", "Interstitial adUnitId is required")
+            promise.reject("NAP_SSP_INVALID_AD_UNIT", "Rewarded adUnitId is required")
             return
         }
 
         if (loadedAdUnitIds[normalizedAdUnitId] != true) {
-            promise.reject("NAP_SSP_INTERSTITIAL_NOT_READY", "Interstitial has not been loaded yet")
+            promise.reject("NAP_SSP_REWARDED_NOT_READY", "Rewarded ad has not been loaded yet")
             return
         }
 
-        NapSspSdkBridge.markInterstitialState(normalizedAdUnitId, NapSspLoadState.SHOWN)
+        NapSspSdkBridge.markRewardedState(normalizedAdUnitId, NapSspLoadState.SHOWN)
         NapSspEventEmitter.emitModuleEvent(
             reactContext,
             "onAdOpened",
-            mapOf("adUnitId" to normalizedAdUnitId, "format" to "interstitial"),
+            mapOf("adUnitId" to normalizedAdUnitId, "format" to "rewarded"),
+        )
+        NapSspEventEmitter.emitModuleEvent(
+            reactContext,
+            "onRewarded",
+            mapOf(
+                "adUnitId" to normalizedAdUnitId,
+                "format" to "rewarded",
+                "type" to "reward",
+                "amount" to 1,
+            ),
         )
         NapSspEventEmitter.emitModuleEvent(
             reactContext,
             "onAdClosed",
-            mapOf("adUnitId" to normalizedAdUnitId, "format" to "interstitial"),
+            mapOf("adUnitId" to normalizedAdUnitId, "format" to "rewarded"),
         )
         loadedAdUnitIds.remove(normalizedAdUnitId)
-        NapSspSdkBridge.clearInterstitial(normalizedAdUnitId)
+        NapSspSdkBridge.clearRewarded(normalizedAdUnitId)
         promise.resolve(null)
     }
 
@@ -68,7 +78,7 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
     fun destroy(adUnitId: String, promise: Promise) {
         val normalizedAdUnitId = adUnitId.trim()
         loadedAdUnitIds.remove(normalizedAdUnitId)
-        NapSspSdkBridge.clearInterstitial(normalizedAdUnitId)
+        NapSspSdkBridge.clearRewarded(normalizedAdUnitId)
         promise.resolve(null)
     }
 

@@ -23,7 +23,15 @@ export interface BannerAdProps {
   testID?: string;
 }
 
-type NativeBannerProps = BannerAdProps & {
+type NativeBannerProps = Omit<
+  BannerAdProps,
+  'onAdLoaded' | 'onAdFailedToLoad' | 'onAdClicked' | 'onAdOpened' | 'onAdClosed'
+> & {
+  onAdLoaded?: () => void;
+  onAdFailedToLoad?: (event: { nativeEvent: AdError }) => void;
+  onAdClicked?: () => void;
+  onAdOpened?: () => void;
+  onAdClosed?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -54,7 +62,21 @@ export default function BannerAd(props: BannerAdProps) {
   const size = props.size ?? 'BANNER_320x50';
 
   if (NativeBannerComponent) {
-    return <NativeBannerComponent {...props} />;
+    return (
+      <NativeBannerComponent
+        adUnitId={props.adUnitId}
+        size={size}
+        style={props.style}
+        testID={props.testID}
+        onAdLoaded={props.onAdLoaded}
+        onAdFailedToLoad={
+          props.onAdFailedToLoad ? (event) => props.onAdFailedToLoad?.(event.nativeEvent) : undefined
+        }
+        onAdClicked={props.onAdClicked}
+        onAdOpened={props.onAdOpened}
+        onAdClosed={props.onAdClosed}
+      />
+    );
   }
 
   const fallback = FALLBACK_DIMENSIONS[size];

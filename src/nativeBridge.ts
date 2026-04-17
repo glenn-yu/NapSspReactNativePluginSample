@@ -3,7 +3,7 @@ import { NativeModules, Platform } from 'react-native';
 export const NativeModuleNames = {
   napSsp: ['NapSspModule'],
   interstitial: ['InterstitialModule', 'NapSspInterstitial'],
-  rewarded: ['RewardedModule', 'NapSspRewardedModule'],
+  rewarded: ['RewardedModule', 'NapSspRewardedModule', 'NapSspRewarded'],
   banner: ['BannerView', 'NapSspBannerView'],
 } as const;
 

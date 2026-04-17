@@ -1,17 +1,58 @@
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
-    compileSdkVersion 33
+    namespace 'com.napsspplugin'
+    compileSdk 34
+
     defaultConfig {
-        minSdkVersion 24
-        targetSdkVersion 33
+        minSdk 21
+        targetSdk 34
+        consumerProguardFiles 'consumer-rules.pro'
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    lint {
+        abortOnError false
     }
 }
 
+repositories {
+    google()
+    mavenCentral()
+    maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }
+    maven { url 'https://artifact.bytedance.com/repository/pangle/' }
+}
+
 dependencies {
-    // nap ssp SDK dependency (placeholder)
-    // implementation 'io.github.nasmedia-tech:admixer-ssp:1.0.21'
+    compileOnly 'com.facebook.react:react-android'
+    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib'
+
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.9.0'
+
+    // Core nap ssp / mediation artifacts are declared as compileOnly until the
+    // exact Android SDK entry points are wired against the official APIs.
+    compileOnly 'io.github.nasmedia-tech:admixer-ssp:1.0.21'
+    compileOnly 'io.github.nasmedia-tech:admixer-admanager:1.0.14'
+    compileOnly 'io.github.nasmedia-tech:admixer-adfit:1.0.10'
+    compileOnly 'io.github.nasmedia-tech:admixer-pangle:1.0.10'
+    compileOnly 'io.github.nasmedia-tech:admixer-applovin:1.0.8'
+    compileOnly 'io.github.nasmedia-tech:admixer-unity:1.0.6'
 }

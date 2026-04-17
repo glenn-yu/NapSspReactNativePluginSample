@@ -51,6 +51,7 @@ export class InterstitialAd {
     }
 
     await nativeModule.show(this.adUnitId);
+    this._loaded = false;
     this.emitter.emit('opened', undefined);
     this.emitter.emit('closed', undefined);
   }
