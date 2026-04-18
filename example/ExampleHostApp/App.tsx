@@ -46,6 +46,11 @@ const TEST_CONFIG = Platform.OS === 'ios' ? TEST_CONFIG_IOS : TEST_CONFIG_ANDROI
 
 function App(): JSX.Element {
   const [statusText, setStatusText] = useState('Waiting for SDK initialization...');
+  const appendStatus = (label: string, payload?: unknown) => {
+    const line = payload === undefined ? label : `${label}: ${JSON.stringify(payload)}`;
+    console.log(`[NapSspExample] ${line}`);
+    setStatusText((prev) => `${line}\n\n${prev}`);
+  };
   const isNative = isNativeModuleAvailable([
     'NapSspModule',
     'NapSspBannerView',
@@ -58,28 +63,36 @@ function App(): JSX.Element {
     let isMounted = true;
 
     const initialize = async () => {
+      const config = {
+        mediaKey: TEST_CONFIG.mediaKey,
+        adUnitIds: [
+          TEST_CONFIG.bannerId,
+          TEST_CONFIG.nativeAdId,
+          TEST_CONFIG.videoAdId,
+          TEST_CONFIG.interstitialId,
+          TEST_CONFIG.interstitialVideoId,
+          TEST_CONFIG.rewardedId,
+        ],
+        logLevel: 'debug' as const,
+      };
+
+      appendStatus('initialize.start', {
+        platform: Platform.OS,
+        nativeAvailable: isNative,
+        config,
+      });
+
       try {
-        await NapSspAd.initialize({
-          mediaKey: TEST_CONFIG.mediaKey,
-          adUnitIds: [
-            TEST_CONFIG.bannerId,
-            TEST_CONFIG.nativeAdId,
-            TEST_CONFIG.videoAdId,
-            TEST_CONFIG.interstitialId,
-            TEST_CONFIG.interstitialVideoId,
-            TEST_CONFIG.rewardedId,
-          ],
-          logLevel: 'debug',
-        });
+        await NapSspAd.initialize(config);
+        appendStatus('initialize.success');
 
         const status = await NapSspAd.getStatus();
-        if (isMounted) {
-          setStatusText(JSON.stringify(status, null, 2));
-        }
+        appendStatus('getStatus.success', status);
       } catch (error) {
         console.warn('NapSsp initialize failed', error);
+        appendStatus('initialize.failed', String(error));
         if (isMounted) {
-          setStatusText(`Initialization failed: ${String(error)}`);
+          setStatusText((prev) => `Initialization failed: ${String(error)}\n\n${prev}`);
         }
       }
     };
@@ -94,29 +107,48 @@ function App(): JSX.Element {
   const refreshStatus = async () => {
     try {
       const status = await NapSspAd.getStatus();
-      setStatusText(JSON.stringify(status, null, 2));
+      appendStatus('refreshStatus.success', status);
     } catch (error) {
+      appendStatus('refreshStatus.failed', String(error));
       Alert.alert('Status', `Unable to fetch status: ${String(error)}`);
     }
   };
 
   const handleShowInterstitial = async () => {
     const interstitial = new InterstitialAd(TEST_CONFIG.interstitialId);
+    interstitial.addAdEventListener('loaded', () => appendStatus('interstitial.loaded', TEST_CONFIG.interstitialId));
+    interstitial.addAdEventListener('loadFailed', (error) => appendStatus('interstitial.loadFailed', error));
+    interstitial.addAdEventListener('opened', () => appendStatus('interstitial.opened', TEST_CONFIG.interstitialId));
+    interstitial.addAdEventListener('closed', () => appendStatus('interstitial.closed', TEST_CONFIG.interstitialId));
+    interstitial.addAdEventListener('clicked', () => appendStatus('interstitial.clicked', TEST_CONFIG.interstitialId));
+    interstitial.addAdEventListener('impression', () => appendStatus('interstitial.impression', TEST_CONFIG.interstitialId));
     try {
+      appendStatus('interstitial.load.start', TEST_CONFIG.interstitialId);
       await interstitial.load();
+      appendStatus('interstitial.show.start', TEST_CONFIG.interstitialId);
       await interstitial.show();
     } catch (error) {
+      appendStatus('interstitial.failed', String(error));
       Alert.alert('알림', `전면 광고를 불러오지 못했습니다.\n${String(error)}`);
     }
   };
 
   const handleShowInterstitialVideo = async () => {
     const interstitialVideo = new InterstitialVideoAd(TEST_CONFIG.interstitialVideoId);
+    interstitialVideo.addAdEventListener('loaded', () => appendStatus('interstitialVideo.loaded', TEST_CONFIG.interstitialVideoId));
+    interstitialVideo.addAdEventListener('loadFailed', (error) => appendStatus('interstitialVideo.loadFailed', error));
+    interstitialVideo.addAdEventListener('opened', () => appendStatus('interstitialVideo.opened', TEST_CONFIG.interstitialVideoId));
+    interstitialVideo.addAdEventListener('closed', () => appendStatus('interstitialVideo.closed', TEST_CONFIG.interstitialVideoId));
+    interstitialVideo.addAdEventListener('clicked', () => appendStatus('interstitialVideo.clicked', TEST_CONFIG.interstitialVideoId));
+    interstitialVideo.addAdEventListener('impression', () => appendStatus('interstitialVideo.impression', TEST_CONFIG.interstitialVideoId));
     try {
+      appendStatus('interstitialVideo.load.start', TEST_CONFIG.interstitialVideoId);
       await interstitialVideo.load();
+      appendStatus('interstitialVideo.show.start', TEST_CONFIG.interstitialVideoId);
       await interstitialVideo.show();
       Alert.alert('알림', '전면 동영상 광고 show()가 호출되었습니다.');
     } catch (error) {
+      appendStatus('interstitialVideo.failed', String(error));
       Alert.alert('알림', `전면 동영상 광고를 불러오지 못했습니다.\n${String(error)}`);
     }
   };
@@ -124,14 +156,24 @@ function App(): JSX.Element {
   const handleShowRewarded = async () => {
     const rewarded = new RewardedAd(TEST_CONFIG.rewardedId);
 
+    rewarded.addAdEventListener('loaded', () => appendStatus('rewarded.loaded', TEST_CONFIG.rewardedId));
+    rewarded.addAdEventListener('loadFailed', (error) => appendStatus('rewarded.loadFailed', error));
+    rewarded.addAdEventListener('opened', () => appendStatus('rewarded.opened', TEST_CONFIG.rewardedId));
+    rewarded.addAdEventListener('closed', () => appendStatus('rewarded.closed', TEST_CONFIG.rewardedId));
+    rewarded.addAdEventListener('clicked', () => appendStatus('rewarded.clicked', TEST_CONFIG.rewardedId));
+    rewarded.addAdEventListener('impression', () => appendStatus('rewarded.impression', TEST_CONFIG.rewardedId));
     rewarded.addAdEventListener('onRewarded', () => {
+      appendStatus('rewarded.rewarded', TEST_CONFIG.rewardedId);
       Alert.alert('보상 획득!', '보상 이벤트가 발생했습니다.');
     });
 
     try {
+      appendStatus('rewarded.load.start', TEST_CONFIG.rewardedId);
       await rewarded.load();
+      appendStatus('rewarded.show.start', TEST_CONFIG.rewardedId);
       await rewarded.show();
     } catch (error) {
+      appendStatus('rewarded.failed', String(error));
       Alert.alert('알림', `보상형 광고를 불러오지 못했습니다.\n${String(error)}`);
     }
   };
@@ -180,8 +222,8 @@ function App(): JSX.Element {
               <BannerAd
                 adUnitId={TEST_CONFIG.bannerId}
                 size="BANNER_320x50"
-                onAdLoaded={() => console.log('배너 로드 성공')}
-                onAdFailedToLoad={(e) => console.log('배너 실패:', e.message)}
+                onAdLoaded={() => appendStatus('banner.loaded', TEST_CONFIG.bannerId)}
+                onAdFailedToLoad={(e) => appendStatus('banner.loadFailed', e)}
               />
             ) : (
               <Text style={{color: '#6B7280'}}>Native banner not available (placeholder)</Text>
