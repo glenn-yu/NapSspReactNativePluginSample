@@ -107,6 +107,12 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
+    // Add specific adapter libs so mediation adapters are packaged into the host APK for testing.
+    // Start with Pangle adapter (server shows Pangle in priority list).
+    implementation 'io.github.nasmedia-tech:admixer-pangle:1.0.10'
+    // Add AdFit adapter next
+    implementation 'io.github.nasmedia-tech:admixer-adfit:1.0.10'
+
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.squareup.okhttp3', module:'okhttp'

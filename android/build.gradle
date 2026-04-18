@@ -28,7 +28,7 @@ def napSspSdkCoordinates = [
     pangle: 'io.github.nasmedia-tech:admixer-pangle:1.0.10',
     appLovin: 'io.github.nasmedia-tech:admixer-applovin:1.0.8',
     unity: 'io.github.nasmedia-tech:admixer-unity:1.0.6',
-    adsIdentifier: 'com.google.android.gms:play-services-ads-identifier:18.9.0',
+    adsIdentifier: 'com.google.android.gms:play-services-ads-identifier:18.0.1',
 ]
 
 android {

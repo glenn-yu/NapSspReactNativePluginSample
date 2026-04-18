@@ -18,6 +18,7 @@ import {
   RewardedAd,
   VideoAd,
   isNativeModuleAvailable,
+  isNativeViewAvailable,
 } from '../../src';
 
 import {Platform} from 'react-native';
@@ -27,7 +28,8 @@ const TEST_CONFIG_ANDROID = {
   bannerId: '104701', // 320x50
   nativeAdId: '104588',
   videoAdId: '104591', // instream
-  interstitialId: '104704',
+  // 104704 is configured as banner on the server; 104703 is marked fullscreen=true so use it for fullscreen flows
+  interstitialId: '104703',
   interstitialVideoId: '104703',
   rewardedId: '103722',
 };
@@ -51,13 +53,13 @@ function App(): JSX.Element {
     console.log(`[NapSspExample] ${line}`);
     setStatusText((prev) => `${line}\n\n${prev}`);
   };
-  const isNative = isNativeModuleAvailable([
+  const hasNativeModule = isNativeModuleAvailable([
     'NapSspModule',
-    'NapSspBannerView',
-    'NapSspNativeAdView',
-    'NapSspVideoAdView',
     'NapSspInterstitialVideo',
   ]);
+  const hasBannerView = Platform.OS === 'ios' && isNativeViewAvailable('NapSspBannerView');
+  const hasNativeAdView = Platform.OS === 'ios' && isNativeViewAvailable('NapSspNativeAdView');
+  const hasVideoAdView = Platform.OS === 'ios' && isNativeViewAvailable('NapSspVideoAdView');
 
   useEffect(() => {
     let isMounted = true;
@@ -78,7 +80,10 @@ function App(): JSX.Element {
 
       appendStatus('initialize.start', {
         platform: Platform.OS,
-        nativeAvailable: isNative,
+        nativeAvailable: hasNativeModule,
+        bannerViewAvailable: hasBannerView,
+        nativeAdViewAvailable: hasNativeAdView,
+        videoAdViewAvailable: hasVideoAdView,
         config,
       });
 
@@ -125,6 +130,7 @@ function App(): JSX.Element {
     try {
       appendStatus('interstitial.load.start', TEST_CONFIG.interstitialId);
       await interstitial.load();
+      appendStatus('interstitial.isLoaded.afterLoad', interstitial.isLoaded());
       appendStatus('interstitial.show.start', TEST_CONFIG.interstitialId);
       await interstitial.show();
     } catch (error) {
@@ -144,6 +150,7 @@ function App(): JSX.Element {
     try {
       appendStatus('interstitialVideo.load.start', TEST_CONFIG.interstitialVideoId);
       await interstitialVideo.load();
+      appendStatus('interstitialVideo.isLoaded.afterLoad', interstitialVideo.isLoaded());
       appendStatus('interstitialVideo.show.start', TEST_CONFIG.interstitialVideoId);
       await interstitialVideo.show();
       Alert.alert('알림', '전면 동영상 광고 show()가 호출되었습니다.');
@@ -196,13 +203,7 @@ function App(): JSX.Element {
             <Text style={styles.statusLabel}>Native modules available</Text>
             <Text style={styles.statusValue}>
               {String(
-                isNativeModuleAvailable([
-                  'NapSspModule',
-                  'NapSspBannerView',
-                  'NapSspNativeAdView',
-                  'NapSspVideoAdView',
-                  'NapSspInterstitialVideo',
-                ]),
+                hasNativeModule,
               )}
             </Text>
             <Text style={styles.statusLabel}>NapSspAd.getStatus()</Text>
@@ -218,7 +219,7 @@ function App(): JSX.Element {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>1. 배너 광고 (Banner)</Text>
           <View style={styles.adContainer}>
-            {isNative ? (
+            {hasBannerView ? (
               <BannerAd
                 adUnitId={TEST_CONFIG.bannerId}
                 size="BANNER_320x50"
@@ -234,7 +235,7 @@ function App(): JSX.Element {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>2. 네이티브 광고 (Native Ad)</Text>
           <View style={styles.adContainer}>
-            {isNative ? (
+            {hasNativeAdView ? (
               <NativeAd adUnitId={TEST_CONFIG.nativeAdId} />
             ) : (
               <Text style={{color: '#6B7280'}}>Native ad not available (placeholder)</Text>
@@ -245,7 +246,7 @@ function App(): JSX.Element {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>3. 동영상 광고 뷰 (Video Ad)</Text>
           <View style={styles.adContainer}>
-            {isNative ? (
+            {hasVideoAdView ? (
               <VideoAd adUnitId={TEST_CONFIG.videoAdId} />
             ) : (
               <Text style={{color: '#6B7280'}}>Video ad not available (placeholder)</Text>

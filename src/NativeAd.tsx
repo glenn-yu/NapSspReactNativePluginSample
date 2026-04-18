@@ -8,7 +8,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { NativeModuleNames } from './nativeBridge';
+import { NativeModuleNames, isNativeViewAvailable } from './nativeBridge';
 import type { AdError, NativeAdProps } from './types';
 
 type NativeAdComponentProps = Omit<
@@ -25,11 +25,11 @@ type NativeAdComponentProps = Omit<
 
 function resolveNativeAdComponent(): React.ComponentType<NativeAdComponentProps> | null {
   for (const componentName of NativeModuleNames.nativeAd) {
-    try {
-      return requireNativeComponent<NativeAdComponentProps>(componentName);
-    } catch {
-      // Try the next known native component name.
+    if (!isNativeViewAvailable(componentName)) {
+      continue;
     }
+
+    return requireNativeComponent<NativeAdComponentProps>(componentName);
   }
 
   return null;

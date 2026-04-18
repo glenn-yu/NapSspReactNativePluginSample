@@ -1,0 +1,13 @@
+04-18 18:25:15.901 23891 23924 D libEGL  : loaded /vendor/lib64/egl/libEGL_emulation.so
+04-18 18:25:15.902 23891 23924 D libEGL  : loaded /vendor/lib64/egl/libGLESv1_CM_emulation.so
+04-18 18:25:15.902 23891 23924 D libEGL  : loaded /vendor/lib64/egl/libGLESv2_emulation.so
+04-18 18:25:16.166 23891 23930 I ReactNativeJS: Running "ExampleHostApp
+04-18 18:25:16.284 23891 23930 I ReactNativeJS: [NapSspExample] initialize.start: {"platform":"android","nativeAvailable":true,"bannerViewAvailable":false,"nativeAdViewAvailable":false,"videoAdViewAvailable":false,"config":{"mediaKey":"10771","adUnitIds":["104701","104588","104591","104704","104703","103722"],"logLevel":"debug"}}
+04-18 18:25:16.296 23891 23930 W ReactNativeJS: `new NativeEventEmitter()` was called with a non-null argument without the required `addListener` method.
+04-18 18:25:16.296 23891 23930 W ReactNativeJS: `new NativeEventEmitter()` was called with a non-null argument without the required `removeListeners` method.
+04-18 18:25:16.377 23891 23930 I ReactNativeJS: [NapSspExample] initialize.success
+04-18 18:25:16.393 23891 23930 I ReactNativeJS: [NapSspExample] getStatus.success: {"sdkCoordinates":{"adsIdentifier":"com.google.android.gms:play-services-ads-identifier:18.0.1","unity":"io.github.nasmedia-tech:admixer-unity:1.0.6","appLovin":"io.github.nasmedia-tech:admixer-applovin:1.0.8","adManager":"io.github.nasmedia-tech:admixer-admanager:1.0.14","pangle":"io.github.nasmedia-tech:admixer-pangle:1.0.10","adFit":"io.github.nasmedia-tech:admixer-adfit:1.0.10","core":"io.github.nasmedia-tech:admixer-ssp:1.0.21"},"supportedEvents":["onAdLoaded","onAdFailedToLoad","onAdClicked","onAdOpened","onAdClosed","onAdImpression","onRewarded","onVideoCompleted","onVideoSkipped"],"supportedFormats":["banner","interstitial","rewarded","native","video","interstitial_video"],"runtime":{"mediationFlags":"{adFitEnabled=false, mobwithEnabled=false, pangleConfigured=false, appLovinConfigured=false, unityConfigured=false, adManagerConfigured=false}","mediaKeyHash":46737106,"bannerStates":"{}","mediationConfigured":false,"rewardedStates":"{}","interstitialStates":"{}"},"configuredAdUnitIds":["104701","104588","104591","104704","104703","103722"],"coppa":false,"initialized":true,"logLevel":"debug","vendorSdkEnabled":true,"placeholderMode":false}
+04-18 18:25:23.646 23891 23930 I ReactNativeJS: [NapSspExample] interstitial.load.start: "104704"
+04-18 18:25:23.659 23891 23930 I ReactNativeJS: [NapSspExample] interstitial.isLoaded.afterLoad: false
+04-18 18:25:23.662 23891 23930 I ReactNativeJS: [NapSspExample] interstitial.show.start: "104704"
+04-18 18:25:23.664 23891 23930 I ReactNativeJS: [NapSspExample] interstitial.failed: "Error: Interstitial ad \"104704\" has not been loaded."
