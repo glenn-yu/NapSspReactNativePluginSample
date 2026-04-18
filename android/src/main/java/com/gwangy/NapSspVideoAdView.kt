@@ -8,7 +8,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 
-internal class NapSspVideoAdView(context: Context) : FrameLayout(context) {
+class NapSspVideoAdView(context: Context) : FrameLayout(context) {
     private val placeholderLayout: LinearLayout = LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
         gravity = Gravity.CENTER

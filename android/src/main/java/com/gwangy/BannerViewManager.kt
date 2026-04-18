@@ -21,7 +21,7 @@ class BannerViewManager : SimpleViewManager<NapSspBannerView>() {
 
     @ReactProp(name = "size")
     fun setSize(view: NapSspBannerView, size: String?) {
-        view.size = size
+        view.size = size ?: "BANNER_320x50"
     }
 
     @ReactProp(name = "autoLoad", defaultBoolean = true)
