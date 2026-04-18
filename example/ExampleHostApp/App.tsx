@@ -20,15 +20,29 @@ import {
   isNativeModuleAvailable,
 } from '../../src';
 
-const TEST_CONFIG = {
-  mediaKey: 'TEST_MEDIA_KEY',
-  bannerId: 'TEST_BANNER',
-  nativeAdId: 'TEST_NATIVE_AD',
-  videoAdId: 'TEST_VIDEO_AD',
-  interstitialId: 'TEST_INTERSTITIAL',
-  interstitialVideoId: 'TEST_INTERSTITIAL_VIDEO',
-  rewardedId: 'TEST_REWARDED',
+import {Platform} from 'react-native';
+
+const TEST_CONFIG_ANDROID = {
+  mediaKey: '10771',
+  bannerId: '104701', // 320x50
+  nativeAdId: '104588',
+  videoAdId: '104591', // instream
+  interstitialId: '104704',
+  interstitialVideoId: '104703',
+  rewardedId: '103722',
 };
+
+const TEST_CONFIG_IOS = {
+  mediaKey: '10347',
+  bannerId: '103790', // 320x50
+  nativeAdId: '101626',
+  videoAdId: '104711',
+  interstitialId: '104707',
+  interstitialVideoId: '103868',
+  rewardedId: '104710',
+};
+
+const TEST_CONFIG = Platform.OS === 'ios' ? TEST_CONFIG_IOS : TEST_CONFIG_ANDROID;
 
 function App(): JSX.Element {
   const [statusText, setStatusText] = useState('Waiting for SDK initialization...');
