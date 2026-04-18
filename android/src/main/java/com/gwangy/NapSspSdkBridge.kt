@@ -31,9 +31,14 @@ internal object NapSspSdkBridge {
                     val adMixerClass = Class.forName("com.nasmedia.admixerssp.common.AdMixer")
                     val getInstance = adMixerClass.getMethod("getInstance")
                     val adMixer = getInstance.invoke(null)
-                    val initialize = adMixerClass.getMethod("initialize", android.content.Context::class.java, String::class.java, List::class.java)
-                    initialize.invoke(adMixer, context.applicationContext, config.mediaKey, config.adUnitIds)
-                    
+                    val initialize = adMixerClass.getMethod(
+                        "initialize",
+                        android.content.Context::class.java,
+                        String::class.java,
+                        java.util.ArrayList::class.java,
+                    )
+                    initialize.invoke(adMixer, context.applicationContext, config.mediaKey, java.util.ArrayList(config.adUnitIds))
+
                     val registerAdapter = adMixerClass.getMethod("registerAdapter", String::class.java)
                     val adapters = listOf(
                         "ADAPTER_ADMANAGER",
@@ -48,7 +53,7 @@ internal object NapSspSdkBridge {
                             val field = adMixerClass.getField(adapterConst)
                             val adapterName = field.get(null) as? String
                             if (adapterName != null) {
-                                registerAdapter.invoke(adMixer, adapterName)
+                                registerAdapter.invoke(null, adapterName)
                             }
                         } catch (_: Throwable) {
                             // ignore missing adapter constants

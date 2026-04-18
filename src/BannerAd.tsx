@@ -8,7 +8,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { NativeModuleNames } from './nativeBridge';
+import { NativeModuleNames, isNativeViewAvailable } from './nativeBridge';
 import type { AdError, BannerSize } from './types';
 
 export interface BannerAdProps {
@@ -46,11 +46,11 @@ const FALLBACK_DIMENSIONS: Record<BannerSize, { width: number; height: number }>
 
 function resolveNativeBannerComponent(): React.ComponentType<NativeBannerProps> | null {
   for (const componentName of NativeModuleNames.banner) {
-    try {
-      return requireNativeComponent<NativeBannerProps>(componentName);
-    } catch {
-      // Try the next known native component name.
+    if (!isNativeViewAvailable(componentName)) {
+      continue;
     }
+
+    return requireNativeComponent<NativeBannerProps>(componentName);
   }
 
   return null;

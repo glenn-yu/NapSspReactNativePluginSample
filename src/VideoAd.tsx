@@ -8,7 +8,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { NativeModuleNames } from './nativeBridge';
+import { NativeModuleNames, isNativeViewAvailable } from './nativeBridge';
 import type { AdError, VideoAdProps } from './types';
 
 type NativeVideoAdComponentProps = Omit<
@@ -27,11 +27,11 @@ type NativeVideoAdComponentProps = Omit<
 
 function resolveNativeVideoAdComponent(): React.ComponentType<NativeVideoAdComponentProps> | null {
   for (const componentName of NativeModuleNames.videoAd) {
-    try {
-      return requireNativeComponent<NativeVideoAdComponentProps>(componentName);
-    } catch {
-      // Try the next known native component name.
+    if (!isNativeViewAvailable(componentName)) {
+      continue;
     }
+
+    return requireNativeComponent<NativeVideoAdComponentProps>(componentName);
   }
 
   return null;

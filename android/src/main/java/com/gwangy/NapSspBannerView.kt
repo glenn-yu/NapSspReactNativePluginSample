@@ -7,7 +7,7 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.TextView
 
-internal class NapSspBannerView(context: Context) : FrameLayout(context) {
+class NapSspBannerView(context: Context) : FrameLayout(context) {
     private val placeholderTextView: TextView = TextView(context).apply {
         setTextColor(Color.WHITE)
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)

@@ -5,7 +5,7 @@ export { default as VideoAd } from './VideoAd';
 export { InterstitialAd } from './InterstitialAd';
 export { RewardedAd } from './RewardedAd';
 export { InterstitialVideoAd } from './InterstitialVideoAd';
-export { isNativeModuleAvailable, NativeModuleNames } from './nativeBridge';
+export { isNativeModuleAvailable, isNativeViewAvailable, NativeModuleNames } from './nativeBridge';
 export { normalizeAdError } from './errors';
 
 export type { RewardedEventName } from './RewardedAd';

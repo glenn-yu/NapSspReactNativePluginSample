@@ -26,13 +26,13 @@ class VideoAdViewManager : SimpleViewManager<NapSspVideoAdView>() {
 
     override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Any> {
         return mutableMapOf(
-            NapSspContracts.VIEW_EVENT_AD_LOADED to mapOf("registrationName" to "onAdLoaded"),
-            NapSspContracts.VIEW_EVENT_AD_FAILED to mapOf("registrationName" to "onAdFailedToLoad"),
-            NapSspContracts.VIEW_EVENT_AD_CLICKED to mapOf("registrationName" to "onAdClicked"),
-            NapSspContracts.VIEW_EVENT_AD_OPENED to mapOf("registrationName" to "onAdOpened"),
-            NapSspContracts.VIEW_EVENT_AD_CLOSED to mapOf("registrationName" to "onAdClosed"),
-            "onVideoCompleted" to mapOf("registrationName" to "onAdCompleted"),
-            "onVideoSkipped" to mapOf("registrationName" to "onAdSkipped")
+            NapSspContracts.VIEW_EVENT_AD_LOADED to mutableMapOf("registrationName" to "onAdLoaded"),
+            NapSspContracts.VIEW_EVENT_AD_FAILED to mutableMapOf("registrationName" to "onAdFailedToLoad"),
+            NapSspContracts.VIEW_EVENT_AD_CLICKED to mutableMapOf("registrationName" to "onAdClicked"),
+            NapSspContracts.VIEW_EVENT_AD_OPENED to mutableMapOf("registrationName" to "onAdOpened"),
+            NapSspContracts.VIEW_EVENT_AD_CLOSED to mutableMapOf("registrationName" to "onAdClosed"),
+            "onVideoCompleted" to mutableMapOf("registrationName" to "onAdCompleted"),
+            "onVideoSkipped" to mutableMapOf("registrationName" to "onAdSkipped")
         )
     }
 }

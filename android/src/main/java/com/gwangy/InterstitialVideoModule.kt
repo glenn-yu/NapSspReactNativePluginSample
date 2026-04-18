@@ -1,13 +1,17 @@
 package com.gwangy
 
+import android.util.Log
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import java.lang.reflect.Proxy
 import java.util.concurrent.ConcurrentHashMap
 
 class InterstitialVideoModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+    private val tag = "NapSspInterstitialVideo"
     private val loadedAdUnitIds = ConcurrentHashMap<String, Boolean>()
+    private val interstitialVideoAds = ConcurrentHashMap<String, Any>()
 
     override fun getName(): String = NapSspContracts.INTERSTITIAL_VIDEO_MODULE_NAME
 
@@ -24,13 +28,31 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
             return
         }
 
-        loadedAdUnitIds[normalizedAdUnitId] = true
-        NapSspEventEmitter.emitModuleEvent(
-            reactContext,
-            NapSspContracts.EVENT_AD_LOADED,
-            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO),
-        )
-        promise.resolve(null)
+        if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
+            loadedAdUnitIds[normalizedAdUnitId] = true
+            NapSspEventEmitter.emitModuleEvent(
+                reactContext,
+                NapSspContracts.EVENT_AD_LOADED,
+                mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO),
+            )
+            promise.resolve(null)
+            return
+        }
+
+        val activity = currentActivity
+        if (activity == null) {
+            promise.reject("NAP_SSP_ACTIVITY_REQUIRED", "InterstitialVideo ads require a foreground Activity context")
+            return
+        }
+
+        try {
+            val interstitialVideo = createOrGetInterstitialVideo(normalizedAdUnitId, activity)
+            Log.d(tag, "loadInterstitialVideoAd request adUnitId=$normalizedAdUnitId")
+            interstitialVideo.javaClass.getMethod("loadInterstitialVideoAd").invoke(interstitialVideo)
+            promise.resolve(null)
+        } catch (error: Throwable) {
+            promise.reject("NAP_SSP_INTERSTITIAL_VIDEO_LOAD_FAILED", error)
+        }
     }
 
     @ReactMethod
@@ -46,18 +68,32 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
             return
         }
 
-        NapSspEventEmitter.emitModuleEvent(
-            reactContext,
-            NapSspContracts.EVENT_AD_OPENED,
-            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO),
-        )
-        NapSspEventEmitter.emitModuleEvent(
-            reactContext,
-            NapSspContracts.EVENT_AD_CLOSED,
-            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO),
-        )
-        loadedAdUnitIds.remove(normalizedAdUnitId)
-        promise.resolve(null)
+        try {
+            if (BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
+                val interstitialVideo = interstitialVideoAds[normalizedAdUnitId]
+                if (interstitialVideo == null) {
+                    promise.reject("NAP_SSP_INTERSTITIAL_VIDEO_NOT_READY", "InterstitialVideo instance is missing")
+                    return
+                }
+                Log.d(tag, "showInterstitialVideoAd request adUnitId=$normalizedAdUnitId")
+                interstitialVideo.javaClass.getMethod("showInterstitialVideoAd").invoke(interstitialVideo)
+            } else {
+                NapSspEventEmitter.emitModuleEvent(
+                    reactContext,
+                    NapSspContracts.EVENT_AD_OPENED,
+                    mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO),
+                )
+                NapSspEventEmitter.emitModuleEvent(
+                    reactContext,
+                    NapSspContracts.EVENT_AD_CLOSED,
+                    mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO),
+                )
+                loadedAdUnitIds.remove(normalizedAdUnitId)
+            }
+            promise.resolve(null)
+        } catch (error: Throwable) {
+            promise.reject("NAP_SSP_INTERSTITIAL_VIDEO_SHOW_FAILED", error)
+        }
     }
 
     @ReactMethod
@@ -70,7 +106,74 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
     fun destroy(adUnitId: String, promise: Promise) {
         val normalizedAdUnitId = adUnitId.trim()
         loadedAdUnitIds.remove(normalizedAdUnitId)
+        interstitialVideoAds.remove(normalizedAdUnitId)?.let { interstitialVideo ->
+            runCatching { interstitialVideo.javaClass.getMethod("onDestroy").invoke(interstitialVideo) }
+        }
         promise.resolve(null)
+    }
+
+    private fun createOrGetInterstitialVideo(adUnitId: String, activity: android.app.Activity): Any {
+        interstitialVideoAds[adUnitId]?.let { return it }
+
+        val interstitialVideoClass = Class.forName("com.nasmedia.admixerssp.ads.InterstitialVideoAd")
+        val adInfoClass = Class.forName("com.nasmedia.admixerssp.ads.AdInfo")
+        val builderClass = Class.forName("com.nasmedia.admixerssp.ads.AdInfo\$Builder")
+        val listenerClass = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
+
+        val builder = builderClass.getConstructor(String::class.java).newInstance(adUnitId)
+        val adInfo = builderClass.getMethod("build").invoke(builder)
+        val interstitialVideo = interstitialVideoClass.getConstructor(android.content.Context::class.java).newInstance(activity)
+        interstitialVideoClass.getMethod("setAdInfo", adInfoClass).invoke(interstitialVideo, adInfo)
+
+        val listener = Proxy.newProxyInstance(listenerClass.classLoader, arrayOf(listenerClass)) { _, method, args ->
+            when (method.name) {
+                "onReceivedAd" -> {
+                    Log.d(tag, "onReceivedAd adUnitId=$adUnitId args=${args?.contentToString()}")
+                    loadedAdUnitIds[adUnitId] = true
+                    NapSspEventEmitter.emitModuleEvent(
+                        reactContext,
+                        NapSspContracts.EVENT_AD_LOADED,
+                        mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO),
+                    )
+                }
+                "onFailedToReceiveAd" -> {
+                    Log.d(tag, "onFailedToReceiveAd adUnitId=$adUnitId args=${args?.contentToString()}")
+                    loadedAdUnitIds.remove(adUnitId)
+                    NapSspEventEmitter.emitModuleEvent(
+                        reactContext,
+                        NapSspContracts.EVENT_AD_FAILED,
+                        mapOf(
+                            "adUnitId" to adUnitId,
+                            "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO,
+                            "code" to (args?.getOrNull(2) as? Int ?: -1),
+                            "message" to (args?.getOrNull(3)?.toString() ?: "unknown"),
+                        ),
+                    )
+                }
+                "onEventAd" -> {
+                    val eventName = args?.getOrNull(1)?.toString()
+                    Log.d(tag, "onEventAd adUnitId=$adUnitId event=$eventName args=${args?.contentToString()}")
+                    when (eventName) {
+                        "DISPLAYED" -> {
+                            NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_OPENED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO))
+                            NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_IMPRESSION, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO))
+                        }
+                        "CLICK", "LEFT_CLICK", "RIGHT_CLICK" -> NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_CLICKED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO))
+                        "CLOSE" -> {
+                            NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_CLOSED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO))
+                            loadedAdUnitIds.remove(adUnitId)
+                        }
+                        "COMPLETION" -> NapSspEventEmitter.emitModuleEvent(reactContext, "onVideoCompleted", mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO))
+                        "SKIPPED" -> NapSspEventEmitter.emitModuleEvent(reactContext, "onVideoSkipped", mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO))
+                    }
+                }
+            }
+            null
+        }
+
+        interstitialVideoClass.getMethod("setListener", listenerClass).invoke(interstitialVideo, listener)
+        interstitialVideoAds[adUnitId] = interstitialVideo
+        return interstitialVideo
     }
 
     @ReactMethod
@@ -81,6 +184,10 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
 
     override fun invalidate() {
         loadedAdUnitIds.clear()
+        interstitialVideoAds.values.forEach { interstitialVideo ->
+            runCatching { interstitialVideo.javaClass.getMethod("onDestroy").invoke(interstitialVideo) }
+        }
+        interstitialVideoAds.clear()
         super.invalidate()
     }
 }

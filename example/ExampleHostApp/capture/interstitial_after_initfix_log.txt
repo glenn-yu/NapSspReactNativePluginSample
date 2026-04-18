@@ -1,0 +1,114 @@
+04-18 18:27:39.958   918   918 D ControlsListingControllerImpl: ServiceConfig reloaded, count: 0
+04-18 18:27:39.958   918   918 D ControlsListingControllerImpl: ServiceConfig reloaded, count: 0
+04-18 18:27:39.959   918   918 D ControlsListingControllerImpl: ServiceConfig reloaded, count: 0
+04-18 18:27:40.274 24393 24486 D libEGL  : loaded /vendor/lib64/egl/libEGL_emulation.so
+04-18 18:27:40.281 24393 24486 D libEGL  : loaded /vendor/lib64/egl/libGLESv1_CM_emulation.so
+04-18 18:27:40.284 24393 24486 D libEGL  : loaded /vendor/lib64/egl/libGLESv2_emulation.so
+04-18 18:27:40.711 24393 24495 I ReactNativeJS: [NapSspExample] initialize.start: {"platform":"android","nativeAvailable":true,"bannerViewAvailable":false,"nativeAdViewAvailable":false,"videoAdViewAvailable":false,"config":{"mediaKey":"10771","adUnitIds":["104701","104588","104591","104704","104703","103722"],"logLevel":"debug"}}
+04-18 18:27:40.776 24393 24495 I ReactNativeJS: [NapSspExample] initialize.success
+04-18 18:27:40.799 24393 24495 I ReactNativeJS: [NapSspExample] getStatus.success: {"sdkCoordinates":{"adsIdentifier":"com.google.android.gms:play-services-ads-identifier:18.0.1","unity":"io.github.nasmedia-tech:admixer-unity:1.0.6","appLovin":"io.github.nasmedia-tech:admixer-applovin:1.0.8","adManager":"io.github.nasmedia-tech:admixer-admanager:1.0.14","pangle":"io.github.nasmedia-tech:admixer-pangle:1.0.10","adFit":"io.github.nasmedia-tech:admixer-adfit:1.0.10","core":"io.github.nasmedia-tech:admixer-ssp:1.0.21"},"supportedEvents":["onAdLoaded","onAdFailedToLoad","onAdClicked","onAdOpened","onAdClosed","onAdImpression","onRewarded","onVideoCompleted","onVideoSkipped"],"supportedFormats":["banner","interstitial","rewarded","native","video","interstitial_video"],"runtime":{"mediationFlags":"{adFitEnabled=false, mobwithEnabled=false, pangleConfigured=false, appLovinConfigured=false, unityConfigured=false, adManagerConfigured=false}","mediaKeyHash":46737106,"bannerStates":"{}","mediationConfigured":false,"rewardedStates":"{}","interstitialStates":"{}"},"configuredAdUnitIds":["104701","104588","104591","104704","104703","103722"],"coppa":false,"initialized":true,"logLevel":"debug","vendorSdkEnabled":true,"placeholderMode":false}
+04-18 18:27:48.248 24393 24495 I ReactNativeJS: [NapSspExample] interstitial.load.start: "104704"
+04-18 18:27:48.255 24393 24496 D NapSspInterstitial: loadInterstitial request adUnitId=104704
+04-18 18:27:48.267 24393 24495 I ReactNativeJS: [NapSspExample] interstitial.isLoaded.afterLoad: false
+04-18 18:27:48.271 24393 24495 I ReactNativeJS: [NapSspExample] interstitial.show.start: "104704"
+04-18 18:27:48.274 24393 24495 I ReactNativeJS: [NapSspExample] interstitial.failed: "Error: Interstitial ad \"104704\" has not been loaded."
+04-18 18:27:48.332 24393 24393 E AdMixerSDK::1.0.21: This adUnit ID(104704) is not support interstitial
+04-18 18:27:48.332 24393 24393 D NapSspInterstitial: onFailedToReceiveAd adUnitId=104704 args=[com.nasmedia.admixerssp.ads.InterstitialAd@bec0bdd, AdMixer, -2147483646, This adUnit ID(104704) is not support interstitial]
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: java.lang.ClassNotFoundException: com.nasmedia.pangle.PangleAdapter
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.Class.classForName(Native Method)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.Class.forName(Class.java:536)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.loadModule(SourceFile:101)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.onServerConfigReady(SourceFile:11)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.InterstitialAdView.onServerConfigReady(SourceFile:1)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.common.AdMixer.updateServerConfigListener(SourceFile:7)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.common.AdMixer.loadConfig(SourceFile:11)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.startLoad(SourceFile:82)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.processHandlerMessage(SourceFile:9)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.InterstitialAdView.processHandlerMessage(SourceFile:18)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a$a.handleMessage(SourceFile:1)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at android.os.Handler.dispatchMessage(Handler.java:106)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at android.os.Looper.loopOnce(Looper.java:205)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at android.os.Looper.loop(Looper.java:294)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at android.app.ActivityThread.main(ActivityThread.java:8177)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.reflect.Method.invoke(Native Method)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: Caused by: java.lang.ClassNotFoundException: Didn't find class "com.nasmedia.pangle.PangleAdapter" on path: DexPathList[[zip file "/data/app/~~WZay_BCYwXHrktJ22Pb-7Q==/com.examplehostapp-rBpjO70c_09MU7Zie3fEGA==/base.apk"],nativeLibraryDirectories=[/data/app/~~WZay_BCYwXHrktJ22Pb-7Q==/com.examplehostapp-rBpjO70c_09MU7Zie3fEGA==/lib/arm64, /data/app/~~WZay_BCYwXHrktJ22Pb-7Q==/com.examplehostapp-rBpjO70c_09MU7Zie3fEGA==/base.apk!/lib/arm64-v8a, /system/lib64, /system_ext/lib64]]
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at dalvik.system.BaseDexClassLoader.findClass(BaseDexClassLoader.java:259)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.ClassLoader.loadClass(ClassLoader.java:379)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.ClassLoader.loadClass(ClassLoader.java:312)
+04-18 18:27:48.337 24393 24393 W AdMixerSDK::1.0.21: 	... 18 more
+04-18 18:27:48.338 24393 24393 E AdMixerSDK::1.0.21: This adUnit ID(104704) is not support interstitial
+04-18 18:27:48.338 24393 24393 D NapSspInterstitial: onFailedToReceiveAd adUnitId=104704 args=[com.nasmedia.admixerssp.ads.InterstitialAd@bec0bdd, AdMixer, -2147483646, This adUnit ID(104704) is not support interstitial]
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: java.lang.ClassNotFoundException: com.nasmedia.adfit.AdfitAdapter
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.Class.classForName(Native Method)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.Class.forName(Class.java:536)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.loadModule(SourceFile:101)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.onAdReceiveAdFailed(SourceFile:24)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.InterstitialAdView.onAdReceiveAdFailed(SourceFile:41)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.loadModule(SourceFile:142)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.onServerConfigReady(SourceFile:11)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.InterstitialAdView.onServerConfigReady(SourceFile:1)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.common.AdMixer.updateServerConfigListener(SourceFile:7)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.common.AdMixer.loadConfig(SourceFile:11)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.startLoad(SourceFile:82)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.processHandlerMessage(SourceFile:9)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.InterstitialAdView.processHandlerMessage(SourceFile:18)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a$a.handleMessage(SourceFile:1)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at android.os.Handler.dispatchMessage(Handler.java:106)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at android.os.Looper.loopOnce(Looper.java:205)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at android.os.Looper.loop(Looper.java:294)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at android.app.ActivityThread.main(ActivityThread.java:8177)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.reflect.Method.invoke(Native Method)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: Caused by: java.lang.ClassNotFoundException: Didn't find class "com.nasmedia.adfit.AdfitAdapter" on path: DexPathList[[zip file "/data/app/~~WZay_BCYwXHrktJ22Pb-7Q==/com.examplehostapp-rBpjO70c_09MU7Zie3fEGA==/base.apk"],nativeLibraryDirectories=[/data/app/~~WZay_BCYwXHrktJ22Pb-7Q==/com.examplehostapp-rBpjO70c_09MU7Zie3fEGA==/lib/arm64, /data/app/~~WZay_BCYwXHrktJ22Pb-7Q==/com.examplehostapp-rBpjO70c_09MU7Zie3fEGA==/base.apk!/lib/arm64-v8a, /system/lib64, /system_ext/lib64]]
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at dalvik.system.BaseDexClassLoader.findClass(BaseDexClassLoader.java:259)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.ClassLoader.loadClass(ClassLoader.java:379)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.ClassLoader.loadClass(ClassLoader.java:312)
+04-18 18:27:48.341 24393 24393 W AdMixerSDK::1.0.21: 	... 21 more
+04-18 18:27:48.344 24393 24393 E AdMixerSDK::1.0.21: This adUnit ID(104704) is not support interstitial
+04-18 18:27:48.344 24393 24393 D NapSspInterstitial: onFailedToReceiveAd adUnitId=104704 args=[com.nasmedia.admixerssp.ads.InterstitialAd@bec0bdd, AdMixer, -2147483646, This adUnit ID(104704) is not support interstitial]
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: java.lang.ClassNotFoundException: com.nasmedia.admanager.AdmanagerAdapter
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.Class.classForName(Native Method)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.Class.forName(Class.java:536)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.loadModule(SourceFile:101)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.onAdReceiveAdFailed(SourceFile:24)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.InterstitialAdView.onAdReceiveAdFailed(SourceFile:41)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.loadModule(SourceFile:142)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.onAdReceiveAdFailed(SourceFile:24)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.InterstitialAdView.onAdReceiveAdFailed(SourceFile:41)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.loadModule(SourceFile:142)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.onServerConfigReady(SourceFile:11)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.InterstitialAdView.onServerConfigReady(SourceFile:1)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.common.AdMixer.updateServerConfigListener(SourceFile:7)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.common.AdMixer.loadConfig(SourceFile:11)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.startLoad(SourceFile:82)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a.processHandlerMessage(SourceFile:9)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.InterstitialAdView.processHandlerMessage(SourceFile:18)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.nasmedia.admixerssp.ads.a$a.handleMessage(SourceFile:1)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at android.os.Handler.dispatchMessage(Handler.java:106)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at android.os.Looper.loopOnce(Looper.java:205)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at android.os.Looper.loop(Looper.java:294)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at android.app.ActivityThread.main(ActivityThread.java:8177)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.reflect.Method.invoke(Native Method)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: Caused by: java.lang.ClassNotFoundException: Didn't find class "com.nasmedia.admanager.AdmanagerAdapter" on path: DexPathList[[zip file "/data/app/~~WZay_BCYwXHrktJ22Pb-7Q==/com.examplehostapp-rBpjO70c_09MU7Zie3fEGA==/base.apk"],nativeLibraryDirectories=[/data/app/~~WZay_BCYwXHrktJ22Pb-7Q==/com.examplehostapp-rBpjO70c_09MU7Zie3fEGA==/lib/arm64, /data/app/~~WZay_BCYwXHrktJ22Pb-7Q==/com.examplehostapp-rBpjO70c_09MU7Zie3fEGA==/base.apk!/lib/arm64-v8a, /system/lib64, /system_ext/lib64]]
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at dalvik.system.BaseDexClassLoader.findClass(BaseDexClassLoader.java:259)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.ClassLoader.loadClass(ClassLoader.java:379)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	at java.lang.ClassLoader.loadClass(ClassLoader.java:312)
+04-18 18:27:48.352 24393 24393 W AdMixerSDK::1.0.21: 	... 24 more
+04-18 18:27:48.352 24393 24393 E AdMixerSDK::1.0.21: This adUnit ID(104704) is not support interstitial
+04-18 18:27:48.352 24393 24393 D NapSspInterstitial: onFailedToReceiveAd adUnitId=104704 args=[com.nasmedia.admixerssp.ads.InterstitialAd@bec0bdd, AdMixer, -2147483646, This adUnit ID(104704) is not support interstitial]
+04-18 18:27:48.355 24393 24393 E AdMixerSDK::1.0.21: This adUnit ID(104704) is not support interstitial
+04-18 18:27:48.355 24393 24393 D NapSspInterstitial: onFailedToReceiveAd adUnitId=104704 args=[com.nasmedia.admixerssp.ads.InterstitialAd@bec0bdd, AdMixer, -2147483646, This adUnit ID(104704) is not support interstitial]
+04-18 18:27:48.355 24393 24393 D NapSspInterstitial: onFailedToReceiveAd adUnitId=104704 args=[com.nasmedia.admixerssp.ads.InterstitialAd@bec0bdd, AdManager, 0, AdUnit{adUnitId='104704', adFormat='banner', size='', width=320, height=100, interstitial='0', interval=0, videoType='null', videoPlacement='null', close_btn_delay='0'} Adapter Load Fail.]
+04-18 18:27:48.355 24393 24393 D NapSspInterstitial: onFailedToReceiveAd adUnitId=104704 args=[com.nasmedia.admixerssp.ads.InterstitialAd@bec0bdd, KaKao Adfit, 0, AdUnit{adUnitId='104704', adFormat='banner', size='', width=320, height=100, interstitial='0', interval=0, videoType='null', videoPlacement='null', close_btn_delay='0'} Adapter Load Fail.]
+04-18 18:27:48.356 24393 24393 D NapSspInterstitial: onFailedToReceiveAd adUnitId=104704 args=[com.nasmedia.admixerssp.ads.InterstitialAd@bec0bdd, Pangle, 0, AdUnit{adUnitId='104704', adFormat='banner', size='', width=320, height=100, interstitial='0', interval=0, videoType='null', videoPlacement='null', close_btn_delay='0'} Adapter Load Fail.]
+04-18 18:28:08.349 24393 24393 E AdMixerSDK::1.0.21: This adUnit ID(104704) is not support interstitial
+04-18 18:28:08.349 24393 24393 D NapSspInterstitial: onFailedToReceiveAd adUnitId=104704 args=[com.nasmedia.admixerssp.ads.InterstitialAd@bec0bdd, AdMixer, -2147483646, This adUnit ID(104704) is not support interstitial]
+04-18 18:28:08.351 24393 24393 E AdMixerSDK::1.0.21: This adUnit ID(104704) is not support interstitial
+04-18 18:28:08.351 24393 24393 D NapSspInterstitial: onFailedToReceiveAd adUnitId=104704 args=[com.nasmedia.admixerssp.ads.InterstitialAd@bec0bdd, AdMixer, -2147483646, This adUnit ID(104704) is not support interstitial]
+04-18 18:28:08.352 24393 24393 E AdMixerSDK::1.0.21: This adUnit ID(104704) is not support interstitial
+04-18 18:28:08.353 24393 24393 D NapSspInterstitial: onFailedToReceiveAd adUnitId=104704 args=[com.nasmedia.admixerssp.ads.InterstitialAd@bec0bdd, AdMixer, -2147483646, This adUnit ID(104704) is not support interstitial]

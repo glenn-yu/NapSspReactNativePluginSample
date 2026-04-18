@@ -1,0 +1,62 @@
+04-18 18:10:07.144 21788 21858 I ReactNativeJS: Running "ExampleHostApp
+04-18 18:10:07.199 21788 21858 E ReactNativeJS: TypeError: 0,_r(d[5]).isNativeViewAvailable is not a function (it is undefined)
+04-18 18:10:07.199 21788 21858 E ReactNativeJS: 
+04-18 18:10:07.199 21788 21858 E ReactNativeJS: This error is located at:
+04-18 18:10:07.199 21788 21858 E ReactNativeJS:     in Unknown
+04-18 18:10:07.199 21788 21858 E ReactNativeJS:     in RCTView
+04-18 18:10:07.199 21788 21858 E ReactNativeJS:     in Unknown
+04-18 18:10:07.199 21788 21858 E ReactNativeJS:     in RCTView
+04-18 18:10:07.199 21788 21858 E ReactNativeJS:     in Unknown
+04-18 18:10:07.199 21788 21858 E ReactNativeJS:     in u, js engine: hermes
+04-18 18:10:07.200 21788 21858 E ReactNativeJS: TypeError: 0,_r(d[5]).isNativeViewAvailable is not a function (it is undefined)
+04-18 18:10:07.200 21788 21858 E ReactNativeJS: 
+04-18 18:10:07.200 21788 21858 E ReactNativeJS: This error is located at:
+04-18 18:10:07.200 21788 21858 E ReactNativeJS:     in Unknown
+04-18 18:10:07.200 21788 21858 E ReactNativeJS:     in RCTView
+04-18 18:10:07.200 21788 21858 E ReactNativeJS:     in Unknown
+04-18 18:10:07.200 21788 21858 E ReactNativeJS:     in RCTView
+04-18 18:10:07.200 21788 21858 E ReactNativeJS:     in Unknown
+04-18 18:10:07.200 21788 21858 E ReactNativeJS:     in u, js engine: hermes
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: Process: com.examplehostapp, PID: 21788
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: com.facebook.react.common.JavascriptException: TypeError: 0,_r(d[5]).isNativeViewAvailable is not a function (it is undefined)
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: This error is located at:
+04-18 18:10:07.210 21788 21859 E AndroidRuntime:     in Unknown
+04-18 18:10:07.210 21788 21859 E AndroidRuntime:     in RCTView
+04-18 18:10:07.210 21788 21859 E AndroidRuntime:     in Unknown
+04-18 18:10:07.210 21788 21859 E AndroidRuntime:     in RCTView
+04-18 18:10:07.210 21788 21859 E AndroidRuntime:     in Unknown
+04-18 18:10:07.210 21788 21859 E AndroidRuntime:     in u, js engine: hermes, stack:
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: anonymous@421:2581
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: Ir@220:43650
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: Ta@220:95355
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: yi@220:86357
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: vi@220:86259
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: mi@220:86024
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: ci@220:82977
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: pt@220:27138
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: ri@220:79614
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: Wi@220:94730
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: anonymous@220:100979
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: anonymous@50:541
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: anonymous@156:835
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: run@148:867
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: runApplication@148:1954
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: value@33:3921
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: anonymous@33:741
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: value@33:2571
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: value@33:713
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:188)
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:958)
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:99)
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:27)
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 	at android.os.Looper.loopOnce(Looper.java:205)
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:294)
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:228)
+04-18 18:10:07.210 21788 21859 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:1012)

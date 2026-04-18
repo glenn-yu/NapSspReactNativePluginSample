@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from 'react-native';
+import { NativeModules, Platform, UIManager } from 'react-native';
 
 export const NativeModuleNames = {
   napSsp: ['NapSspModule'],
@@ -34,6 +34,16 @@ function asModuleNames(moduleNameOrNames: string | readonly string[]): readonly 
 
 export function isNativeModuleAvailable(moduleNameOrNames: string | readonly string[]): boolean {
   return getNativeModuleFromNames(asModuleNames(moduleNameOrNames)) !== undefined;
+}
+
+export function isNativeViewAvailable(componentNameOrNames: string | readonly string[]): boolean {
+  return asModuleNames(componentNameOrNames).some((componentName) => {
+    try {
+      return !!UIManager.getViewManagerConfig?.(componentName);
+    } catch {
+      return false;
+    }
+  });
 }
 
 export function createNativeModuleMissingError(
