@@ -88,9 +88,18 @@ npm test -- --runInBand
 Note: the Jest test uses lightweight mocks for the plugin exports so the example UI can render without a native bridge in CI or local Node-only environments, and it now checks the initialize call covers all sample ad unit IDs.
 
 ## Current verification status
-- Android example host app: build verified, emulator install verified, app launch verified.
-- iOS example host app: `pod install` verified, simulator build verified.
+- Android example host app: build verified, emulator install verified, app launch verified, screenshot capture verified.
+- iOS example host app: `pod install` verified, simulator build verified, simulator launch and screenshot capture verified.
 - Real ad delivery: requires valid server-side test inventory and native module registration on each platform.
+- Current direct API spot-check: Android 320x50 and iOS 320x50 test endpoints returned HTTP 200 with `ads` length `0`, so real fill is not yet confirmed.
+
+## Feature checklist
+- App initialization flow: verified
+- Banner / Native / Video placeholder-safe rendering: verified
+- Interstitial / Interstitial Video / Rewarded JS flow: wired in sample app
+- Android local build/install/run: verified
+- iOS local pod install/build/run: verified
+- Real ad fill from provided test endpoints: not yet verified, server response currently empty in spot-check
 
 ## Notes
 - The example app uses placeholder/native-safe behavior by default. To exercise real vendor SDK flows, enable vendor SDK in the host Android build and add the required iOS pods/packages.
