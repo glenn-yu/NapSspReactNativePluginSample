@@ -28,6 +28,21 @@ This folder contains a minimal React Native app that demonstrates the public JS/
 - Xcode and command line tools (`xcodebuild` available)
 - CocoaPods installed (`pod` available)
 
+## Quick start for beginners
+
+If you just want to see the sample app run, use this order:
+
+1. From repo root, install packages and build the package.
+2. Run the example host app on Android or iOS.
+3. If Android fails first, check Java/JDK.
+4. If iOS fails first, check CocoaPods.
+
+```bash
+npm ci
+npm run build
+cd example/ExampleHostApp
+```
+
 ## Run notes
 
 The example is intentionally lightweight and should be treated as a host verification app, not as proof that every native dependency is already installed on your machine.
@@ -71,6 +86,11 @@ npm test -- --runInBand
 ```
 
 Note: the Jest test uses lightweight mocks for the plugin exports so the example UI can render without a native bridge in CI or local Node-only environments, and it now checks the initialize call covers all sample ad unit IDs.
+
+## Current verification status
+- Android example host app: build verified, emulator install verified, app launch verified.
+- iOS example host app: `pod install` verified, simulator build verified.
+- Real ad delivery: requires valid server-side test inventory and native module registration on each platform.
 
 ## Notes
 - The example app uses placeholder/native-safe behavior by default. To exercise real vendor SDK flows, enable vendor SDK in the host Android build and add the required iOS pods/packages.
