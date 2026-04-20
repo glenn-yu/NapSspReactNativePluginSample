@@ -59,6 +59,8 @@ internal object NapSspSdkBridge {
                             // ignore missing adapter constants
                         }
                     }
+                    // Initialize mediation-specific SDKs after AdMixer adapters are registered
+                    initializeMediationSdks(context, config)
                 } catch (e: Throwable) {
                     // vendor SDK present but reflection failed; leave placeholder behavior
                 }
@@ -68,8 +70,70 @@ internal object NapSspSdkBridge {
         }
     }
 
+    private fun initializeMediationSdks(context: android.content.Context, config: NapSspConfig) {
+        // Pangle — requires appId
+        val pangleAppId = config.mediations?.pangle?.get("appId") as? String
+        if (!pangleAppId.isNullOrBlank()) {
+            try {
+                val pagConfigBuilderClass = Class.forName("com.bytedance.sdk.openadsdk.api.init.PAGConfig\$Builder")
+                val pagConfigBuilder = pagConfigBuilderClass.getConstructor().newInstance()
+                pagConfigBuilderClass.getMethod("appId", String::class.java).invoke(pagConfigBuilder, pangleAppId)
+                val pagConfig = pagConfigBuilderClass.getMethod("build").invoke(pagConfigBuilder)
+                val pagSdkClass = Class.forName("com.bytedance.sdk.openadsdk.api.init.PAGSdk")
+                val callbackClass = Class.forName("com.bytedance.sdk.openadsdk.api.init.PAGSdk\$PAGInitCallback")
+                val callbackProxy = java.lang.reflect.Proxy.newProxyInstance(
+                    callbackClass.classLoader, arrayOf(callbackClass)
+                ) { _, _, _ -> null }
+                pagSdkClass.getMethod("init", android.content.Context::class.java, pagConfig.javaClass, callbackClass)
+                    .invoke(null, context.applicationContext, pagConfig, callbackProxy)
+            } catch (_: Throwable) {}
+        }
+
+        // AppLovin — requires sdkKey
+        val appLovinSdkKey = config.mediations?.appLovin?.get("sdkKey") as? String
+        if (!appLovinSdkKey.isNullOrBlank()) {
+            try {
+                val alSdkClass = Class.forName("com.applovin.sdk.AppLovinSdk")
+                val alSdkSettingsClass = Class.forName("com.applovin.sdk.AppLovinSdkSettings")
+                val alSdkSettings = alSdkSettingsClass.getConstructor().newInstance()
+                val getInstance = alSdkClass.getMethod("getInstance", String::class.java, alSdkSettingsClass, android.content.Context::class.java)
+                val alSdk = getInstance.invoke(null, appLovinSdkKey, alSdkSettings, context.applicationContext)
+                alSdkClass.getMethod("initializeSdk", android.content.Context::class.java).invoke(alSdk, context.applicationContext)
+            } catch (_: Throwable) {}
+        }
+
+        // UnityAds — requires appId
+        val unityAppId = config.mediations?.unityAds?.get("appId") as? String
+        if (!unityAppId.isNullOrBlank()) {
+            try {
+                val unityAdsClass = Class.forName("com.unity3d.ads.UnityAds")
+                val listenerClass = Class.forName("com.unity3d.ads.IUnityAdsInitializationListener")
+                val listenerProxy = java.lang.reflect.Proxy.newProxyInstance(
+                    listenerClass.classLoader, arrayOf(listenerClass)
+                ) { _, _, _ -> null }
+                unityAdsClass.getMethod("initialize", android.content.Context::class.java, String::class.java, Boolean::class.javaPrimitiveType, listenerClass)
+                    .invoke(null, context.applicationContext, unityAppId, false, listenerProxy)
+            } catch (_: Throwable) {}
+        }
+    }
+
     fun setLogLevel(level: String) {
-        logLevel = level.trim().ifEmpty { logLevel }
+        val normalized = level.trim().ifEmpty { logLevel }
+        logLevel = normalized
+        if (BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
+            try {
+                val logClass = Class.forName("com.nasmedia.admixerssp.common.AdMixerLog")
+                val logLevelClass = Class.forName("com.nasmedia.admixerssp.common.AdMixerLog\$Level")
+                val levelValue = when (normalized.lowercase()) {
+                    "verbose", "debug" -> logLevelClass.getField("DEBUG").get(null)
+                    "warn" -> logLevelClass.getField("WARN").get(null)
+                    "error" -> logLevelClass.getField("ERROR").get(null)
+                    "none" -> logLevelClass.getField("NONE").get(null)
+                    else -> logLevelClass.getField("INFO").get(null)
+                }
+                logClass.getMethod("setLogLevel", logLevelClass).invoke(null, levelValue)
+            } catch (_: Throwable) {}
+        }
     }
 
     fun setCoppa(enabled: Boolean) {

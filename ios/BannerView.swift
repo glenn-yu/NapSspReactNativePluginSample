@@ -22,6 +22,7 @@ final class BannerView: UIView {
   @objc var onAdClicked: RCTBubblingEventBlock?
   @objc var onAdOpened: RCTBubblingEventBlock?
   @objc var onAdClosed: RCTBubblingEventBlock?
+  @objc var onAdImpression: RCTBubblingEventBlock?
 
   private let containerView = UIView()
   private let titleLabel = UILabel()
@@ -178,6 +179,7 @@ final class BannerView: UIView {
     containerView.layer.borderColor = UIColor.systemGreen.cgColor
 
     onAdLoaded?(eventPayload(adUnitId: adUnitId, source: "placeholder", message: "Banner placeholder loaded"))
+    onAdImpression?(eventPayload(adUnitId: adUnitId, source: "placeholder", message: "Banner impression"))
   }
 
   private func registerForInitializationNotifications() {

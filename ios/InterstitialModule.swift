@@ -9,6 +9,50 @@ class InterstitialModule: NSObject {
   @objc
   func load(_ adUnitId: String, options: NSDictionary?, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.main.async {
+      #if canImport(AdMixerMediation)
+      guard NapSspRuntime.shared.isInitialized else {
+        reject(NapSspError.notInitialized.errorCode, NapSspError.notInitialized.errorDescription, nil)
+        return
+      }
+      let config = AMMInterstitialConfig()
+      let adType = options?["type"] as? String ?? "default"
+      switch adType {
+      case "popup":
+        config.viewType = .popup
+        let buttonTitle = options?["buttonLeftText"] as? String ?? "닫기"
+        config.popupOption = AMMInterstitialPopupOption(
+          buttonTitle: buttonTitle,
+          buttonTextColor: .white,
+          buttonBackgroundColor: .black
+        )
+      case "countdown":
+        config.viewType = .countDown
+        let countDownTime = options?["countDownTime"] as? Int ?? 5
+        config.countDownOption = AMMInterstitialCountDownOption(
+          countDownTime: max(2, min(5, countDownTime)),
+          countDownType: .gauge
+        )
+      default:
+        config.viewType = .basic
+      }
+      if let ratio = options?["closeButtonTouchAreaRatio"] as? Double {
+        config.closeButtonTouchAreaRatio = CGFloat(max(0.2, min(1.0, ratio)))
+      }
+      AMMInterstitial.load(adUnitID: adUnitId, config: config) { [weak self] interstitial, error in
+        guard let _ = self else { return }
+        if let error = error {
+          let errPayload = napSspErrorPayload(adUnitId: adUnitId, format: "interstitial", error: error)
+          reject(errPayload["code"] as? String ?? "napssp_interstitial_load_failed", error.localizedDescription, error)
+          NapSspModule.shared?.emitEvent(name: "onAdFailedToLoad", payload: errPayload)
+          return
+        }
+        if let interstitial = interstitial {
+          NapSspRuntime.shared.storeInterstitial(adUnitId: adUnitId, instance: interstitial)
+        }
+        resolve(nil)
+        NapSspModule.shared?.emitEvent(name: "onAdLoaded", payload: ["adUnitId": adUnitId, "format": "interstitial"])
+      }
+      #else
       do {
         let status = try NapSspRuntime.shared.registerInterstitialLoad(adUnitId: adUnitId)
         resolve(status)
@@ -33,6 +77,7 @@ class InterstitialModule: NSObject {
           "message": error.localizedDescription
         ])
       }
+      #endif
     }
   }
 
@@ -44,28 +89,73 @@ class InterstitialModule: NSObject {
         return
       }
 
+      #if canImport(AdMixerMediation)
+      guard let interstitial = NapSspRuntime.shared.consumeStoredInterstitial(adUnitId: adUnitId) else {
+        reject(NapSspError.adNotLoaded("No interstitial has been loaded yet.").errorCode, "No interstitial has been loaded yet.", nil)
+        return
+      }
+      guard let rootVC = UIApplication.shared.keyWindow?.rootViewController else {
+        reject("napssp_no_view_controller", "No root view controller found.", nil)
+        return
+      }
+      interstitial.delegate = NapSspInterstitialDelegate.shared(adUnitId: adUnitId)
+      interstitial.show(rootViewController: rootVC)
+      resolve(nil)
+      #else
       guard let payload = NapSspRuntime.shared.consumeInterstitialPresentation(adUnitId: adUnitId) else {
         reject(NapSspError.adNotLoaded("No interstitial has been loaded yet.").errorCode, "No interstitial has been loaded yet.", nil)
         return
       }
-
       resolve(payload)
-      NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: [
-        "adUnitId": adUnitId,
-        "format": "interstitial"
-      ])
-      
-      // In a real ad SDK, close event is fired when the user closes the UI.
-      // Since this is a placeholder/mock SDK right now, we immediately emit the closed event to complete the cycle.
-      NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: [
-        "adUnitId": adUnitId,
-        "format": "interstitial"
-      ])
+      NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: ["adUnitId": adUnitId, "format": "interstitial"])
+      NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: ["adUnitId": adUnitId, "format": "interstitial"])
+      NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: ["adUnitId": adUnitId, "format": "interstitial"])
+      #endif
     }
   }
 
   @objc
   func destroy(_ adUnitId: String) {
-    _ = adUnitId
+    #if canImport(AdMixerMediation)
+    NapSspRuntime.shared.removeStoredInterstitial(adUnitId: adUnitId)
+    #endif
   }
 }
+
+#if canImport(AdMixerMediation)
+private final class NapSspInterstitialDelegate: NSObject, AMMInterstitialDelegate {
+  private let adUnitId: String
+  private static var instances: [String: NapSspInterstitialDelegate] = [:]
+
+  private init(adUnitId: String) { self.adUnitId = adUnitId }
+
+  static func shared(adUnitId: String) -> NapSspInterstitialDelegate {
+    if let existing = instances[adUnitId] { return existing }
+    let delegate = NapSspInterstitialDelegate(adUnitId: adUnitId)
+    instances[adUnitId] = delegate
+    return delegate
+  }
+
+  func onSuccessShowInterstitial() {
+    NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: ["adUnitId": adUnitId, "format": "interstitial"])
+    NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: ["adUnitId": adUnitId, "format": "interstitial"])
+  }
+
+  func onFailShowInterstitial(error: Error?) {
+    NapSspModule.shared?.emitEvent(name: "onAdFailedToLoad", payload: [
+      "adUnitId": adUnitId, "format": "interstitial",
+      "code": "napssp_interstitial_show_failed",
+      "message": error?.localizedDescription ?? "unknown"
+    ])
+  }
+
+  func onTapInterstitial() {
+    NapSspModule.shared?.emitEvent(name: "onAdClicked", payload: ["adUnitId": adUnitId, "format": "interstitial"])
+  }
+
+  func onCloseInterstitial() {
+    NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: ["adUnitId": adUnitId, "format": "interstitial"])
+    NapSspInterstitialDelegate.instances.removeValue(forKey: adUnitId)
+  }
+}
+#endif

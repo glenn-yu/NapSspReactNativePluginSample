@@ -67,10 +67,11 @@ export interface AdError {
 }
 
 export interface InterstitialAdOptions {
-  type?: 'default' | 'popup';
+  type?: 'default' | 'popup' | 'countdown';
   countDownTime?: number;
   buttonLeftText?: string;
   buttonRightText?: string;
+  closeButtonTouchAreaRatio?: number; // iOS only: 0.2~1.0 (basic/countdown only)
 }
 
 export interface RewardedAdOptions {

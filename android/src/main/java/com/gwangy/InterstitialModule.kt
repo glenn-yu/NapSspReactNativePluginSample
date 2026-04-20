@@ -47,7 +47,7 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
         }
 
         try {
-            val interstitial = createOrGetInterstitial(normalizedAdUnitId, activity)
+            val interstitial = createOrGetInterstitial(normalizedAdUnitId, activity, options)
             Log.d(tag, "loadInterstitial request adUnitId=$normalizedAdUnitId")
             interstitial.javaClass.getMethod("loadInterstitial").invoke(interstitial)
             promise.resolve(null)
@@ -117,7 +117,45 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
         promise.resolve(null)
     }
 
-    private fun createOrGetInterstitial(adUnitId: String, activity: android.app.Activity): Any {
+    private fun applyInterstitialOptions(builder: Any, builderClass: Class<*>, options: com.facebook.react.bridge.ReadableMap?) {
+        if (options == null) return
+        try {
+            val adType = options.getString("type") ?: "default"
+            val interstitialAdTypeClass = Class.forName("com.nasmedia.admixerssp.ads.AdInfo\$InterstitialAdType")
+            val typeValue = when (adType) {
+                "popup", "countdown" -> interstitialAdTypeClass.getField("Popup").get(null)
+                else -> interstitialAdTypeClass.getField("Basic").get(null)
+            }
+            builderClass.getMethod("interstitialAdType", interstitialAdTypeClass).invoke(builder, typeValue)
+        } catch (_: Throwable) {}
+
+        if (options.hasKey("buttonLeftText") || options.hasKey("buttonRightText") || options.getString("type") == "countdown") {
+            try {
+                val popupOptionClass = Class.forName("com.nasmedia.admixerssp.ads.PopupInterstitialAdOption")
+                val popupConfig = popupOptionClass.getConstructor().newInstance()
+
+                val buttonLeft = options.getString("buttonLeftText") ?: "닫기"
+                popupOptionClass.getMethod("setButtonLeft", String::class.java, String::class.java)
+                    .invoke(popupConfig, buttonLeft, null)
+
+                val buttonRight = if (options.hasKey("buttonRightText")) options.getString("buttonRightText") else null
+                if (buttonRight != null) {
+                    popupOptionClass.getMethod("setButtonRight", String::class.java, String::class.java)
+                        .invoke(popupConfig, buttonRight, null)
+                }
+
+                if (options.getString("type") == "countdown") {
+                    val countDownTime = if (options.hasKey("countDownTime")) options.getInt("countDownTime") else 5
+                    popupOptionClass.getMethod("setCountDown", Int::class.java, Int::class.java)
+                        .invoke(popupConfig, 0, countDownTime.coerceIn(2, 5))
+                }
+
+                builderClass.getMethod("popupAdOption", popupOptionClass).invoke(builder, popupConfig)
+            } catch (_: Throwable) {}
+        }
+    }
+
+    private fun createOrGetInterstitial(adUnitId: String, activity: android.app.Activity, options: com.facebook.react.bridge.ReadableMap?): Any {
         interstitialAds[adUnitId]?.let { return it }
 
         val interstitialClass = Class.forName("com.nasmedia.admixerssp.ads.InterstitialAd")
@@ -126,6 +164,7 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
         val listenerClass = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
 
         val builder = builderClass.getConstructor(String::class.java).newInstance(adUnitId)
+        applyInterstitialOptions(builder!!, builderClass, options)
         val adInfo = builderClass.getMethod("build").invoke(builder)
         val interstitial = interstitialClass.getConstructor(android.content.Context::class.java).newInstance(activity)
         interstitialClass.getMethod("setAdInfo", adInfoClass).invoke(interstitial, adInfo)

@@ -6,8 +6,10 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.TextView
+import com.facebook.react.bridge.LifecycleEventListener
+import com.facebook.react.uimanager.ThemedReactContext
 
-class NapSspBannerView(context: Context) : FrameLayout(context) {
+class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventListener {
     private val placeholderTextView: TextView = TextView(context).apply {
         setTextColor(Color.WHITE)
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
@@ -210,11 +212,18 @@ class NapSspBannerView(context: Context) : FrameLayout(context) {
                     arrayOf(listenerInterface)
                 ) { _, method, args ->
                     when (method.name) {
-                        "onReceivedAd" -> NapSspEventEmitter.emitViewEvent(
-                            this@NapSspBannerView,
-                            NapSspContracts.VIEW_EVENT_AD_LOADED,
-                            mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
-                        )
+                        "onReceivedAd" -> {
+                            NapSspEventEmitter.emitViewEvent(
+                                this@NapSspBannerView,
+                                NapSspContracts.VIEW_EVENT_AD_LOADED,
+                                mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
+                            )
+                            NapSspEventEmitter.emitViewEvent(
+                                this@NapSspBannerView,
+                                NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
+                                mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
+                            )
+                        }
                         "onFailedToReceiveAd" -> NapSspEventEmitter.emitViewEvent(
                             this@NapSspBannerView,
                             NapSspContracts.VIEW_EVENT_AD_FAILED,
@@ -262,6 +271,31 @@ class NapSspBannerView(context: Context) : FrameLayout(context) {
         } catch (_: Throwable) {
             throw RuntimeException("vendor attach failed")
         }
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        (context as? ThemedReactContext)?.addLifecycleEventListener(this)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        (context as? ThemedReactContext)?.removeLifecycleEventListener(this)
+        adViewInstance?.let { runCatching { it.javaClass.getMethod("onDestroy").invoke(it) } }
+        adViewInstance = null
+    }
+
+    override fun onHostResume() {
+        adViewInstance?.let { runCatching { it.javaClass.getMethod("onResume").invoke(it) } }
+    }
+
+    override fun onHostPause() {
+        adViewInstance?.let { runCatching { it.javaClass.getMethod("onPause").invoke(it) } }
+    }
+
+    override fun onHostDestroy() {
+        adViewInstance?.let { runCatching { it.javaClass.getMethod("onDestroy").invoke(it) } }
+        adViewInstance = null
     }
 
     private fun updatePlaceholderText() {

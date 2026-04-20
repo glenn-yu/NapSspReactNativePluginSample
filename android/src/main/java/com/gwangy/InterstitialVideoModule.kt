@@ -46,7 +46,7 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
         }
 
         try {
-            val interstitialVideo = createOrGetInterstitialVideo(normalizedAdUnitId, activity)
+            val interstitialVideo = createOrGetInterstitialVideo(normalizedAdUnitId, activity, options)
             Log.d(tag, "loadInterstitialVideoAd request adUnitId=$normalizedAdUnitId")
             interstitialVideo.javaClass.getMethod("loadInterstitialVideoAd").invoke(interstitialVideo)
             promise.resolve(null)
@@ -112,7 +112,42 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
         promise.resolve(null)
     }
 
-    private fun createOrGetInterstitialVideo(adUnitId: String, activity: android.app.Activity): Any {
+    private fun applyInterstitialVideoOptions(builder: Any, builderClass: Class<*>, options: com.facebook.react.bridge.ReadableMap?) {
+        if (options == null) return
+        try {
+            if (options.hasKey("timeout")) {
+                builderClass.getMethod("interstitialTimeout", Int::class.javaPrimitiveType)
+                    .invoke(builder, options.getInt("timeout"))
+            }
+        } catch (_: Throwable) {}
+
+        try {
+            if (options.hasKey("maxRetryCountInSlot")) {
+                builderClass.getMethod("maxRetryCountInSlot", Int::class.javaPrimitiveType)
+                    .invoke(builder, options.getInt("maxRetryCountInSlot"))
+            }
+        } catch (_: Throwable) {}
+
+        try {
+            if (options.hasKey("customParams")) {
+                val customParamsMap = options.getMap("customParams")
+                if (customParamsMap != null) {
+                    val hashMap = java.util.HashMap<String, String>()
+                    val iterator = customParamsMap.keySetIterator()
+                    while (iterator.hasNextKey()) {
+                        val key = iterator.nextKey()
+                        customParamsMap.getString(key)?.let { hashMap[key] = it }
+                    }
+                    if (hashMap.isNotEmpty()) {
+                        builderClass.getMethod("setCustomParams", java.util.HashMap::class.java)
+                            .invoke(builder, hashMap)
+                    }
+                }
+            }
+        } catch (_: Throwable) {}
+    }
+
+    private fun createOrGetInterstitialVideo(adUnitId: String, activity: android.app.Activity, options: com.facebook.react.bridge.ReadableMap?): Any {
         interstitialVideoAds[adUnitId]?.let { return it }
 
         val interstitialVideoClass = Class.forName("com.nasmedia.admixerssp.ads.InterstitialVideoAd")
@@ -121,6 +156,7 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
         val listenerClass = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
 
         val builder = builderClass.getConstructor(String::class.java).newInstance(adUnitId)
+        applyInterstitialVideoOptions(builder!!, builderClass, options)
         val adInfo = builderClass.getMethod("build").invoke(builder)
         val interstitialVideo = interstitialVideoClass.getConstructor(android.content.Context::class.java).newInstance(activity)
         interstitialVideoClass.getMethod("setAdInfo", adInfoClass).invoke(interstitialVideo, adInfo)

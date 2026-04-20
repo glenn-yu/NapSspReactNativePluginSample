@@ -1,4 +1,4 @@
-# React Native Nap SSP 플러그인
+# 🚀 React Native Nap SSP 플러그인 (v0.1.2)
 
 KT Nasmedia Nap SSP SDK를 React Native에서 쓰기 위한 플러그인입니다.
 
@@ -258,11 +258,12 @@ const showRewardedAd = async () => {
     mute: true // (안드로이드 전용) 시작 시 음소거
   });
   
-  // 보상 지급 이벤트 (SDK 스펙에 따라 item 데이터는 제공되지 않을 수 있음)
-  reward.addAdEventListener('onRewarded', () => {
-    console.log('🎉 보상 지급 이벤트 발생!');
-    // SDK의 rewarded 이벤트는 payload 없이 호출됩니다.
-    // 정확한 보상 처리는 S2S 콜백 이용 권장
+  // 가장 중요한 '보상 지급' 이벤트 리스너! 
+  // 주의: 공식 SDK 스펙에 따라 item의 상세 데이터(type, amount)는 제공되지 않거나 기본값일 수 있습니다.
+  reward.addAdEventListener('onRewarded', (item) => {
+    console.log(`🎉 보상 지급 이벤트 발생! (데이터는 네이티브 SDK 스펙에 의존합니다)`);
+    // 정확한 보상 처리는 S2S 콜백 사용을 강력 권장합니다.
+
   });
 
   reward.addAdEventListener('closed', () => {

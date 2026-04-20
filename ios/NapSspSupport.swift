@@ -4,6 +4,9 @@ import React
 #if canImport(AppTrackingTransparency)
 import AppTrackingTransparency
 #endif
+#if canImport(AdMixerMediation)
+import AdMixerMediation
+#endif
 
 extension Notification.Name {
   static let napSspDidInitialize = Notification.Name("com.napssp.didInitialize")
@@ -99,6 +102,47 @@ struct NapSspConfiguration {
   }
 }
 
+// iOS SDK error codes (0~6) per official guide
+enum NapSspSdkErrorCode: Int {
+  case missingBaseURL = 0
+  case invalidURLString = 1
+  case invalidServerResponse = 2
+  case decodeError = 3
+  case apiResponseFail = 4
+  case vastParsingError = 5
+  case emptyAd = 6
+  case unknown = -1
+
+  var stringCode: String {
+    switch self {
+    case .missingBaseURL:      return "napssp_missing_base_url"
+    case .invalidURLString:    return "napssp_invalid_url"
+    case .invalidServerResponse: return "napssp_invalid_server_response"
+    case .decodeError:         return "napssp_decode_error"
+    case .apiResponseFail:     return "napssp_api_response_fail"
+    case .vastParsingError:    return "napssp_vast_parsing_error"
+    case .emptyAd:             return "napssp_empty_ad"
+    case .unknown:             return "napssp_unknown"
+    }
+  }
+
+  static func from(_ error: Error?) -> NapSspSdkErrorCode {
+    guard let nsError = error as NSError? else { return .unknown }
+    return NapSspSdkErrorCode(rawValue: nsError.code) ?? .unknown
+  }
+}
+
+func napSspErrorPayload(adUnitId: String, format: String, error: Error?) -> [String: Any] {
+  let sdkCode = NapSspSdkErrorCode.from(error)
+  return [
+    "adUnitId": adUnitId,
+    "format": format,
+    "code": sdkCode.stringCode,
+    "nativeCode": sdkCode.rawValue,
+    "message": error?.localizedDescription ?? sdkCode.stringCode,
+  ]
+}
+
 enum NapSspError: LocalizedError {
   case invalidConfiguration(String)
   case notInitialized
@@ -185,6 +229,12 @@ final class NapSspRuntime {
   private var loadedInterstitialAdUnitIds: Set<String> = []
   private var lastRewardedAdUnitId: String?
   private var loadedRewardedAdUnitIds: Set<String> = []
+  #if canImport(AdMixerMediation)
+  private var storedInterstitials: [String: AMMInterstitial] = [:]
+  private var storedRewardedAds: [String: AMMRewardVideo] = [:]
+  private var storedInterstitialVideos: [String: AMMVideoInterstitial] = [:]
+  private var storedInterstitialVideoDelegates: [String: NSObject] = [:]
+  #endif
 
   private init() {}
 
@@ -194,6 +244,12 @@ final class NapSspRuntime {
 
   func initialize(with configDictionary: NSDictionary) throws -> [String: Any] {
     let config = try NapSspConfiguration(dictionary: configDictionary)
+
+    #if canImport(AdMixerMediation)
+    AMMediation.shared.initialize(mediaKey: config.mediaKey, adunitID: config.adUnitIds)
+    let isDebugEnabled = config.logLevel == "debug" || config.logLevel == "verbose"
+    AMMediation.shared.setDebugEnabled(isEnabled: isDebugEnabled)
+    #endif
 
     let status = stateQueue.sync {
       configuration = config
@@ -223,6 +279,9 @@ final class NapSspRuntime {
     stateQueue.sync {
       logLevel = normalized.isEmpty ? "info" : normalized
     }
+    #if canImport(AdMixerMediation)
+    AMMediation.shared.setDebugEnabled(isEnabled: normalized == "debug" || normalized == "verbose")
+    #endif
   }
 
   func setCoppa(_ enabled: Bool) {
@@ -345,6 +404,77 @@ final class NapSspRuntime {
   func bannerSize(for rawValue: String?) -> NapSspBannerSize {
     NapSspBannerSize.parse(rawValue)
   }
+
+  #if canImport(AdMixerMediation)
+  func storeInterstitial(adUnitId: String, instance: AMMInterstitial) {
+    stateQueue.sync { storedInterstitials[adUnitId] = instance }
+    loadedInterstitialAdUnitIds.insert(adUnitId)
+  }
+
+  func consumeStoredInterstitial(adUnitId: String) -> AMMInterstitial? {
+    stateQueue.sync {
+      let instance = storedInterstitials[adUnitId]
+      storedInterstitials.removeValue(forKey: adUnitId)
+      loadedInterstitialAdUnitIds.remove(adUnitId)
+      return instance
+    }
+  }
+
+  func removeStoredInterstitial(adUnitId: String) {
+    stateQueue.sync {
+      storedInterstitials.removeValue(forKey: adUnitId)
+      loadedInterstitialAdUnitIds.remove(adUnitId)
+    }
+  }
+
+  func storeRewardedAd(adUnitId: String, instance: AMMRewardVideo) {
+    stateQueue.sync { storedRewardedAds[adUnitId] = instance }
+    loadedRewardedAdUnitIds.insert(adUnitId)
+  }
+
+  func consumeStoredRewardedAd(adUnitId: String) -> AMMRewardVideo? {
+    stateQueue.sync {
+      let instance = storedRewardedAds[adUnitId]
+      storedRewardedAds.removeValue(forKey: adUnitId)
+      loadedRewardedAdUnitIds.remove(adUnitId)
+      return instance
+    }
+  }
+
+  func removeStoredRewardedAd(adUnitId: String) {
+    stateQueue.sync {
+      storedRewardedAds.removeValue(forKey: adUnitId)
+      loadedRewardedAdUnitIds.remove(adUnitId)
+    }
+  }
+
+  func storeInterstitialVideo(adUnitId: String, instance: AMMVideoInterstitial) {
+    stateQueue.sync { storedInterstitialVideos[adUnitId] = instance }
+  }
+
+  func consumeStoredInterstitialVideo(adUnitId: String) -> AMMVideoInterstitial? {
+    stateQueue.sync {
+      let instance = storedInterstitialVideos[adUnitId]
+      storedInterstitialVideos.removeValue(forKey: adUnitId)
+      return instance
+    }
+  }
+
+  func removeStoredInterstitialVideo(adUnitId: String) {
+    stateQueue.sync {
+      storedInterstitialVideos.removeValue(forKey: adUnitId)
+      storedInterstitialVideoDelegates.removeValue(forKey: adUnitId)
+    }
+  }
+
+  func storeInterstitialVideoDelegate(adUnitId: String, delegate: NSObject) {
+    stateQueue.sync { storedInterstitialVideoDelegates[adUnitId] = delegate }
+  }
+
+  func removeStoredInterstitialVideoDelegate(adUnitId: String) {
+    stateQueue.sync { storedInterstitialVideoDelegates.removeValue(forKey: adUnitId) }
+  }
+  #endif
 
   func requestTrackingAuthorization(completion: @escaping (String) -> Void) {
     #if canImport(AppTrackingTransparency)

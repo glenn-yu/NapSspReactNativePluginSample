@@ -47,7 +47,7 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
         }
 
         try {
-            val rewardedAd = createOrGetRewardedAd(normalizedAdUnitId, activity)
+            val rewardedAd = createOrGetRewardedAd(normalizedAdUnitId, activity, options)
             Log.d(tag, "loadRewardVideoAd request adUnitId=$normalizedAdUnitId")
             rewardedAd.javaClass.getMethod("loadRewardVideoAd").invoke(rewardedAd)
             promise.resolve(null)
@@ -127,7 +127,34 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
         promise.resolve(null)
     }
 
-    private fun createOrGetRewardedAd(adUnitId: String, activity: android.app.Activity): Any {
+    private fun applyRewardedOptions(builder: Any, builderClass: Class<*>, options: com.facebook.react.bridge.ReadableMap?) {
+        if (options == null) return
+        try {
+            if (options.hasKey("customParams")) {
+                val customParamsMap = options.getMap("customParams")
+                if (customParamsMap != null) {
+                    val hashMap = java.util.HashMap<String, String>()
+                    val iterator = customParamsMap.keySetIterator()
+                    while (iterator.hasNextKey()) {
+                        val key = iterator.nextKey()
+                        customParamsMap.getString(key)?.let { hashMap[key] = it }
+                    }
+                    if (hashMap.isNotEmpty()) {
+                        builderClass.getMethod("setCustomParams", java.util.HashMap::class.java)
+                            .invoke(builder, hashMap)
+                    }
+                }
+            }
+        } catch (_: Throwable) {}
+
+        try {
+            if (options.hasKey("mute") && options.getBoolean("mute")) {
+                builderClass.getMethod("setMute", Boolean::class.javaPrimitiveType).invoke(builder, true)
+            }
+        } catch (_: Throwable) {}
+    }
+
+    private fun createOrGetRewardedAd(adUnitId: String, activity: android.app.Activity, options: com.facebook.react.bridge.ReadableMap?): Any {
         rewardedAds[adUnitId]?.let { return it }
 
         val rewardedClass = Class.forName("com.nasmedia.admixerssp.ads.RewardInterstitialVideoAd")
@@ -136,6 +163,7 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
         val listenerClass = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
 
         val builder = builderClass.getConstructor(String::class.java).newInstance(adUnitId)
+        applyRewardedOptions(builder!!, builderClass, options)
         val adInfo = builderClass.getMethod("build").invoke(builder)
         val rewardedAd = rewardedClass.getConstructor(android.content.Context::class.java).newInstance(activity)
         rewardedClass.getMethod("setAdInfo", adInfoClass).invoke(rewardedAd, adInfo)

@@ -36,6 +36,7 @@ RCT_EXPORT_VIEW_PROPERTY(onAdFailedToLoad, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdClicked, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdOpened, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdClosed, RCTBubblingEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onAdImpression, RCTBubblingEventBlock)
 @end
 
 @interface RCT_EXTERN_MODULE(NapSspNativeAdView, RCTViewManager)
@@ -45,6 +46,7 @@ RCT_EXPORT_VIEW_PROPERTY(onAdFailedToLoad, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdClicked, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdOpened, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdClosed, RCTBubblingEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onAdImpression, RCTBubblingEventBlock)
 @end
 
 @interface RCT_EXTERN_MODULE(NapSspVideoAdView, RCTViewManager)
