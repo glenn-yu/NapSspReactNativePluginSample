@@ -9,12 +9,19 @@ react-native-nap-ssp-*.tgz
 
 # Security (CRITICAL)
 .npmrc
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
 
 # Android
 .gradle
 android/build
 android/.gradle
 android/app/build
+local.properties
 *.keystore
 !debug.keystore
 
@@ -24,6 +31,7 @@ ios/build
 ios/*.xcresult
 ios/DerivedData
 .ls_id_cache
+*.moved-aside
 
 # React Native / Metro
 .expo/*
@@ -31,6 +39,19 @@ ios/DerivedData
 .metro/*
 example/ExampleHostApp/.bundle/
 example/ExampleHostApp/node_modules/
+example/ExampleHostApp/android/build
+example/ExampleHostApp/android/.gradle
+example/ExampleHostApp/ios/Pods
+example/ExampleHostApp/ios/build
+example/ExampleHostApp/capture/*
+
+# Integration Test App
+integration-test-app/node_modules/
+integration-test-app/android/build
+integration-test-app/android/.gradle
+integration-test-app/android/local.properties
+integration-test-app/ios/Pods
+integration-test-app/ios/build
 
 # Logs
 npm-debug.log*
@@ -38,8 +59,23 @@ yarn-debug.log*
 yarn-error.log*
 *.log
 
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+.claude/
+.gemini/
+
 # OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
 # TypeScript
