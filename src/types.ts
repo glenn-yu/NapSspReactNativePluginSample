@@ -4,6 +4,7 @@ export type BannerSize =
   | 'BANNER_320x50'
   | 'BANNER_320x100'
   | 'BANNER_300x250'
+  | 'BANNER_320x480'
   | 'LARGE_BANNER'
   | 'MEDIUM_RECTANGLE'
   | 'SMART_BANNER';

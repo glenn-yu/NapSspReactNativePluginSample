@@ -179,14 +179,17 @@ struct NapSspBannerSize {
   static let banner = NapSspBannerSize(width: 320, height: 50)
   static let mediumRectangle = NapSspBannerSize(width: 300, height: 250)
   static let largeBanner = NapSspBannerSize(width: 320, height: 100)
+  static let banner320x480 = NapSspBannerSize(width: 320, height: 480)
   static let smartBanner = NapSspBannerSize(width: 320, height: 50)
 
   static func parse(_ rawValue: String?) -> NapSspBannerSize {
     switch rawValue?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() {
-    case "MEDIUM_RECTANGLE", "MREC", "300X250":
+    case "MEDIUM_RECTANGLE", "MREC", "300X250", "BANNER_300X250":
       return .mediumRectangle
-    case "LARGE_BANNER", "320X100":
+    case "LARGE_BANNER", "320X100", "BANNER_320X100":
       return .largeBanner
+    case "BANNER_320X480":
+      return .banner320x480
     case "SMART_BANNER":
       return .smartBanner
     default:

@@ -39,6 +39,7 @@ const FALLBACK_DIMENSIONS: Record<BannerSize, { width: number; height: number }>
   BANNER_320x50: { width: 320, height: 50 },
   BANNER_320x100: { width: 320, height: 100 },
   BANNER_300x250: { width: 300, height: 250 },
+  BANNER_320x480: { width: 320, height: 480 },
   LARGE_BANNER: { width: 320, height: 100 },
   MEDIUM_RECTANGLE: { width: 300, height: 250 },
   SMART_BANNER: { width: 320, height: 50 },
