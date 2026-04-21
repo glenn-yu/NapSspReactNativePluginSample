@@ -6,7 +6,6 @@ import type { InterstitialVideoAdEventMap, InterstitialVideoAdOptions } from './
 interface NativeInterstitialVideoModule {
   load?: (adUnitId: string, options?: InterstitialVideoAdOptions) => Promise<void>;
   show?: (adUnitId: string) => Promise<void>;
-  isLoaded?: (adUnitId: string) => Promise<boolean>;
   destroy?: (adUnitId: string) => void;
 }
 
@@ -88,9 +87,6 @@ export class InterstitialVideoAd {
 
     try {
       await nativeModule.load(this.adUnitId, this.options);
-      if (!this._loaded && typeof nativeModule.isLoaded === 'function') {
-        this._loaded = await Promise.resolve(nativeModule.isLoaded(this.adUnitId));
-      }
     } catch (error) {
       const adError = normalizeAdError(error, 'interstitial_video_load_failed');
       this.emitter.emit('loadFailed', adError);

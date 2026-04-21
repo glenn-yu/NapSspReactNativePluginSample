@@ -74,7 +74,7 @@ class RewardedModule: NSObject {
         reject(NapSspError.adNotLoaded("No rewarded ad has been loaded yet.").errorCode, "No rewarded ad has been loaded yet.", nil)
         return
       }
-      guard let rootVC = UIApplication.shared.keyWindow?.rootViewController else {
+      guard let rootVC = NapSspRuntime.activeRootViewController() else {
         reject("napssp_no_view_controller", "No root view controller found.", nil)
         return
       }
@@ -146,6 +146,7 @@ private final class NapSspRewardedDelegate: NSObject, AMMRewardVideoDelegate {
       "code": "napssp_rewarded_show_failed",
       "message": error?.localizedDescription ?? "unknown"
     ])
+    NapSspRewardedDelegate.instances.removeValue(forKey: adUnitId)
   }
 }
 #endif

@@ -12,6 +12,7 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
     private val tag = "NapSspInterstitialVideo"
     private val loadedAdUnitIds = ConcurrentHashMap<String, Boolean>()
     private val interstitialVideoAds = ConcurrentHashMap<String, Any>()
+    private val loadPromises = ConcurrentHashMap<String, Promise>()
 
     override fun getName(): String = NapSspContracts.INTERSTITIAL_VIDEO_MODULE_NAME
 
@@ -46,11 +47,13 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
         }
 
         try {
+            loadPromises[normalizedAdUnitId]?.reject("NAP_SSP_INTERSTITIAL_VIDEO_LOAD_CANCELLED", "Superseded by new load")
+            loadPromises[normalizedAdUnitId] = promise
             val interstitialVideo = createOrGetInterstitialVideo(normalizedAdUnitId, activity, options)
             Log.d(tag, "loadInterstitialVideoAd request adUnitId=$normalizedAdUnitId")
             interstitialVideo.javaClass.getMethod("loadInterstitialVideoAd").invoke(interstitialVideo)
-            promise.resolve(null)
         } catch (error: Throwable) {
+            loadPromises.remove(normalizedAdUnitId)
             promise.reject("NAP_SSP_INTERSTITIAL_VIDEO_LOAD_FAILED", error)
         }
     }
@@ -107,7 +110,7 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
         val normalizedAdUnitId = adUnitId.trim()
         loadedAdUnitIds.remove(normalizedAdUnitId)
         interstitialVideoAds.remove(normalizedAdUnitId)?.let { interstitialVideo ->
-            runCatching { interstitialVideo.javaClass.getMethod("onDestroy").invoke(interstitialVideo) }
+            runCatching { interstitialVideo.javaClass.getMethod("stopInterstitialVideoAd").invoke(interstitialVideo) }
         }
         promise.resolve(null)
     }
@@ -157,6 +160,7 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
 
         val builder = builderClass.getConstructor(String::class.java).newInstance(adUnitId)
         applyInterstitialVideoOptions(builder!!, builderClass, options)
+        try { builderClass.getMethod("setIsUseMediation", Boolean::class.java).invoke(builder, true) } catch (_: Throwable) {}
         val adInfo = builderClass.getMethod("build").invoke(builder)
         val interstitialVideo = interstitialVideoClass.getConstructor(android.content.Context::class.java).newInstance(activity)
         interstitialVideoClass.getMethod("setAdInfo", adInfoClass).invoke(interstitialVideo, adInfo)
@@ -171,20 +175,24 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
                         NapSspContracts.EVENT_AD_LOADED,
                         mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO),
                     )
+                    loadPromises.remove(adUnitId)?.resolve(null)
                 }
                 "onFailedToReceiveAd" -> {
                     Log.d(tag, "onFailedToReceiveAd adUnitId=$adUnitId args=${args?.contentToString()}")
                     loadedAdUnitIds.remove(adUnitId)
+                    val code = args?.getOrNull(2) as? Int ?: -1
+                    val message = args?.getOrNull(3)?.toString() ?: "unknown"
                     NapSspEventEmitter.emitModuleEvent(
                         reactContext,
                         NapSspContracts.EVENT_AD_FAILED,
                         mapOf(
                             "adUnitId" to adUnitId,
                             "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO,
-                            "code" to (args?.getOrNull(2) as? Int ?: -1),
-                            "message" to (args?.getOrNull(3)?.toString() ?: "unknown"),
+                            "code" to code,
+                            "message" to message,
                         ),
                     )
+                    loadPromises.remove(adUnitId)?.reject("NAP_SSP_INTERSTITIAL_VIDEO_LOAD_FAILED", message)
                 }
                 "onEventAd" -> {
                     val eventName = args?.getOrNull(1)?.toString()
@@ -219,9 +227,11 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
     fun removeListeners(count: Int) = Unit
 
     override fun invalidate() {
+        loadPromises.values.forEach { it.reject("NAP_SSP_INTERSTITIAL_VIDEO_LOAD_CANCELLED", "Module invalidated") }
+        loadPromises.clear()
         loadedAdUnitIds.clear()
         interstitialVideoAds.values.forEach { interstitialVideo ->
-            runCatching { interstitialVideo.javaClass.getMethod("onDestroy").invoke(interstitialVideo) }
+            runCatching { interstitialVideo.javaClass.getMethod("stopInterstitialVideoAd").invoke(interstitialVideo) }
         }
         interstitialVideoAds.clear()
         super.invalidate()

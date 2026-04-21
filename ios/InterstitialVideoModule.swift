@@ -55,7 +55,7 @@ class InterstitialVideoModule: NSObject {
         return
       }
 
-      guard let rootVC = UIApplication.shared.keyWindow?.rootViewController else {
+      guard let rootVC = NapSspRuntime.activeRootViewController() else {
         reject("NO_ROOT_VC", "No root view controller available.", nil)
         return
       }

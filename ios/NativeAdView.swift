@@ -5,7 +5,7 @@ import React
 import AdMixerMediation
 #endif
 
-@objc(NapSspNativeAdUIView)
+@objc(NapSspNativeAdViewImpl)
 final class NativeAdView: UIView {
   @objc dynamic var adUnitId: NSString = "" {
     didSet { reloadIfNeeded() }
@@ -105,7 +105,7 @@ final class NativeAdView: UIView {
 
   #if canImport(AdMixerMediation)
   private func loadWithSdk(adUnitId: String) {
-    guard let rootVC = UIApplication.shared.keyWindow?.rootViewController else { return }
+    guard let rootVC = NapSspRuntime.activeRootViewController() else { return }
 
     // v2.2.1: remove existing container before loading new one
     nativeAdContainer?.stop()

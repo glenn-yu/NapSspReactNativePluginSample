@@ -1,11 +1,29 @@
 import Foundation
 import UIKit
 import React
+
 #if canImport(AppTrackingTransparency)
 import AppTrackingTransparency
 #endif
+
 #if canImport(AdMixerMediation)
 import AdMixerMediation
+#endif
+
+#if canImport(GoogleMobileAds)
+import GoogleMobileAds
+#endif
+
+#if canImport(PAGAdSDK)
+import PAGAdSDK
+#endif
+
+#if canImport(AppLovinSDK)
+import AppLovinSDK
+#endif
+
+#if canImport(UnityAds)
+import UnityAds
 #endif
 
 extension Notification.Name {
@@ -252,6 +270,38 @@ final class NapSspRuntime {
     AMMediation.shared.initialize(mediaKey: config.mediaKey, adunitID: config.adUnitIds)
     let isDebugEnabled = config.logLevel == "debug" || config.logLevel == "verbose"
     AMMediation.shared.setDebugEnabled(isEnabled: isDebugEnabled)
+    
+    // Initialize Google Mobile Ads if available
+    #if canImport(GoogleMobileAds)
+    GADMobileAds.sharedInstance().start(completionHandler: nil)
+    #endif
+    
+    // Initialize Pangle if appId is provided
+    if let pangleConfig = config.mediations["pangle"] as? [String: Any],
+       let appId = pangleConfig["appId"] as? String {
+      #if canImport(PAGAdSDK)
+      let pagConfig = PAGConfig.share()
+      pagConfig.appID = appId
+      PAGSdk.start(with: pagConfig) { _, _ in }
+      #endif
+    }
+    
+    // Initialize AppLovin if sdkKey is provided
+    if let alConfigDict = config.mediations["appLovin"] as? [String: Any],
+       let sdkKey = alConfigDict["sdkKey"] as? String {
+      #if canImport(AppLovinSDK)
+      let alConfig = ALSdkInitializationConfiguration(sdkKey: sdkKey)
+      ALSdk.shared().initialize(with: alConfig) { _ in }
+      #endif
+    }
+    
+    // Initialize UnityAds if appId is provided
+    if let unityConfig = config.mediations["unityAds"] as? [String: Any],
+       let appId = unityConfig["appId"] as? String {
+      #if canImport(UnityAds)
+      UnityAds.initialize(appId)
+      #endif
+    }
     #endif
 
     let status = stateQueue.sync {
@@ -265,7 +315,7 @@ final class NapSspRuntime {
       lastRewardedAdUnitId = nil
 
       return currentStatusLocked(extra: [
-        "message": "NapSsp placeholder runtime initialized.",
+        "message": "NapSsp runtime initialized.",
         "configuration": config.dictionaryRepresentation,
       ])
     }
@@ -410,8 +460,10 @@ final class NapSspRuntime {
 
   #if canImport(AdMixerMediation)
   func storeInterstitial(adUnitId: String, instance: AMMInterstitial) {
-    stateQueue.sync { storedInterstitials[adUnitId] = instance }
-    loadedInterstitialAdUnitIds.insert(adUnitId)
+    stateQueue.sync {
+      storedInterstitials[adUnitId] = instance
+      loadedInterstitialAdUnitIds.insert(adUnitId)
+    }
   }
 
   func consumeStoredInterstitial(adUnitId: String) -> AMMInterstitial? {
@@ -431,8 +483,10 @@ final class NapSspRuntime {
   }
 
   func storeRewardedAd(adUnitId: String, instance: AMMRewardVideo) {
-    stateQueue.sync { storedRewardedAds[adUnitId] = instance }
-    loadedRewardedAdUnitIds.insert(adUnitId)
+    stateQueue.sync {
+      storedRewardedAds[adUnitId] = instance
+      loadedRewardedAdUnitIds.insert(adUnitId)
+    }
   }
 
   func consumeStoredRewardedAd(adUnitId: String) -> AMMRewardVideo? {
@@ -542,6 +596,17 @@ final class NapSspRuntime {
 
     extra.forEach { payload[$0.key] = $0.value }
     return payload
+  }
+
+  static func activeRootViewController() -> UIViewController? {
+    if #available(iOS 13.0, *) {
+      return UIApplication.shared.connectedScenes
+        .compactMap { $0 as? UIWindowScene }
+        .flatMap { $0.windows }
+        .first(where: { $0.isKeyWindow })?.rootViewController
+    } else {
+      return UIApplication.shared.keyWindow?.rootViewController
+    }
   }
 
   private static func redactedMediaKey(_ value: String) -> String {

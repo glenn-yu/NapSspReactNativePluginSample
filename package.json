@@ -17,8 +17,7 @@
     "ios",
     "README.md",
     "CHANGELOG.md",
-    "RELEASE_NOTES.md",
-    "TODO.md"
+    "RELEASE_NOTES.md"
   ],
   "scripts": {
     "build": "npx tsc -p tsconfig.json",
@@ -30,6 +29,11 @@
     "smoke:test": "node scripts/smoke-test.js",
     "verify": "npm run typecheck && npm run build && npm run smoke:test",
     "start:example": "npm --prefix example start"
+  },
+  "react-native": {
+    "android": {
+      "sourceDir": "./android"
+    }
   },
   "peerDependencies": {
     "react": ">=18.0.0",

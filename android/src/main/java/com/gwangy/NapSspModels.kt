@@ -56,9 +56,15 @@ internal fun ReadableMap.toNapSspConfig(): NapSspConfig {
 internal fun NapSspConfig.requireValid(): NapSspConfig {
     require(mediaKey.isNotBlank()) { "mediaKey is required" }
     require(adUnitIds.isNotEmpty()) { "adUnitIds must contain at least one item" }
+    val cleaned = adUnitIds.map { it.trim() }.filter { it.isNotEmpty() }.distinct()
+    val nonNumeric = cleaned.filter { it.toLongOrNull() == null }
+    require(nonNumeric.isEmpty()) {
+        "adUnit IDs must be numeric strings (received non-numeric: ${nonNumeric.joinToString()}). " +
+            "Get numeric IDs from the nap SSP partner site."
+    }
     return copy(
         mediaKey = mediaKey.trim(),
-        adUnitIds = adUnitIds.map { it.trim() }.filter { it.isNotEmpty() }.distinct(),
+        adUnitIds = cleaned,
         logLevel = logLevel?.trim()?.takeIf { it.isNotEmpty() },
     )
 }

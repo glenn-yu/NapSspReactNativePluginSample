@@ -59,22 +59,3 @@ export function createNativeModuleMissingError(
   );
 }
 
-export async function callNative<T>(
-  moduleNameOrNames: string | readonly string[],
-  method: string,
-  args: readonly unknown[] = [],
-  feature?: string,
-): Promise<T> {
-  const resolvedFeature = feature ?? asModuleNames(moduleNameOrNames).join(' / ');
-  const module = getNativeModuleFromNames<Record<string, (...methodArgs: any[]) => Promise<T> | T>>(
-    asModuleNames(moduleNameOrNames),
-  );
-
-  const fn = module?.[method];
-
-  if (typeof fn !== 'function') {
-    throw createNativeModuleMissingError(resolvedFeature, moduleNameOrNames);
-  }
-
-  return await Promise.resolve(fn(...args));
-}

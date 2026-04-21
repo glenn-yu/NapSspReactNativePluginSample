@@ -15,6 +15,12 @@ class NapSspModule(private val reactContext: ReactApplicationContext) : ReactCon
     }
 
     @ReactMethod
+    fun addListener(eventName: String) {}
+
+    @ReactMethod
+    fun removeListeners(count: Int) {}
+
+    @ReactMethod
     fun initialize(config: ReadableMap, promise: Promise) {
         try {
             val parsedConfig = config.toNapSspConfig()

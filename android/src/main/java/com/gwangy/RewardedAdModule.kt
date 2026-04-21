@@ -12,6 +12,7 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
     private val tag = "NapSspRewarded"
     private val loadedAdUnitIds = ConcurrentHashMap<String, Boolean>()
     private val rewardedAds = ConcurrentHashMap<String, Any>()
+    private val loadPromises = ConcurrentHashMap<String, Promise>()
 
     override fun getName(): String = NapSspContracts.REWARDED_MODULE_NAME
 
@@ -47,11 +48,13 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
         }
 
         try {
+            loadPromises[normalizedAdUnitId]?.reject("NAP_SSP_REWARDED_LOAD_CANCELLED", "Superseded by new load")
+            loadPromises[normalizedAdUnitId] = promise
             val rewardedAd = createOrGetRewardedAd(normalizedAdUnitId, activity, options)
             Log.d(tag, "loadRewardVideoAd request adUnitId=$normalizedAdUnitId")
             rewardedAd.javaClass.getMethod("loadRewardVideoAd").invoke(rewardedAd)
-            promise.resolve(null)
         } catch (error: Throwable) {
+            loadPromises.remove(normalizedAdUnitId)
             promise.reject("NAP_SSP_REWARDED_LOAD_FAILED", error)
         }
     }
@@ -121,7 +124,7 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
         val normalizedAdUnitId = adUnitId.trim()
         loadedAdUnitIds.remove(normalizedAdUnitId)
         rewardedAds.remove(normalizedAdUnitId)?.let { rewardedAd ->
-            runCatching { rewardedAd.javaClass.getMethod("onDestroy").invoke(rewardedAd) }
+            runCatching { rewardedAd.javaClass.getMethod("stopRewardVideoAd").invoke(rewardedAd) }
         }
         NapSspSdkBridge.clearRewarded(normalizedAdUnitId)
         promise.resolve(null)
@@ -164,6 +167,7 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
 
         val builder = builderClass.getConstructor(String::class.java).newInstance(adUnitId)
         applyRewardedOptions(builder!!, builderClass, options)
+        try { builderClass.getMethod("setIsUseMediation", Boolean::class.java).invoke(builder, true) } catch (_: Throwable) {}
         val adInfo = builderClass.getMethod("build").invoke(builder)
         val rewardedAd = rewardedClass.getConstructor(android.content.Context::class.java).newInstance(activity)
         rewardedClass.getMethod("setAdInfo", adInfoClass).invoke(rewardedAd, adInfo)
@@ -179,21 +183,25 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
                         NapSspContracts.EVENT_AD_LOADED,
                         mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED),
                     )
+                    loadPromises.remove(adUnitId)?.resolve(null)
                 }
                 "onFailedToReceiveAd" -> {
                     Log.d(tag, "onFailedToReceiveAd adUnitId=$adUnitId args=${args?.contentToString()}")
                     loadedAdUnitIds.remove(adUnitId)
                     NapSspSdkBridge.clearRewarded(adUnitId)
+                    val code = args?.getOrNull(2) as? Int ?: -1
+                    val message = args?.getOrNull(3)?.toString() ?: "unknown"
                     NapSspEventEmitter.emitModuleEvent(
                         reactContext,
                         NapSspContracts.EVENT_AD_FAILED,
                         mapOf(
                             "adUnitId" to adUnitId,
                             "format" to NapSspContracts.FORMAT_REWARDED,
-                            "code" to (args?.getOrNull(2) as? Int ?: -1),
-                            "message" to (args?.getOrNull(3)?.toString() ?: "unknown"),
+                            "code" to code,
+                            "message" to message,
                         ),
                     )
+                    loadPromises.remove(adUnitId)?.reject("NAP_SSP_REWARDED_LOAD_FAILED", message)
                 }
                 "onEventAd" -> {
                     val eventName = args?.getOrNull(1)?.toString()
@@ -234,9 +242,11 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
     fun removeListeners(count: Int) = Unit
 
     override fun invalidate() {
+        loadPromises.values.forEach { it.reject("NAP_SSP_REWARDED_LOAD_CANCELLED", "Module invalidated") }
+        loadPromises.clear()
         loadedAdUnitIds.clear()
         rewardedAds.values.forEach { rewardedAd ->
-            runCatching { rewardedAd.javaClass.getMethod("onDestroy").invoke(rewardedAd) }
+            runCatching { rewardedAd.javaClass.getMethod("stopRewardVideoAd").invoke(rewardedAd) }
         }
         rewardedAds.clear()
         super.invalidate()

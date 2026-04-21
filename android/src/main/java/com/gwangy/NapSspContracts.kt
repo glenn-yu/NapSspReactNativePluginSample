@@ -24,6 +24,8 @@ internal object NapSspContracts {
     const val VIEW_EVENT_AD_OPENED = "topAdOpened"
     const val VIEW_EVENT_AD_CLOSED = "topAdClosed"
     const val VIEW_EVENT_AD_IMPRESSION = "topAdImpression"
+    const val VIEW_EVENT_AD_COMPLETED = "onVideoCompleted"
+    const val VIEW_EVENT_AD_SKIPPED = "onVideoSkipped"
 
     const val FORMAT_BANNER = "banner"
     const val FORMAT_INTERSTITIAL = "interstitial"

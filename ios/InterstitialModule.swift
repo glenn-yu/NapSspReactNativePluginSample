@@ -94,7 +94,7 @@ class InterstitialModule: NSObject {
         reject(NapSspError.adNotLoaded("No interstitial has been loaded yet.").errorCode, "No interstitial has been loaded yet.", nil)
         return
       }
-      guard let rootVC = UIApplication.shared.keyWindow?.rootViewController else {
+      guard let rootVC = NapSspRuntime.activeRootViewController() else {
         reject("napssp_no_view_controller", "No root view controller found.", nil)
         return
       }
@@ -147,6 +147,7 @@ private final class NapSspInterstitialDelegate: NSObject, AMMInterstitialDelegat
       "code": "napssp_interstitial_show_failed",
       "message": error?.localizedDescription ?? "unknown"
     ])
+    NapSspInterstitialDelegate.instances.removeValue(forKey: adUnitId)
   }
 
   func onTapInterstitial() {

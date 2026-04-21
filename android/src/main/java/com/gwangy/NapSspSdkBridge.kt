@@ -24,22 +24,35 @@ internal object NapSspSdkBridge {
         // If the vendor SDK is enabled at build time, try to initialize it.
         // Use reflection so this module can compile without the vendor SDK present (compileOnly).
         try {
-            val vendorEnabled = BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED
-
-            if (vendorEnabled) {
+            if (BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
                 try {
                     val adMixerClass = Class.forName("com.nasmedia.admixerssp.common.AdMixer")
                     val getInstance = adMixerClass.getMethod("getInstance")
                     val adMixer = getInstance.invoke(null)
-                    val initialize = adMixerClass.getMethod(
-                        "initialize",
-                        android.content.Context::class.java,
-                        String::class.java,
-                        java.util.ArrayList::class.java,
-                    )
-                    initialize.invoke(adMixer, context.applicationContext, config.mediaKey, java.util.ArrayList(config.adUnitIds))
+                    
+                    // Try "initialize" first (per docs), then fallback to "init"
+                    val initializeMethod = try {
+                        adMixerClass.getMethod(
+                            "initialize",
+                            android.content.Context::class.java,
+                            String::class.java,
+                            java.util.ArrayList::class.java,
+                        )
+                    } catch (_: NoSuchMethodException) {
+                        adMixerClass.getMethod(
+                            "init",
+                            android.content.Context::class.java,
+                            String::class.java,
+                            java.util.ArrayList::class.java,
+                        )
+                    }
+                    
+                    initializeMethod.invoke(adMixer, context.applicationContext, config.mediaKey, java.util.ArrayList(config.adUnitIds))
+                    android.util.Log.d("NapSspSdkBridge", "AdMixer initialized with ${initializeMethod.name}")
 
-                    val registerAdapter = adMixerClass.getMethod("registerAdapter", String::class.java)
+                    val registerAdapter = try {
+                        adMixerClass.getMethod("registerAdapter", String::class.java)
+                    } catch (_: Throwable) { null }
                     val adapters = listOf(
                         "ADAPTER_ADMANAGER",
                         "ADAPTER_ADFIT",
@@ -48,21 +61,27 @@ internal object NapSspSdkBridge {
                         "ADAPTER_APPLOVIN",
                         "ADAPTER_UNITY"
                     )
-                    for (adapterConst in adapters) {
-                        try {
-                            val field = adMixerClass.getField(adapterConst)
-                            val adapterName = field.get(null) as? String
-                            if (adapterName != null) {
-                                registerAdapter.invoke(null, adapterName)
+                    if (registerAdapter != null) {
+                        // Determine if static or instance by checking modifiers
+                        val isStatic = java.lang.reflect.Modifier.isStatic(registerAdapter.modifiers)
+                        val receiver = if (isStatic) null else adMixer
+                        for (adapterConst in adapters) {
+                            try {
+                                val field = adMixerClass.getField(adapterConst)
+                                val adapterName = field.get(null) as? String
+                                if (adapterName != null) {
+                                    registerAdapter.invoke(receiver, adapterName)
+                                    android.util.Log.d("NapSspSdkBridge", "Registered adapter: $adapterName")
+                                }
+                            } catch (_: Throwable) {
+                                // ignore missing adapter constants
                             }
-                        } catch (_: Throwable) {
-                            // ignore missing adapter constants
                         }
                     }
                     // Initialize mediation-specific SDKs after AdMixer adapters are registered
                     initializeMediationSdks(context, config)
                 } catch (e: Throwable) {
-                    // vendor SDK present but reflection failed; leave placeholder behavior
+                    android.util.Log.e("NapSspSdkBridge", "Vendor SDK initialization failed: ${e.message}", e)
                 }
             }
         } catch (_: Throwable) {
@@ -123,7 +142,7 @@ internal object NapSspSdkBridge {
         if (BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
             try {
                 val logClass = Class.forName("com.nasmedia.admixerssp.common.AdMixerLog")
-                val logLevelClass = Class.forName("com.nasmedia.admixerssp.common.AdMixerLog\$Level")
+                val logLevelClass = Class.forName("com.nasmedia.admixerssp.common.AdMixerLog\$LogLevel")
                 val levelValue = when (normalized.lowercase()) {
                     "verbose", "debug" -> logLevelClass.getField("DEBUG").get(null)
                     "warn" -> logLevelClass.getField("WARN").get(null)

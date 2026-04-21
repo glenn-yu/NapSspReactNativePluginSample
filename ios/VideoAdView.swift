@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 import React
 
-@objc(NapSspVideoAdUIView)
+@objc(NapSspVideoAdViewImpl)
 final class VideoAdView: UIView {
   @objc dynamic var adUnitId: NSString = "" {
     didSet { reloadIfNeeded() }

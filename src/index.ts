@@ -20,6 +20,7 @@ export type {
   RewardedAdOptions,
   InterstitialVideoAdOptions,
   InterstitialAdEventMap,
+  InterstitialVideoAdEventMap,
   LogLevel,
   MediationConfig,
   NapSspConfig,

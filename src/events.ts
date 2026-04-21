@@ -36,6 +36,11 @@ export class TypedEventEmitter<TEvents extends Record<string, any>> {
   removeAllListeners(): void {
     this.listeners.clear();
   }
+
+  hasListeners(event: string): boolean {
+    const set = this.listeners.get(event as keyof TEvents);
+    return set != null && set.size > 0;
+  }
 }
 
 /**
@@ -43,7 +48,8 @@ export class TypedEventEmitter<TEvents extends Record<string, any>> {
  */
 class GlobalEventEmitter extends TypedEventEmitter<any> {
   private nativeEmitter?: NativeEventEmitter;
-  private subscriptionCount = 0;
+  // One nativeEmitter subscription per event name (avoids duplicate firings)
+  private nativeSubscriptions = new Map<string, ReturnType<NativeEventEmitter['addListener']>>();
 
   setup(nativeModuleName: string): void {
     if (this.nativeEmitter) {
@@ -60,16 +66,22 @@ class GlobalEventEmitter extends TypedEventEmitter<any> {
 
   addListener(eventName: string, handler: EventHandler<any>): () => void {
     const cleanup = this.on(eventName, handler);
-    this.subscriptionCount++;
 
-    const nativeSubscription = this.nativeEmitter?.addListener(eventName, (payload: any) => {
-      this.emit(eventName, payload);
-    });
+    // Register with nativeEmitter only once per event name
+    if (this.nativeEmitter && !this.nativeSubscriptions.has(eventName)) {
+      const sub = this.nativeEmitter.addListener(eventName, (payload: any) => {
+        this.emit(eventName, payload);
+      });
+      this.nativeSubscriptions.set(eventName, sub);
+    }
 
     return () => {
       cleanup();
-      nativeSubscription?.remove();
-      this.subscriptionCount--;
+      // Remove nativeEmitter subscription when no JS listeners remain
+      if (!this.hasListeners(eventName)) {
+        this.nativeSubscriptions.get(eventName)?.remove();
+        this.nativeSubscriptions.delete(eventName);
+      }
     };
   }
 }

@@ -19,19 +19,21 @@ export interface BannerAdProps {
   onAdClicked?: () => void;
   onAdOpened?: () => void;
   onAdClosed?: () => void;
+  onAdImpression?: () => void;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 }
 
 type NativeBannerProps = Omit<
   BannerAdProps,
-  'onAdLoaded' | 'onAdFailedToLoad' | 'onAdClicked' | 'onAdOpened' | 'onAdClosed'
+  'onAdLoaded' | 'onAdFailedToLoad' | 'onAdClicked' | 'onAdOpened' | 'onAdClosed' | 'onAdImpression'
 > & {
   onAdLoaded?: () => void;
   onAdFailedToLoad?: (event: { nativeEvent: AdError }) => void;
   onAdClicked?: () => void;
   onAdOpened?: () => void;
   onAdClosed?: () => void;
+  onAdImpression?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -83,6 +85,7 @@ export default function BannerAd(props: BannerAdProps) {
         onAdClicked={props.onAdClicked}
         onAdOpened={props.onAdOpened}
         onAdClosed={props.onAdClosed}
+        onAdImpression={props.onAdImpression}
       />
     );
   }
