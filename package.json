@@ -20,12 +20,12 @@
     "RELEASE_NOTES.md"
   ],
   "scripts": {
-    "build": "npx tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
     "prepare": "npm run build",
     "clean": "node -e \"const fs = require('fs'); if (fs.existsSync('lib')) fs.rmSync('lib', { recursive: true, force: true })\"",
     "lint": "npm run typecheck",
     "test": "npm run typecheck && npm run smoke:test",
-    "typecheck": "npx tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "smoke:test": "node scripts/smoke-test.js",
     "verify": "npm run typecheck && npm run build && npm run smoke:test",
     "start:example": "npm --prefix example start"
