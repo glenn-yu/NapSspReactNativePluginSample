@@ -24,7 +24,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "prepare": "npm run build",
+    "prepack": "npm run build",
     "clean": "node -e \"const fs = require('fs'); if (fs.existsSync('lib')) fs.rmSync('lib', { recursive: true, force: true })\"",
     "lint": "npm run typecheck",
     "test": "npm run typecheck && npm run smoke:test",
