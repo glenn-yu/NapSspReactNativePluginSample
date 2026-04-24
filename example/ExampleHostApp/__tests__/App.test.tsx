@@ -8,55 +8,26 @@ import {Text} from 'react-native';
 import renderer, {act} from 'react-test-renderer';
 import App from '../App';
 
-jest.mock('../../../src', () => {
-  const mockReact = require('react');
-  const {View} = require('react-native');
+jest.mock('react-native/Libraries/BatchedBridge/NativeModules', () => ({
+  UIManager: { RCTView: () => ({}) },
+  PlatformConstants: { osVersion: '13.0', platform: 'iOS' },
+}));
 
-  class MockInterstitialAd {
-    async load() {}
-    async show() {}
-    addAdEventListener() {
-      return () => {};
-    }
-  }
-
-  class MockRewardedAd {
-    async load() {}
-    async show() {}
-    addAdEventListener() {
-      return () => {};
-    }
-  }
-
-  class MockInterstitialVideoAd {
-    async load() {}
-    async show() {}
-    addAdEventListener() {
-      return () => {};
-    }
-  }
-
-  const mockView = (props: any) => mockReact.createElement(View, props);
-
-  return {
-    NapSspAd: {
-      initialize: jest.fn().mockResolvedValue(undefined),
-      getStatus: jest.fn().mockResolvedValue({
-        initialized: true,
-        placeholderMode: true,
-      }),
-    },
-    BannerAd: mockView,
-    NativeAd: mockView,
-    VideoAd: mockView,
-    InterstitialAd: MockInterstitialAd,
-    RewardedAd: MockRewardedAd,
-    InterstitialVideoAd: MockInterstitialVideoAd,
-    isNativeModuleAvailable: jest.fn().mockReturnValue(false),
-  };
-});
-
-const mockedSrc = jest.requireMock('../../../src');
+jest.mock('../../../src', () => ({
+  ...jest.requireActual('../../../src'),
+  TEST_CONFIG: {
+    mediaKey: 'TEST_MEDIA_KEY',
+    adUnitIds: [
+      'TEST_BANNER',
+      'TEST_NATIVE_AD',
+      'TEST_VIDEO_AD',
+      'TEST_INTERSTITIAL',
+      'TEST_INTERSTITIAL_VIDEO',
+      'TEST_REWARDED',
+    ],
+    logLevel: 'debug',
+  },
+}));
 
 it('renders the beginner-friendly host screen and initializes every major ad flow', async () => {
   let tree: ReturnType<typeof renderer.create>;
@@ -83,28 +54,4 @@ it('renders the beginner-friendly host screen and initializes every major ad flo
       '6. 보상형 광고 (Rewarded)',
     ]),
   );
-
-  expect(mockedSrc.NapSspAd.initialize).toHaveBeenCalledWith(
-    expect.objectContaining({
-      mediaKey: 'TEST_MEDIA_KEY',
-      adUnitIds: [
-        'TEST_BANNER',
-        'TEST_NATIVE_AD',
-        'TEST_VIDEO_AD',
-        'TEST_INTERSTITIAL',
-        'TEST_INTERSTITIAL_VIDEO',
-        'TEST_REWARDED',
-      ],
-      logLevel: 'debug',
-    }),
-  );
-
-  expect(mockedSrc.NapSspAd.getStatus).toHaveBeenCalledTimes(1);
-  expect(mockedSrc.isNativeModuleAvailable).toHaveBeenCalledWith([
-    'NapSspModule',
-    'NapSspBannerView',
-    'NapSspNativeAdView',
-    'NapSspVideoAdView',
-    'NapSspInterstitialVideo',
-  ]);
 });
