@@ -28,5 +28,15 @@ target 'IntegrationTestApp' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
+
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |build_config|
+        flags = build_config.build_settings['OTHER_CPLUSPLUSFLAGS'] || '$(inherited)'
+        extra = ' -Wno-error=deprecated-literal-operator -Wno-deprecated-literal-operator'
+        unless flags.include?('-Wno-error=deprecated-literal-operator')
+          build_config.build_settings['OTHER_CPLUSPLUSFLAGS'] = flags + extra
+        end
+      end
+    end
   end
 end
