@@ -61,7 +61,7 @@
 
 - `ios/Package.swift` checksum placeholder 해소 전까지 SPM은 참고용 수준
 - `integration-test-app`은 문서상 설명과 달리 즉시 실행 가능한 완성형 통합 테스트 앱이 아님
-- 공식 네이티브 가이드에 등장하는 Bizboard는 RN surface에 아직 노출되지 않음
+- 공식 네이티브 가이드에 등장하는 Bizboard는 RN surface에 아직 노출되지 않으며, README 등 사용자 문서에도 지원 범위가 명확히 적혀 있어야 함
 - 일부 문서는 실제 코드/실행 상태보다 readiness를 높게 표현하고 있었음
 
 따라서 본 프로젝트는 **CI 기준 기본 품질은 확보했지만, 배포/문서/실기기 검증 관점에서는 추가 정리가 필요한 상태**로 평가하는 것이 정확합니다.

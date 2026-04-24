@@ -6,6 +6,7 @@ KT Nasmedia Nap SSP SDK를 React Native에서 쓰기 위한 플러그인입니�
 - 지원 목표: Android / iOS
 - 제공 형태: Native Module + Native View
 - 현재 중심 기능: 초기화, 배너, 전면, 전면 동영상, 리워드, 네이티브, 비디오
+- 현재 미지원: Bizboard 전용 RN surface
 - 예제 앱은 위 주요 흐름을 모두 커버하면서, 네이티브 브리지 없이도 화면이 렌더되는 플레이스홀더 모드도 보여줍니다.
 
 ## 가장 먼저 할 일
@@ -291,6 +292,11 @@ npm run verify
 - `typecheck`: TypeScript 타입 확인
 - `build`: `lib/` 생성 확인
 - `smoke:test`: 공개 API 및 기본 초기화 흐름 확인
+
+## 지원 범위 메모
+
+- 공식 Android/iOS 네이티브 가이드에는 Bizboard 관련 내용이 포함되어 있지만, 현재 React Native 공개 API에서는 Bizboard 전용 타입이나 컴포넌트를 아직 제공하지 않습니다.
+- 즉, 현재 RN 패키지 기준 지원 범위는 배너, 전면, 전면 동영상, 리워드, 네이티브, 인라인 비디오입니다.
 
 ## ❓ 자주 묻는 질문 (FAQ)
 
