@@ -1,5 +1,14 @@
 # SPM (Swift Package Manager) 통합 가이드
 
+## 현재 상태
+
+SPM 지원 코드는 포함되어 있지만, **아직 바로 배포 가능한 완성 상태는 아닙니다.**
+
+이유:
+- `ios/Package.swift`의 `adMixerMediationChecksum` 값이 아직 placeholder입니다.
+- checksum이 공식 배포값으로 확정되기 전까지는 SPM 연동을 참고용 또는 사내용 검증용으로만 취급하는 것이 안전합니다.
+- 미디에이션 어댑터는 현재 CocoaPods 기준 안내가 더 현실적입니다.
+
 ## 개요
 
 `ios/Package.swift`는 `AdMixerMediation.xcframework`를 `.binaryTarget`으로 선언합니다.  

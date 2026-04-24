@@ -123,6 +123,8 @@ Xcode를 열고 다음 단계를 진행합니다.
 2. `node_modules/react-native-nap-ssp/ios` 폴더를 선택하여 로컬 패키지를 추가합니다.
 3. 앱 프로젝트의 `Package.swift`에 나스미디어 Vendor SDK XCFramework를 `binaryTarget`으로 추가하거나 수동으로 링킹합니다. (자세한 방법은 패키지 내 `docs/spm_integration.md` 참조)
 
+> 주의: 현재 SPM 경로는 구조는 갖춰져 있지만 `ios/Package.swift` checksum placeholder가 아직 남아 있어, CocoaPods보다 덜 검증된 경로입니다.
+
 ---
 
 ## 💻 3. 초보자도 따라하기 쉬운 사용 가이드
@@ -300,6 +302,9 @@ npm run verify
 
 - **Q. iOS에서 시뮬레이터로 돌리는데 안 나옵니다.**
   - A. 광고 SDK(특히 미디에이션 된 타사 네트워크들) 중 일부는 실기기(Real Device) 환경에서만 정상적으로 로드되는 경우가 많습니다. 가급적 실기기에서 테스트해 주세요.
+
+- **Q. 저장소의 integration-test-app은 바로 실행 가능한가요?**
+  - A. 현재 데모 코드와 Podfile은 포함되어 있지만, 저장소 상태만으로는 iOS 네이티브 프로젝트 파일이 없어 즉시 `run-ios`가 되는 완성형 앱은 아닙니다. 통합 검증용 베이스로 보고 추가 scaffold 정리가 필요합니다.
 
 ---
 

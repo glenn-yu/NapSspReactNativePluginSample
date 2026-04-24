@@ -1,7 +1,7 @@
 # Nap SSP React Native Plugin 전수 조사 및 검증 보고서
-> 기준 계획서: `docs/action_plan.md` | 작성일: 2026-04-20
+> 기준 계획서: `docs/action_plan.md` | 작성일: 2026-04-20 | 최종 재검토: 2026-04-25
 
-본 보고서는 `docs/action_plan.md`에 정의된 4단계 작업 계획(Phase 1~4)의 이행 현황과 샘플 테스트 앱의 완성도를 전수 조사한 결과입니다. 코드 베이스 분석을 통해 모든 항목이 설계서 및 최신 네이티브 SDK 가이드를 준수하고 있음을 확인하였습니다.
+본 보고서는 `docs/action_plan.md`에 정의된 4단계 작업 계획(Phase 1~4)의 이행 현황과 샘플 테스트 앱의 완성도를 전수 조사한 결과입니다. 다만 2026-04-25 재검토 기준으로, 일부 항목은 문서상 완료로 표시되었으나 실제 저장소 상태와 차이가 있음을 확인했습니다. 아래 평가는 코드, CI, 실행 가능성 기준으로 보수적으로 정리한 최신 상태입니다.
 
 ---
 
@@ -12,7 +12,7 @@
 | **Phase 1** | CRITICAL | ✅ 완료 | iOS 초기화 연결 및 ObjC 클래스 충돌 방지(명칭 변경) 완료 |
 | **Phase 2** | HIGH | ✅ 완료 | 안드로이드 ProGuard, 옵션 연동 및 네이티브 광고 바인딩 완료 |
 | **Phase 3** | MEDIUM | ✅ 완료 | 생명주기, 로그 연동, 임프레션 발행 및 iOS 에러코드 매핑 완료 |
-| **Phase 4** | LOW | ✅ 완료 | SPM 지원, 테스트 앱 고도화 및 New Architecture Spec 작성 완료 |
+| **Phase 4** | LOW | ⚠️ 부분 완료 | New Architecture Spec 작성 및 일부 배포/테스트 자산은 존재하지만, SPM은 placeholder 상태이고 integration-test-app은 즉시 실행 가능한 검증 앱으로 완성되지 않음 |
 
 ---
 
@@ -36,8 +36,8 @@
 
 ### 2.4 Phase 4 — LOW (아키텍처 및 도구)
 - **Task 4-1 (Android 미디에이션 초기화)**: Pangle/AppLovin/UnityAds SDK에 대한 별도 초기화 로직 확인.
-- **Task 4-2 (iOS SPM)**: `Package.swift` 구성 및 `binaryTarget` 참조 완료.
-- **Task 4-3 (테스트 앱)**: `integration-test-app`에 모든 광고 포맷 및 라이브 로그 뷰어 포함 확인.
+- **Task 4-2 (iOS SPM)**: `Package.swift` 구성과 `binaryTarget` 선언은 존재하나, checksum이 `REPLACE_WITH_OFFICIAL_CHECKSUM`으로 남아 있어 release-grade 상태는 아님.
+- **Task 4-3 (테스트 앱)**: `integration-test-app`에 광고 포맷 데모 코드는 있으나, iOS 네이티브 프로젝트 파일이 없어 즉시 실행 가능한 통합 검증 앱으로 보기 어려움.
 - **Task 4-4 (New Architecture)**: JSI Spec 파일(`NativeNapSspModuleSpec.ts` 등) 작성 완료.
 
 ---
@@ -50,11 +50,18 @@
 - **상세 가이드**: Android/iOS 필수 의존성 설정과 CocoaPods vs SPM 선택 가이드가 포함되어 실무 적용이 용이함.
 
 ### 3.2 기능 및 옵션 커버리지 (integration-test-app)
-- **모든 포맷 포함**: 배너, 전면, 리워드, 네이티브, 인라인 비디오, 전면 비디오가 모두 구현됨.
-- **모든 옵션 테스트**: 팝업형 전면 광고의 카운트다운 시간 설정, 리워드 광고의 S2S 커스텀 파라미터 전달, 음소거 옵션 등 상세 설정 기능이 샘플 코드에 녹아 있음.
-- **디버깅 편의성**: 실시간 이벤트 로그(Loaded, Clicked, Impression 등)를 앱 내에서 즉시 확인할 수 있는 UI가 제공되어 테스트 효율성을 높임.
+- **데모 코드 범위**: 배너, 전면, 리워드, 네이티브, 인라인 비디오, 전면 비디오 데모 코드가 포함되어 있음.
+- **옵션 예시 포함**: 팝업형 전면 광고의 카운트다운 시간 설정, 리워드 광고의 S2S 커스텀 파라미터 전달, 음소거 옵션 등 예시가 포함되어 있음.
+- **중요한 제한사항**: 현재 저장소 상태만으로는 iOS 프로젝트 파일이 없어 `react-native run-ios`로 즉시 실행되지 않으며, 실제 단말/에뮬레이터 기반 통합 검증이 완료되었다고 단정할 수 없음.
 
 ---
 
 ## 4. 최종 결론
-`docs/action_plan.md`의 모든 항목이 성공적으로 이행되었으며, 샘플 앱과 가이드 문서 또한 초보자부터 전문가까지 아우를 수 있는 높은 완성도로 작성되었습니다. 본 프로젝트는 상용 배포가 가능한 안정적인 상태임을 확인하였습니다.
+핵심 React Native 플러그인 기능과 기본 CI 검증 경로는 유의미하게 정비되었고, `verify-js` 및 `verify-example` GitHub Actions는 2026-04-25 기준 통과했습니다. 다만 아래 항목은 아직 후속 작업이 필요합니다.
+
+- `ios/Package.swift` checksum placeholder 해소 전까지 SPM은 참고용 수준
+- `integration-test-app`은 문서상 설명과 달리 즉시 실행 가능한 완성형 통합 테스트 앱이 아님
+- 공식 네이티브 가이드에 등장하는 Bizboard는 RN surface에 아직 노출되지 않음
+- 일부 문서는 실제 코드/실행 상태보다 readiness를 높게 표현하고 있었음
+
+따라서 본 프로젝트는 **CI 기준 기본 품질은 확보했지만, 배포/문서/실기기 검증 관점에서는 추가 정리가 필요한 상태**로 평가하는 것이 정확합니다.
