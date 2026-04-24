@@ -8,27 +8,6 @@ import {Text} from 'react-native';
 import renderer, {act} from 'react-test-renderer';
 import App from '../App';
 
-jest.mock('react-native/Libraries/BatchedBridge/NativeModules', () => ({
-  UIManager: { RCTView: () => ({}) },
-  PlatformConstants: { osVersion: '13.0', platform: 'iOS' },
-}));
-
-jest.mock('../../../src', () => ({
-  ...jest.requireActual('../../../src'),
-  TEST_CONFIG: {
-    mediaKey: 'TEST_MEDIA_KEY',
-    adUnitIds: [
-      'TEST_BANNER',
-      'TEST_NATIVE_AD',
-      'TEST_VIDEO_AD',
-      'TEST_INTERSTITIAL',
-      'TEST_INTERSTITIAL_VIDEO',
-      'TEST_REWARDED',
-    ],
-    logLevel: 'debug',
-  },
-}));
-
 it('renders the beginner-friendly host screen and initializes every major ad flow', async () => {
   let tree: ReturnType<typeof renderer.create>;
 
