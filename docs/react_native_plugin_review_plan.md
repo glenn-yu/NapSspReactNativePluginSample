@@ -104,6 +104,23 @@
 완료 기준:
 - Android 테스트 앱이 실제 에뮬레이터 또는 기기에서 실행된다.
 
+#### Android 환경 세팅 체크리스트
+
+- [ ] Homebrew Java 설치 여부 확인
+- [ ] Android 실행 시 사용할 JDK를 **openjdk@17**로 고정
+- [ ] `JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home` 설정
+- [ ] `PATH="$JAVA_HOME/bin:$PATH"` 적용
+- [ ] `android/gradlew` 실행권한 확인 (`chmod +x android/gradlew`)
+- [ ] `./android/gradlew -p android tasks --all` 성공 확인
+- [ ] Android SDK / platform-tools 접근 가능 확인
+- [ ] `adb devices`에서 emulator 또는 실제 기기 인식 확인
+- [ ] 인식된 대상이 없으면 emulator 기동 또는 기기 USB 연결
+- [ ] 그 다음 `npx react-native run-android` 실행
+
+참고:
+- JDK 25는 현재 Gradle 8.0.1 조합에서 `Unsupported class file major version 69`로 실패할 수 있다.
+- 이 저장소의 Android 실행 검증 기준 Java는 현재 **JDK 17**이다.
+
 ---
 
 ### Phase 3. iOS 테스트 앱 복구 및 빌드 성공

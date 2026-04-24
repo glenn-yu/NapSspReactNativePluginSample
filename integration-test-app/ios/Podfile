@@ -36,6 +36,13 @@ target 'IntegrationTestApp' do
         unless flags.include?('-Wno-error=deprecated-literal-operator')
           build_config.build_settings['OTHER_CPLUSPLUSFLAGS'] = flags + extra
         end
+
+        if target.name == 'RCT-Folly'
+          defs = build_config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] || ['$(inherited)']
+          defs = [defs] unless defs.is_a?(Array)
+          defs << 'FOLLY_HAVE_CLOCK_GETTIME=1' unless defs.include?('FOLLY_HAVE_CLOCK_GETTIME=1')
+          build_config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = defs
+        end
       end
     end
   end
