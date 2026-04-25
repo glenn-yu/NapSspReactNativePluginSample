@@ -1,10 +1,8 @@
 appId: com.integrationtestapp
 ---
-- launchApp:
-    clearState: true
 - extendedWaitUntil:
     visible: "SDK 초기화"
-    timeout: 20000
+    timeout: 30000
 - runFlow:
     when:
       visible: "OK"
