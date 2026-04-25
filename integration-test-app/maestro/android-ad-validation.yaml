@@ -67,6 +67,10 @@ appId: com.integrationtestapp
       visible: "OK"
     commands:
       - tapOn: "OK"
+- scrollUntilVisible:
+    element: "전면 동영상"
+    direction: DOWN
+    timeout: 10000
 - tapOn: "전면 동영상"
 - waitForAnimationToEnd
 - runFlow:
