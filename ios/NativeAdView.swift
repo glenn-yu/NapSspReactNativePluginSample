@@ -19,7 +19,7 @@ final class NativeAdView: UIView {
   @objc var onAdImpression: RCTBubblingEventBlock?
 
   #if canImport(AdMixerMediation)
-  private var nativeAdContainer: AMMNativeAdViewContainer?
+  var nativeAdContainer: AMMNativeAdViewContainer?
   private var sdkDelegate: NapSspNativeDelegate?
   #endif
 
@@ -106,6 +106,13 @@ final class NativeAdView: UIView {
   #if canImport(AdMixerMediation)
   private func loadWithSdk(adUnitId: String) {
     guard let rootVC = NapSspRuntime.activeRootViewController() else { return }
+    guard let numericAdUnitId = Int(adUnitId) else {
+      onAdFailedToLoad?([
+        "adUnitId": adUnitId, "format": "native",
+        "code": "napssp_invalid_ad_unit", "message": "Native adUnitId must be numeric on iOS."
+      ])
+      return
+    }
 
     // v2.2.1: remove existing container before loading new one
     nativeAdContainer?.stop()
@@ -115,7 +122,7 @@ final class NativeAdView: UIView {
     sdkDelegate = delegate
 
     let container = AMMNativeAdViewContainer(rootViewController: rootVC)
-    container.adUnitID = adUnitId
+    container.adUnitID = numericAdUnitId
     container.delegate = delegate
     nativeAdContainer = container
 

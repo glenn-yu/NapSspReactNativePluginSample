@@ -1,5 +1,8 @@
 import Foundation
 import React
+#if canImport(AdMixerMediation)
+import AdMixerMediation
+#endif
 
 @objc(NapSspRewarded)
 class RewardedModule: NSObject {
@@ -14,11 +17,15 @@ class RewardedModule: NSObject {
         reject(NapSspError.notInitialized.errorCode, NapSspError.notInitialized.errorDescription, nil)
         return
       }
+      guard let adUnit = Int(adUnitId) else {
+        reject("napssp_invalid_ad_unit", "Rewarded adUnitId must be numeric on iOS.", nil)
+        return
+      }
       var customParam: [String: String]? = nil
       if let rawParams = options?["customParams"] as? [String: String], !rawParams.isEmpty {
         customParam = rawParams
       }
-      AMMRewardVideo.load(adUnitID: adUnitId, customParam: customParam) { [weak self] reward, error in
+      AMMRewardVideo.load(adUnitID: adUnit, customParam: customParam) { [weak self] reward, error in
         guard let _ = self else { return }
         if let error = error {
           let errPayload = napSspErrorPayload(adUnitId: adUnitId, format: "rewarded", error: error)
@@ -122,7 +129,7 @@ private final class NapSspRewardedDelegate: NSObject, AMMRewardVideoDelegate {
     return delegate
   }
 
-  func onRewardVideoStarted() {
+  func onSuccessShowReward() {
     NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: ["adUnitId": adUnitId, "format": "rewarded"])
     NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: ["adUnitId": adUnitId, "format": "rewarded"])
   }
@@ -136,11 +143,11 @@ private final class NapSspRewardedDelegate: NSObject, AMMRewardVideoDelegate {
     NapSspRewardedDelegate.instances.removeValue(forKey: adUnitId)
   }
 
-  func onRewardVideoClicked() {
+  func onTapRewardVideo() {
     NapSspModule.shared?.emitEvent(name: "onAdClicked", payload: ["adUnitId": adUnitId, "format": "rewarded"])
   }
 
-  func onRewardVideoFailed(error: Error?) {
+  func onFailShowReward(error: Error?) {
     NapSspModule.shared?.emitEvent(name: "onAdFailedToLoad", payload: [
       "adUnitId": adUnitId, "format": "rewarded",
       "code": "napssp_rewarded_show_failed",

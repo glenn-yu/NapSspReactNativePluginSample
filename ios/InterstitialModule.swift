@@ -1,5 +1,8 @@
 import React
 import Foundation
+#if canImport(AdMixerMediation)
+import AdMixerMediation
+#endif
 
 @objc(NapSspInterstitial)
 class InterstitialModule: NSObject {
@@ -12,6 +15,10 @@ class InterstitialModule: NSObject {
       #if canImport(AdMixerMediation)
       guard NapSspRuntime.shared.isInitialized else {
         reject(NapSspError.notInitialized.errorCode, NapSspError.notInitialized.errorDescription, nil)
+        return
+      }
+      guard let adUnit = Int(adUnitId) else {
+        reject("napssp_invalid_ad_unit", "Interstitial adUnitId must be numeric on iOS.", nil)
         return
       }
       let config = AMMInterstitialConfig()
@@ -36,9 +43,9 @@ class InterstitialModule: NSObject {
         config.viewType = .basic
       }
       if let ratio = options?["closeButtonTouchAreaRatio"] as? Double {
-        config.closeButtonTouchAreaRatio = CGFloat(max(0.2, min(1.0, ratio)))
+        config.closeButtonTouchAreaRatio = Float(max(0.2, min(1.0, ratio)))
       }
-      AMMInterstitial.load(adUnitID: adUnitId, config: config) { [weak self] interstitial, error in
+      AMMInterstitial.load(adUnitID: adUnit, config: config) { [weak self] interstitial, error in
         guard let _ = self else { return }
         if let error = error {
           let errPayload = napSspErrorPayload(adUnitId: adUnitId, format: "interstitial", error: error)

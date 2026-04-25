@@ -1,14 +1,11 @@
 PODS:
-  - AdFitSDK (3.14.5)
+  - AdFitSDK (3.18.3)
   - AdMixer (1.1.6)
   - AdMixerMediation (2.3.2):
     - AdMixer (>= 1.1.6)
-  - AdMixerMediationAdFit (1.0.4):
-    - AdFitSDK (= 3.14.5)
-    - AdMixerMediation
-  - AdMixerMediationGAM (1.0.7):
+  - AdMixerMediationAdFit (1.0.7):
+    - AdFitSDK (< 3.18.6, >= 3.14.7)
     - AdMixerMediation (>= 2.3.0)
-    - Google-Mobile-Ads-SDK (< 12.14.1, >= 12.7.0)
   - boost (1.76.0)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.72.10)
@@ -21,13 +18,14 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.72.10)
   - fmt (6.2.1)
   - glog (0.3.5)
-  - Google-Mobile-Ads-SDK (12.14.0):
-    - GoogleUserMessagingPlatform (>= 1.1)
-  - GoogleUserMessagingPlatform (3.1.0)
   - hermes-engine (0.72.10):
     - hermes-engine/Pre-built (= 0.72.10)
   - hermes-engine/Pre-built (0.72.10)
   - libevent (2.1.12)
+  - NapSspPlugin/AdFit (0.1.2):
+    - AdMixerMediation
+    - AdMixerMediationAdFit
+    - React-Core
   - RCT-Folly (2021.07.22.00):
     - boost
     - DoubleConversion
@@ -442,9 +440,9 @@ PODS:
   - Yoga (1.14.0)
 
 DEPENDENCIES:
+  - AdFitSDK (<= 3.18.6, >= 3.14.7)
   - AdMixerMediation
   - AdMixerMediationAdFit
-  - AdMixerMediationGAM
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
@@ -452,6 +450,7 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
+  - NapSspPlugin/AdFit (from `../node_modules/react-native-nap-ssp`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
@@ -493,10 +492,7 @@ SPEC REPOS:
     - AdMixer
     - AdMixerMediation
     - AdMixerMediationAdFit
-    - AdMixerMediationGAM
     - fmt
-    - Google-Mobile-Ads-SDK
-    - GoogleUserMessagingPlatform
     - libevent
     - SocketRocket
 
@@ -513,6 +509,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
+  NapSspPlugin:
+    :path: "../node_modules/react-native-nap-ssp"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -581,21 +579,19 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  AdFitSDK: 421ea48b024d6274ea23d81d188457a21e6348ef
+  AdFitSDK: 5dced95f618805b9881365edc8c922de8feb5550
   AdMixer: 54794be2662044147414e6e714b5c8201d59e804
   AdMixerMediation: 34ce6be36bc88f701cd064aa53187cbd33fe2864
-  AdMixerMediationAdFit: 954b0ada69e80fcadf08c5ce70d8e84391f5ad89
-  AdMixerMediationGAM: e01d3627278d0bc67b6db2f371d36a791dadb096
+  AdMixerMediationAdFit: 17e829b31129ab332fa5f720d168c54cf3899565
   boost: 7dcd2de282d72e344012f7d6564d024930a6a440
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: f91d538f197fa71a7d5b77ec2069d49550c0eb96
   FBReactNativeSpec: b13d1c23d6ed82d6b66aad7a253edf8ba76c4a4c
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
-  Google-Mobile-Ads-SDK: 4534fd2dfcd3f705c5485a6633c5188d03d4eed2
-  GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
   hermes-engine: 90e4033deb00bee33330a9f15eff0f874bd82f6d
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
+  NapSspPlugin: a51409057c0f9baac20ea5484c795ef0af2296b5
   RCT-Folly: 8dc08ca5a393b48b1c523ab6220dfdcc0fe000ad
   RCTRequired: b4d3068afa6f52ec5260a8417053b1f1b421483d
   RCTTypeSafety: a4551b3d338c96435f63bf06d564055c1d3cc0ac
@@ -631,6 +627,6 @@ SPEC CHECKSUMS:
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: d0003f849d2b5224c072cef6568b540d8bb15cd3
 
-PODFILE CHECKSUM: 2d1e993d1e2a7a7cfcbeb8a20fc476053df4f00a
+PODFILE CHECKSUM: 980eabbfe90c8121c0974afbd2426a1c5297edab
 
 COCOAPODS: 1.16.2

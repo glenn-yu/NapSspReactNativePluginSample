@@ -1,7 +1,7 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-platform :ios, '13.0'
+platform :ios, '14.0'
 prepare_react_native_project!
 
 target 'IntegrationTestApp' do
@@ -13,9 +13,12 @@ target 'IntegrationTestApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  pod 'NapSspPlugin/AdFit', :path => '../node_modules/react-native-nap-ssp'
+
   # Nap SSP SDK 의존성 추가
+  pod 'AdFitSDK', '>= 3.14.7', '<= 3.18.6'
   pod 'AdMixerMediation'
-  pod 'AdMixerMediationGAM'
+  # pod 'AdMixerMediationGAM'  # disabled for simulator Maestro smoke tests, requires GMA publisher init metadata
   pod 'AdMixerMediationAdFit'
 
   target 'IntegrationTestAppTests' do

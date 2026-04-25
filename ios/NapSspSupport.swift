@@ -267,13 +267,18 @@ final class NapSspRuntime {
     let config = try NapSspConfiguration(dictionary: configDictionary)
 
     #if canImport(AdMixerMediation)
-    AMMediation.shared.initialize(mediaKey: config.mediaKey, adunitID: config.adUnitIds)
+    let numericMediaKey = Int(config.mediaKey) ?? 0
+    let numericAdUnitIds = Set(config.adUnitIds.compactMap(Int.init))
+    AMMediation.shared.initialize(mediaKey: numericMediaKey, adunitID: numericAdUnitIds)
     let isDebugEnabled = config.logLevel == "debug" || config.logLevel == "verbose"
     AMMediation.shared.setDebugEnabled(isEnabled: isDebugEnabled)
     
-    // Initialize Google Mobile Ads if available
+    // Initialize Google Mobile Ads only when an application ID is configured.
     #if canImport(GoogleMobileAds)
-    GADMobileAds.sharedInstance().start(completionHandler: nil)
+    if let gadAppId = Bundle.main.object(forInfoDictionaryKey: "GADApplicationIdentifier") as? String,
+       !gadAppId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+      MobileAds.shared.start(completionHandler: nil)
+    }
     #endif
     
     // Initialize Pangle if appId is provided
@@ -376,7 +381,7 @@ final class NapSspRuntime {
   }
 
   func consumeInterstitialPresentation(adUnitId: String? = nil) -> [String: Any]? {
-    let payload = stateQueue.sync {
+    let payload: [String: Any]? = stateQueue.sync {
       let target = adUnitId?.trimmingCharacters(in: .whitespacesAndNewlines)
       let resolvedTarget = (target?.isEmpty == false ? target : lastInterstitialAdUnitId)
       guard let resolvedTarget, loadedInterstitialAdUnitIds.contains(resolvedTarget) else {
@@ -421,7 +426,7 @@ final class NapSspRuntime {
   }
 
   func consumeRewardedPresentation(adUnitId: String? = nil) -> [String: Any]? {
-    let payload = stateQueue.sync {
+    let payload: [String: Any]? = stateQueue.sync {
       let target = adUnitId?.trimmingCharacters(in: .whitespacesAndNewlines)
       let resolvedTarget = (target?.isEmpty == false ? target : lastRewardedAdUnitId)
       guard let resolvedTarget, loadedRewardedAdUnitIds.contains(resolvedTarget) else {

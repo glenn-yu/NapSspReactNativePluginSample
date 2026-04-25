@@ -13,23 +13,26 @@ class InterstitialVideoModule: NSObject {
   func load(_ adUnitId: String, options: NSDictionary?, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.main.async {
       #if canImport(AdMixerMediation)
-      let timeout = options?["timeout"] as? Int ?? 30
-      let maxRetry = options?["maxRetryCountInSlot"] as? Int ?? 3
-      let customParams = options?["customParams"] as? [String: String]
+      guard let adUnit = Int(adUnitId) else {
+        reject("napssp_invalid_ad_unit", "Interstitial video adUnitId must be numeric on iOS.", nil)
+        return
+      }
 
-      AMMVideoInterstitial.load(adUnitID: adUnitId, timeout: timeout, maxRetryCountInSlot: maxRetry, customParam: customParams) { [weak self] result in
-        switch result {
-        case .success(let ad):
-          NapSspRuntime.shared.storeInterstitialVideo(adUnitId: adUnitId, instance: ad)
-          resolve(nil)
-          NapSspModule.shared?.emitEvent(name: "onAdLoaded", payload: [
-            "adUnitId": adUnitId, "format": "interstitial_video"
-          ])
-        case .failure(let error):
+      AMMVideoInterstitial.load(adUnitID: adUnit) { [weak self] ad, error in
+        guard let _ = self else { return }
+        if let error = error {
           let payload = napSspErrorPayload(adUnitId: adUnitId, format: "interstitial_video", error: error)
           reject(payload["code"] as? String ?? "LOAD_FAILED", payload["message"] as? String ?? "Load failed", error)
           NapSspModule.shared?.emitEvent(name: "onAdFailedToLoad", payload: payload)
+          return
         }
+        if let ad = ad {
+          NapSspRuntime.shared.storeInterstitialVideo(adUnitId: adUnitId, instance: ad)
+        }
+        resolve(nil)
+        NapSspModule.shared?.emitEvent(name: "onAdLoaded", payload: [
+          "adUnitId": adUnitId, "format": "interstitial_video"
+        ])
       }
       #else
       resolve(nil)
@@ -93,27 +96,23 @@ private final class NapSspInterstitialVideoDelegate: NSObject, AMMVideoInterstit
 
   init(adUnitId: String) { self.adUnitId = adUnitId }
 
-  func videoInterstitialDidOpen(_ ad: AMMVideoInterstitial) {
+  func onSuccessShowVideoInterstitial() {
     resolve?(nil)
     resolve = nil
     NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
     NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
   }
 
-  func videoInterstitialDidClose(_ ad: AMMVideoInterstitial) {
+  func onCloseVideoInterstitial() {
     NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
     NapSspRuntime.shared.removeStoredInterstitialVideoDelegate(adUnitId: adUnitId)
   }
 
-  func videoInterstitialDidComplete(_ ad: AMMVideoInterstitial) {
+  func onCompleteVideoInterstitial() {
     NapSspModule.shared?.emitEvent(name: "onVideoCompleted", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
   }
 
-  func videoInterstitialDidSkip(_ ad: AMMVideoInterstitial) {
-    NapSspModule.shared?.emitEvent(name: "onVideoSkipped", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
-  }
-
-  func videoInterstitialDidClick(_ ad: AMMVideoInterstitial) {
+  func onTapVideoInterstitialViewMore() {
     NapSspModule.shared?.emitEvent(name: "onAdClicked", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
   }
 }

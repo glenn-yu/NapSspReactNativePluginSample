@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   Alert,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -19,16 +20,42 @@ import {
   VideoAd,
 } from 'react-native-nap-ssp';
 
-// ─── Default test IDs (replace with real AdUnit IDs) ──────────────────────────
-const DEFAULT_MEDIA_KEY = 'TEST_MEDIA_KEY';
-const DEFAULT_IDS = {
-  banner: 'BANNER_ID',
-  interstitial: 'INTER_ID',
-  rewarded: 'REWARD_ID',
-  native: 'NATIVE_ID',
-  video: 'VIDEO_ID',
-  interstitialVideo: 'INTER_VIDEO_ID',
-};
+// ─── Default real IDs for validation ─────────────────────────────────────────
+const DEFAULT_CONFIG = Platform.select({
+  android: {
+    mediaKey: '10771',
+    ids: {
+      banner: '104701',
+      interstitial: '104703',
+      rewarded: '103722',
+      native: '104588',
+      video: '104589',
+      interstitialVideo: '104591',
+    },
+  },
+  ios: {
+    mediaKey: '10347',
+    ids: {
+      banner: '103790',
+      interstitial: '103868',
+      rewarded: '104710',
+      native: '101626',
+      video: '104709',
+      interstitialVideo: '104711',
+    },
+  },
+  default: {
+    mediaKey: '',
+    ids: {
+      banner: '',
+      interstitial: '',
+      rewarded: '',
+      native: '',
+      video: '',
+      interstitialVideo: '',
+    },
+  },
+})!;
 
 // ─── Log entry ────────────────────────────────────────────────────────────────
 interface LogEntry { ts: string; tag: string; msg: string }
@@ -90,9 +117,10 @@ const LogView = ({ logs }: { logs: LogEntry[] }) => (
 
 // ─── Main App ─────────────────────────────────────────────────────────────────
 const App = () => {
-  const [mediaKey, setMediaKey] = useState(DEFAULT_MEDIA_KEY);
-  const [ids, setIds] = useState(DEFAULT_IDS);
+  const [mediaKey, setMediaKey] = useState(DEFAULT_CONFIG.mediaKey);
+  const [ids, setIds] = useState(DEFAULT_CONFIG.ids);
   const [initStatus, setInitStatus] = useState<'idle' | 'success' | 'failed'>('idle');
+  const [initError, setInitError] = useState<string | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [bannerKey, setBannerKey] = useState(0);
   const [bannerVisible, setBannerVisible] = useState(false);
@@ -107,13 +135,19 @@ const App = () => {
   // ── Initialize ──────────────────────────────────────────────────────────────
   const handleInitialize = () => {
     setInitStatus('idle');
+    setInitError(null);
     NapSspAd.initialize({
       mediaKey,
       adUnitIds: Object.values(ids),
       logLevel: 'debug',
     })
-      .then(() => { setInitStatus('success'); addLog('INIT', '✅ SDK 초기화 성공'); })
-      .catch((e: any) => { setInitStatus('failed'); addLog('INIT', `❌ ${e?.message ?? e}`); });
+      .then(() => { setInitStatus('success'); setInitError(null); addLog('INIT', '✅ SDK 초기화 성공'); })
+      .catch((e: any) => {
+        const message = e?.message ?? String(e);
+        setInitStatus('failed');
+        setInitError(message);
+        addLog('INIT', `❌ ${message}`);
+      });
   };
 
   // ── Interstitial ────────────────────────────────────────────────────────────
@@ -181,6 +215,7 @@ const App = () => {
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Nap SSP 통합 테스트 앱</Text>
         <Text style={[styles.status, { color: statusColor }]}>SDK: {initStatus}</Text>
+        {initError ? <Text style={styles.errorText}>오류: {initError}</Text> : null}
 
         {/* ── SDK 초기화 설정 ────────────────────── */}
         <Section title="SDK 초기화 설정">
@@ -308,7 +343,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FAFAFA' },
   scroll: { padding: 16, paddingBottom: 40 },
   title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 4 },
-  status: { textAlign: 'center', fontSize: 13, marginBottom: 16 },
+  status: { textAlign: 'center', fontSize: 13, marginBottom: 6 },
+  errorText: { textAlign: 'center', fontSize: 11, color: '#D32F2F', marginBottom: 16, paddingHorizontal: 8 },
   section: { marginBottom: 20, backgroundColor: '#fff', borderRadius: 8, padding: 12, elevation: 1, shadowOpacity: 0.06, shadowRadius: 4 },
   sectionTitle: { fontSize: 15, fontWeight: '700', marginBottom: 10, color: '#333' },
   nativeAd: { width: '100%', height: 250 },

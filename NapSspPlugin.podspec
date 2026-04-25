@@ -5,9 +5,9 @@ Pod::Spec.new do |s|
   s.homepage     = 'https://github.com/glenn-yu/react-native-nap-ssp'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.author       = { 'gwangy' => 'gwangy@example.com' }
-  s.platform     = :ios, '13.0'
+  s.platform     = :ios, '14.0'
   s.static_framework = true
-  s.source       = { :git => 'https://github.com/glenn-yu/react-native-nap-ssp.git', :tag => s.version.to_s }
+  s.source       = { :path => '.' }
   s.source_files = 'ios/**/*.{h,m,swift}'
   s.exclude_files = 'ios/Package.swift'
   s.swift_version = '5.0'
