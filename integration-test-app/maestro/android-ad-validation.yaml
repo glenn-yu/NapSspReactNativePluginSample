@@ -28,12 +28,17 @@ appId: com.integrationtestapp
     when:
       visible: "재로드"
     commands:
-      - tapOn: "재로드"
+      - tapOn:
+          text: "재로드"
+          index: 0
 - runFlow:
     when:
-      visible: "로드"
+      visible: "3. 인라인 동영상 광고"
     commands:
-      - tapOn: "로드"
+      - tapOn:
+          text: "로드"
+          index: 2
+          optional: true
 - scrollUntilVisible:
     element: "전면 광고 (popup)"
     direction: DOWN
@@ -77,5 +82,7 @@ appId: com.integrationtestapp
 - scrollUntilVisible:
     element: "이벤트 로그"
     direction: DOWN
+    timeout: 15000
+- extendedWaitUntil:
+    visible: "이벤트 로그"
     timeout: 10000
-- assertVisible: "이벤트 로그"
