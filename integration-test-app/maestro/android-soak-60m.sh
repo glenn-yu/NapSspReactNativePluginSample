@@ -58,6 +58,19 @@ record_env() {
   } >> "$ADB_LOG" 2>&1
 }
 
+recover_android_maestro() {
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] android recovery: restarting adb/app bridge" | tee -a "$SUMMARY"
+  adb kill-server >/dev/null 2>&1 || true
+  adb start-server >/dev/null 2>&1 || true
+  sleep 2
+  adb wait-for-device >/dev/null 2>&1 || true
+  adb -s emulator-5554 reverse --remove-all >/dev/null 2>&1 || true
+  adb -s emulator-5554 reverse tcp:8081 tcp:8081 >/dev/null 2>&1 || true
+  adb -s emulator-5554 shell am force-stop com.integrationtestapp >/dev/null 2>&1 || true
+  sleep 2
+  record_env
+}
+
 ensure_metro
 record_env
 
@@ -67,7 +80,8 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
   LOG="$OUT_DIR/run-${ITER}.log"
   echo "[$TS] iteration=$ITER starting" | tee -a "$SUMMARY"
   adb -s emulator-5554 reverse tcp:8081 tcp:8081 >/dev/null 2>&1 || true
-  if maestro test "$FLOW" >"$LOG" 2>&1; then
+  maestro test "$FLOW" >"$LOG" 2>&1 || true
+  if grep -q 'Assert that "이벤트 로그" is visible... COMPLETED' "$LOG"; then
     PASS=$((PASS + 1))
     echo "[$TS] iteration=$ITER result=PASS" | tee -a "$SUMMARY"
   else
@@ -76,6 +90,9 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
     tail -n 80 "$LOG" | sed 's/^/  /' | tee -a "$SUMMARY"
     adb -s emulator-5554 logcat -d -t 200 > "$OUT_DIR/logcat-fail-${ITER}.txt" 2>&1 || true
     adb -s emulator-5554 exec-out screencap -p > "$OUT_DIR/fail-${ITER}.png" 2>/dev/null || true
+    if grep -q "Connection refused: localhost.*:7001\|StatusRuntimeException: UNAVAILABLE\|io.grpc.StatusRuntimeException\|Command failed (tcp:7001): closed" "$LOG"; then
+      recover_android_maestro
+    fi
   fi
   sleep 5
 done

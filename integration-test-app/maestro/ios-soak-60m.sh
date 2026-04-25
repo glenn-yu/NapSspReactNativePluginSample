@@ -55,6 +55,15 @@ ensure_simulator() {
   xcrun simctl install "$SIM_UDID" /tmp/NapSspIntegrationDerivedData/Build/Products/Debug-iphonesimulator/IntegrationTestApp.app >/dev/null 2>&1 || true
 }
 
+recover_ios_simulator() {
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] ios recovery: relaunching simulator app" | tee -a "$SUMMARY"
+  xcrun simctl terminate "$SIM_UDID" org.reactjs.native.example.IntegrationTestApp >/dev/null 2>&1 || true
+  sleep 2
+  xcrun simctl launch "$SIM_UDID" org.reactjs.native.example.IntegrationTestApp >/dev/null 2>&1 || true
+  sleep 3
+  record_env
+}
+
 record_env() {
   {
     echo "===== $(date '+%Y-%m-%d %H:%M:%S') ====="
@@ -80,6 +89,7 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
     echo "[$TS] iteration=$ITER result=FAIL" | tee -a "$SUMMARY"
     tail -n 80 "$LOG" | sed 's/^/  /' | tee -a "$SUMMARY"
     xcrun simctl io "$SIM_UDID" screenshot "$OUT_DIR/fail-${ITER}.png" >/dev/null 2>&1 || true
+    recover_ios_simulator
   fi
   sleep 5
 done

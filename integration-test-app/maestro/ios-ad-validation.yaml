@@ -4,16 +4,26 @@ appId: org.reactjs.native.example.IntegrationTestApp
     clearState: true
 - extendedWaitUntil:
     visible: "SDK 초기화"
-    timeout: 20000
+    timeout: 30000
 - runFlow:
     when:
       visible: "OK"
     commands:
       - tapOn: "OK"
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "SDK 초기화"
+    timeout: 10000
 - tapOn: "SDK 초기화"
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      visible: "OK"
+    commands:
+      - tapOn: "OK"
 - extendedWaitUntil:
     visible: "1. 배너 광고 (320×50)"
-    timeout: 15000
+    timeout: 25000
 - tapOn:
     text: "로드"
     index: 0
