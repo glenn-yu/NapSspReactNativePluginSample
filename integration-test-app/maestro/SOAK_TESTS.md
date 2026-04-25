@@ -33,7 +33,8 @@
   10. scroll to and verify `이벤트 로그`
 
 ## 1-hour soak runners
-- Android: `android-soak-60m.sh`
+- Android (Maestro): `android-soak-60m.sh`
+- Android (ADB fallback): `android-adb-soak-60m.sh`
 - iOS: `ios-soak-60m.sh`
 
 Both runners:
@@ -45,6 +46,7 @@ Both runners:
 
 ## Execution notes
 - Android debug flow requires Metro on port `8081` and `adb reverse tcp:8081 tcp:8081`
+- Android fallback soak can validate launch/init state without Maestro by using `adb`, `uiautomator dump`, screenshots, and logcat
 - iOS flow requires explicit Maestro simulator targeting with `--device <UDID>`
 - iOS runner assumes the simulator app has already been built to:
   - `/tmp/NapSspIntegrationDerivedData/Build/Products/Debug-iphonesimulator/IntegrationTestApp.app`
