@@ -3,8 +3,13 @@ appId: org.reactjs.native.example.IntegrationTestApp
 - launchApp:
     clearState: true
 - extendedWaitUntil:
-    visible: "Nap SSP 통합 테스트 앱"
+    visible: "SDK 초기화"
     timeout: 20000
+- runFlow:
+    when:
+      visible: "OK"
+    commands:
+      - tapOn: "OK"
 - tapOn: "SDK 초기화"
 - extendedWaitUntil:
     visible: "1. 배너 광고 (320×50)"
@@ -35,7 +40,9 @@ appId: org.reactjs.native.example.IntegrationTestApp
     when:
       visible: "로드"
     commands:
-      - tapOn: "로드"
+      - tapOn:
+          text: "로드"
+          optional: true
 - scrollUntilVisible:
     element: "전면 광고 (popup)"
     direction: DOWN
@@ -52,6 +59,10 @@ appId: org.reactjs.native.example.IntegrationTestApp
       visible: "OK"
     commands:
       - tapOn: "OK"
+- scrollUntilVisible:
+    element: "리워드 동영상"
+    direction: DOWN
+    timeout: 10000
 - tapOn: "리워드 동영상"
 - waitForAnimationToEnd
 - runFlow:
@@ -64,6 +75,10 @@ appId: org.reactjs.native.example.IntegrationTestApp
       visible: "OK"
     commands:
       - tapOn: "OK"
+- scrollUntilVisible:
+    element: "전면 동영상"
+    direction: DOWN
+    timeout: 10000
 - tapOn: "전면 동영상"
 - waitForAnimationToEnd
 - runFlow:

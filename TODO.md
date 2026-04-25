@@ -18,6 +18,12 @@
 
 ## Still blocked
 - [ ] Confirm the exact native callback names for all mediation/event edges against the final vendor SDK versions before removing the remaining placeholder event assumptions
-- [ ] Confirm the example app on physical device/simulator after native SDK wiring and CocoaPods dependency resolution
+- [x] Confirm the example app on physical device/simulator after native SDK wiring and CocoaPods dependency resolution
 - [ ] Add end-to-end native tests once the bridge is exercised against real SDK responses
 - [ ] Add publishing automation after package metadata is finalized
+
+## Validation notes
+- [x] `integration-test-app/ios`: `pod install --repo-update` completed successfully
+- [x] Android `integration-test-app` built, installed, and passed Maestro flow using Metro + `adb reverse tcp:8081 tcp:8081`
+- [x] iOS `integration-test-app` built for simulator, launched on `iPhone 17 Pro`, and passed Maestro flow when targeting the simulator UDID explicitly
+- [x] Hardened Maestro flows to wait on stable controls (`SDK 초기화`) and tolerate optional alert/dismiss paths during ad validation

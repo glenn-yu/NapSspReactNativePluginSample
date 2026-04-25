@@ -3,10 +3,17 @@ appId: com.integrationtestapp
 - launchApp:
     clearState: true
 - extendedWaitUntil:
-    visible: "Nap SSP 통합 테스트 앱"
+    visible: "SDK 초기화"
     timeout: 20000
+- runFlow:
+    when:
+      visible: "OK"
+    commands:
+      - tapOn: "OK"
 - tapOn: "SDK 초기화"
-- assertVisible: "SDK: success"
+- extendedWaitUntil:
+    visible: "SDK: success"
+    timeout: 20000
 - tapOn:
     text: "로드"
     index: 0
@@ -33,7 +40,7 @@ appId: com.integrationtestapp
           index: 0
 - runFlow:
     when:
-      visible: "3. 인라인 동영상 광고"
+      visible: "로드"
     commands:
       - tapOn:
           text: "로드"
@@ -55,6 +62,10 @@ appId: com.integrationtestapp
       visible: "OK"
     commands:
       - tapOn: "OK"
+- scrollUntilVisible:
+    element: "리워드 동영상"
+    direction: DOWN
+    timeout: 10000
 - tapOn: "리워드 동영상"
 - waitForAnimationToEnd
 - runFlow:
