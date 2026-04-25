@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 OUT_DIR="$ROOT_DIR/maestro/results/ios-soak-60m-$(date +%Y%m%d-%H%M%S)"
@@ -97,7 +97,12 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
   TS="$(date '+%Y-%m-%d %H:%M:%S')"
   LOG="$OUT_DIR/run-${ITER}.log"
   echo "[$TS] iteration=$ITER starting" | tee -a "$SUMMARY"
-  if maestro --device "$SIM_UDID" test "$FLOW" >"$LOG" 2>&1; then
+  set +e
+  maestro --device "$SIM_UDID" test "$FLOW" >"$LOG" 2>&1
+  CMD_EXIT=$?
+  set -e
+  echo "[$TS] iteration=$ITER maestro_exit=$CMD_EXIT" >> "$SUMMARY"
+  if [ "$CMD_EXIT" -eq 0 ]; then
     PASS=$((PASS + 1))
     REPEAT_FAIL_COUNT=0
     LAST_FAIL_KEY=""

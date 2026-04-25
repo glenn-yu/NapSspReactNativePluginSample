@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 OUT_DIR="$ROOT_DIR/maestro/results/android-soak-60m-$(date +%Y%m%d-%H%M%S)"
@@ -101,7 +101,11 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
   adb -s emulator-5554 shell am force-stop com.integrationtestapp >/dev/null 2>&1 || true
   adb -s emulator-5554 shell am start -n com.integrationtestapp/.MainActivity >/dev/null 2>&1 || true
   sleep 2
-  maestro test "$FLOW" >"$LOG" 2>&1 || true
+  set +e
+  maestro test "$FLOW" >"$LOG" 2>&1
+  CMD_EXIT=$?
+  set -e
+  echo "[$TS] iteration=$ITER maestro_exit=$CMD_EXIT" >> "$SUMMARY"
   if grep -q 'Assert that "이벤트 로그" is visible... COMPLETED' "$LOG"; then
     PASS=$((PASS + 1))
     REPEAT_FAIL_COUNT=0
