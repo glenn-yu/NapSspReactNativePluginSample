@@ -176,6 +176,15 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
                 "source" to "placeholder",
             ),
         )
+        NapSspEventEmitter.emitViewEvent(
+            this,
+            NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
+            mapOf(
+                "adUnitId" to normalizedAdUnitId,
+                "format" to NapSspContracts.FORMAT_BANNER,
+                "source" to "placeholder",
+            ),
+        )
     }
 
     private fun isSupportedSize(value: String): Boolean {

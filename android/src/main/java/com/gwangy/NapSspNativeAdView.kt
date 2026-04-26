@@ -71,6 +71,10 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context) {
                     this, NapSspContracts.VIEW_EVENT_AD_LOADED,
                     mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
                 )
+                NapSspEventEmitter.emitViewEvent(
+                    this, NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
+                    mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
+                )
             }, 300)
         }
     }

@@ -325,6 +325,8 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
     override fun invalidate() {
         loadPromises.values.forEach { it.reject("NAP_SSP_REWARDED_LOAD_CANCELLED", "Module invalidated") }
         loadPromises.clear()
+        startPromises.values.forEach { it.reject("NAP_SSP_REWARDED_START_CANCELLED", "Module invalidated") }
+        startPromises.clear()
         loadedAdUnitIds.clear()
         rewardedAds.values.forEach { rewardedAd ->
             runCatching { rewardedAd.javaClass.getMethod("stopRewardVideoAd").invoke(rewardedAd) }

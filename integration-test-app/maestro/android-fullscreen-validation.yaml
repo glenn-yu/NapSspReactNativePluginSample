@@ -3,6 +3,7 @@ appId: com.integrationtestapp
 - launchApp:
     appId: com.integrationtestapp
     stopApp: true
+    clearState: true
 - extendedWaitUntil:
     visible: "SDK 초기화"
     timeout: 20000

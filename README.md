@@ -301,6 +301,7 @@ npm run verify
 - **[전수 조사 보고서](./docs/REVIEW_REPORT.md)**: 플러그인 구현 현황 및 기술 부채 요약
 - **[검증 계획서](./docs/REVIEW_PLAN.md)**: SDK 가이드 대비 기능 체크리스트 및 검증 단계
 - **[SPM 통합 가이드](./docs/SPM_GUIDE.md)**: Swift Package Manager 연동 및 제약 사항
+- **[NPM 배포 가이드](./docs/PUBLISH_GUIDE.md)**: 플러그인 배포 절차 및 체크리스트
 - **[네이티브 SDK 가이드](./docs/native_guides/)**: 나스미디어 네이티브 SDK 원본 가이드 (Android/iOS)
 
 ---

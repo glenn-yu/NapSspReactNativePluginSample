@@ -149,6 +149,11 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
                 )
                 NapSspEventEmitter.emitModuleEvent(
                     reactContext,
+                    NapSspContracts.EVENT_AD_IMPRESSION,
+                    mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL),
+                )
+                NapSspEventEmitter.emitModuleEvent(
+                    reactContext,
                     NapSspContracts.EVENT_AD_CLOSED,
                     mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL),
                 )

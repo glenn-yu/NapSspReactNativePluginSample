@@ -44,7 +44,45 @@ appId: org.reactjs.native.example.IntegrationTestApp
 - assertVisible: "INTER_STATUS:LOADED:OPENED:IMPRESSION"
 - assertVisible: "상단 상태 요약"
 - scrollUntilVisible:
-    element: "광고 응답 상태"
+    element: "리워드 동영상"
     direction: DOWN
     timeout: 15000
-- assertVisible: "광고 응답 상태"
+- tapOn: "리워드 동영상"
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      visible: "닫기"
+    commands:
+      - tapOn: "닫기"
+- runFlow:
+    when:
+      visible: "OK"
+    commands:
+      - tapOn: "OK"
+- scrollUntilVisible:
+    element: "REWARD_STATUS:LOADED:OPENED:IMPRESSION"
+    direction: DOWN
+    timeout: 20000
+- assertVisible: "REWARD_STATUS:LOADED:OPENED:IMPRESSION"
+- scrollUntilVisible:
+    element: "전면 동영상"
+    direction: DOWN
+    timeout: 15000
+- tapOn: "전면 동영상"
+- waitForAnimationToEnd
+- runFlow:
+    when:
+      visible: "닫기"
+    commands:
+      - tapOn: "닫기"
+- runFlow:
+    when:
+      visible: "OK"
+    commands:
+      - tapOn: "OK"
+- scrollUntilVisible:
+    element: "IV_STATUS:LOADED:OPENED"
+    direction: DOWN
+    timeout: 20000
+- assertVisible: "IV_STATUS:LOADED:OPENED"
+- assertVisible: "상단 상태 요약"

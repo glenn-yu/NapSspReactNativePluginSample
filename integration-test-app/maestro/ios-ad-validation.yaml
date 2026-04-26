@@ -116,7 +116,7 @@ appId: org.reactjs.native.example.IntegrationTestApp
     commands:
       - tapOn: "닫기"
 - extendedWaitUntil:
-    visible: "REWARDED"
+    visible: "REWARD_STATUS:LOADED:OPENED:IMPRESSION:REWARDED"
     timeout: 10000
 - scrollUntilVisible:
     element: "전면 동영상"
