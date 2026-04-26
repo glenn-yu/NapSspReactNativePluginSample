@@ -42,6 +42,20 @@ iOS는 `#if canImport(AdMixerMediation)`와 같은 조건부 컴파일을 사용
 
 ---
 
-## 4. 코딩 컨벤션
+## 4. 자동 검증 파이프라인 (CI)
+
+본 프로젝트는 GitHub Actions를 통해 모든 Pull Request와 `main` 브랜치 푸시 시점에 아래 검증을 자동으로 수행합니다.
+
+### 4.1 JS/TS 검증 (`ci.yml`)
+- **Lint & Type Check**: 코드 스타일 및 TypeScript 타입 무결성 검사.
+- **Build Test**: `npm run build`를 통한 라이브러리 번들링 성공 여부 확인.
+- **Smoke Test**: `scripts/smoke-test.js`를 통한 공개 API 노출 및 기본 초기화 로직 검증.
+
+### 4.2 예제 앱 빌드 검증
+- **Example Host App**: `example/ExampleHostApp` 프로젝트가 각 플랫폼(Android/iOS) 환경에서 정상적으로 스캐폴딩되고 빌드 준비가 되는지 확인합니다.
+
+---
+
+## 5. 코딩 컨벤션
 - **TypeScript**: 엄격한 타입 체크(`strict: true`)를 준수합니다.
 - **Native**: 네이티브 로그는 JS의 `logLevel` 설정을 따르도록 `NapSspEventEmitter`를 통해 중계합니다.

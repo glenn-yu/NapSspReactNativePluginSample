@@ -88,6 +88,11 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
                 )
                 NapSspEventEmitter.emitModuleEvent(
                     reactContext,
+                    NapSspContracts.EVENT_AD_IMPRESSION,
+                    mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO),
+                )
+                NapSspEventEmitter.emitModuleEvent(
+                    reactContext,
                     NapSspContracts.EVENT_AD_CLOSED,
                     mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO),
                 )

@@ -59,20 +59,55 @@ xcodebuild -workspace IntegrationTestApp.xcworkspace -scheme IntegrationTestApp 
 
 ---
 
-## 4. 디버깅 및 트러블슈팅
+## 4. 테스트 실행 가이드
 
-### 4.1 주요 이슈 해결 사례 (Worklog)
+### 4.1 일회성 검증 (One-shot Validation)
+플랫폼별 또는 전체 플랫폼의 건강 상태를 즉시 확인합니다.
+- **전체 플랫폼**: `integration-test-app/maestro/validate-all.sh`
+- **Android 전용**: `integration-test-app/maestro/android-validate.sh`
+- **iOS 전용**: `integration-test-app/maestro/ios-validate.sh`
+
+### 4.2 부하 테스트 (Soak Tests)
+장시간(기본 1시간) 동안 반복적으로 광고 로직을 실행하여 안정성을 테스트합니다.
+- **전체 플랫폼**: `integration-test-app/maestro/soak-all.sh`
+- **Android**: `android-soak-60m.sh` (또는 ADB 전용 `android-adb-soak-60m.sh`)
+- **iOS**: `ios-soak-60m.sh`
+
+---
+
+## 5. 슬랙 알림 및 리포팅 (Slack Notification)
+
+모든 자동화 스크립트는 실행 종료 시 슬랙으로 요약 결과를 전송하는 기능을 포함하고 있습니다.
+
+### 5.1 설정 방법
+환경 변수 또는 `common.sh` 파일을 통해 Webhook URL을 설정하십시오.
+```bash
+# 환경변수로 설정 (Crontab 권장)
+export MAESTRO_SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..."
+```
+
+### 5.2 리포트 내용
+- **Result**: PASS / FAIL 여부
+- **Stats**: 총 시도 횟수 대비 성공/실패 수
+- **Log Path**: 상세 분석을 위한 로컬 로그 파일 경로
+- **Stop Reason**: 3회 연속 실패 시 자동 중단된 사유 (부하 테스트 전용)
+
+---
+
+## 6. 디버깅 및 트러블슈팅
+
+### 6.1 주요 이슈 해결 사례 (Worklog)
 - **JS 이벤트 래핑**: `NativeAd`, `VideoAd`의 `onAdImpression` 누락 보완.
 - **브릿지 연결 안정화**: iOS `NapSspModule` 링크 오류 해결 및 합성 이벤트(`synthetic events`) 활용.
 - **Android 런타임**: `DeadObjectException` 분석 및 Metro 포트 대기 로직 추가.
 
-### 4.2 장애 복구 가이드
+### 6.2 장애 복구 가이드
 - **Maestro 연결 오류**: `pkill -f maestro` 및 `adb kill-server` 후 재시도.
 - **iOS 브릿지 확인**: `nm -gU` 명령으로 바이너리 내 `NapSspModule` 기호 확인.
 
 ---
 
-## 5. 결과 리포팅 정책 (Results Policy)
+## 7. 결과 리포팅 정책 (Results Policy)
 - **요약 리포트**: 통과/실패 횟수 등 요약 정보만 커밋 (`maestro-soak-history.md`).
 - **로컬 아티팩트**: 대용량 로그 및 스크린샷은 로컬 `results/` 폴더에만 유지하며 커밋하지 않음.
 - **자동 중단**: 동일 유형 실패 3회 연속 발생 시 테스트 자동 중단.
