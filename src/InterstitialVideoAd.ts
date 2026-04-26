@@ -5,6 +5,7 @@ import type { InterstitialVideoAdEventMap, InterstitialVideoAdOptions } from './
 
 interface NativeInterstitialVideoModule {
   load?: (adUnitId: string, options?: InterstitialVideoAdOptions) => Promise<void>;
+  start?: (adUnitId: string, options?: InterstitialVideoAdOptions) => Promise<void>;
   show?: (adUnitId: string) => Promise<void>;
   destroy?: (adUnitId: string) => void;
 }
@@ -95,6 +96,20 @@ export class InterstitialVideoAd {
   }
 
   async start(): Promise<void> {
+    const nativeModule = getNativeModuleFromNames<NativeInterstitialVideoModule>(NativeModuleNames.interstitialVideo);
+    if (nativeModule?.start) {
+      try {
+        await nativeModule.start(this.adUnitId, this.options);
+        this._loaded = false;
+        return;
+      } catch (error) {
+        const adError = normalizeAdError(error, 'interstitial_video_start_failed');
+        this.emitter.emit('loadFailed', adError);
+        throw adError;
+      }
+    }
+
+    // Fallback to load + show if start is not available on native side (e.g. iOS)
     await this.load();
     await this.show();
   }

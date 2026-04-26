@@ -234,5 +234,12 @@ final class BannerView: UIView {
       "code": code.errorCode,
       "message": message,
     ]
+  override func willMove(toWindow newWindow: UIWindow?) {
+    super.willMove(toWindow: newWindow)
+    if newWindow == nil {
+      #if canImport(AdMixerMediation)
+      bannerView?.stop()
+      #endif
+    }
   }
 }

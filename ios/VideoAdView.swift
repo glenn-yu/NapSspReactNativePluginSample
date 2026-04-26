@@ -111,5 +111,12 @@ final class VideoAdView: UIView {
       "source": source,
       "message": message,
     ]
+  override func willMove(toWindow newWindow: UIWindow?) {
+    super.willMove(toWindow: newWindow)
+    if newWindow == nil {
+      #if canImport(AdMixerMediation)
+      videoAdView?.stop()
+      #endif
+    }
   }
 }
