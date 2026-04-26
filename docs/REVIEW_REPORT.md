@@ -1,11 +1,12 @@
 # Nap SSP React Native Plugin 전수 조사 및 검증 보고서
 
-> **최종 재검토 일자**: 2026-04-25 | **최초 조사 일자**: 2026-04-20
-> **기준 문서**: `docs/REVIEW_PLAN.md`, `nap-ssp-android-sdk-native.md`, `nap-ssp-ios-sdk-native.md`
+> **최종 재검토 일자**: 2026-04-25 | **상태**: Phase 1~3 완료, Phase 4 진행 중
+
+본 보고서는 `docs/REVIEW_PLAN.md`에 정의된 검증 단계별 이행 현황과 현재 플러그인의 완성도를 요약한 결과입니다.
 
 ---
 
-## 1. 종합 검증 요약 (2026-04-25 기준)
+## 1. 종합 검증 요약
 
 | 단계 | 중요도 | 상태 | 요약 |
 | :--- | :--- | :---: | :--- |
@@ -16,60 +17,28 @@
 
 ---
 
-## 2. 세부 이행 현황 및 개선 사항
+## 2. 주요 개선 사항 (기술 부채 해결)
 
-### 2.1 SDK 초기화 및 공통 설정 (Core)
-- **iOS 초기화**: `NapSspSupport.swift` 내 `AMMediation.shared.initialize` 호출 연결 완료. (기존 FAIL 항목 개선)
-- **Log Level**: JS의 `logLevel` 설정이 네이티브 SDK(`AdMixerLog`, `setDebugEnabled`)로 정상 전파됨을 확인.
-- **Mediation Adapters**: Android에서 Pangle/AppLovin/UnityAds SDK의 별도 초기화 로직 구현 확인.
+### 2.1 런타임 및 안정성
+- **iOS 초기화**: `AMMediation.shared.initialize` 호출 누락분을 연결하여 iOS 광고 동작 불능 상태 해소.
+- **클래스 충돌**: `NativeAdView`, `VideoAdView`의 ObjC 명칭 중복으로 인한 런타임 크래시 방지(명칭 변경).
+- **ProGuard**: `consumer-rules.pro`에 SDK 필수 규칙 6종을 추가하여 릴리즈 빌드 안정성 확보.
 
-### 2.2 광고 포맷별 구현
-- **배너 (BannerAd)**: `onResume/onPause` 생명주기 연동(Android) 및 임프레션 이벤트 발행 확인.
-- **네이티브 (NativeAd)**: 기존 Placeholder 구현에서 실제 SDK 바인딩(Android: Reflection 기반, iOS: Container 기반)으로 고도화 완료.
-- **옵션 연동**: `Interstitial`, `Rewarded` 등 전 포맷에서 `AdInfo.Builder` 옵션(popup, mute, timeout 등) 파싱 및 전달 로직 확인.
-
-### 2.3 플랫폼 특이사항 및 아키텍처
-- **Android ProGuard**: `consumer-rules.pro`에 공식 가이드의 keep 규칙 6종 및 `-dontwarn` 반영 완료.
-- **iOS SPM**: `Package.swift` 구조는 확보했으나, checksum이 placeholder 상태여서 실제 배포 시에는 공식 체크섬 업데이트가 필요함.
-- **New Architecture**: JSI Spec 파일(`NativeNapSspModuleSpec.ts` 등) 작성을 통해 향후 TurboModules 대응 기반 마련.
+### 2.2 기능 및 이벤트
+- **옵션 연동**: 전면/리워드/비디오 광고의 다양한 옵션(popup, mute, timeout 등)이 네이티브 SDK에 정상 전달되도록 구현.
+- **이벤트 정교화**: 전 포맷 `onAdImpression` 발행 확인 및 iOS 에러코드(0~6) 매핑 완료.
+- **네이티브 광고**: Placeholder를 실제 SDK 바인딩 로직으로 교체하여 에셋 렌더링 정상화.
 
 ---
 
-## 3. 상세 이슈 추적 리스트 (최초 조사 시 식별된 기술 부채)
+## 3. 잔여 과제 및 향후 계획
 
-초기 조사(2026-04-20) 당시 발견된 주요 이슈들의 해결 여부 및 상태입니다.
+### 3.1 즉시 실행 과제 (Short-term)
+1.  **실광고 Key 최종 검증**: 실제 `mediaKey` 및 `adUnitId`를 사용한 필드 테스트 최종 확인.
+2.  **SPM 완성**: 배포 직전 공식 체크섬을 반영하여 `Package.swift` 최종화.
+3.  **통합 테스트 앱 보완**: `integration-test-app`의 시나리오 및 UI를 실기기 검증에 최적화된 상태로 유지.
 
-| 심각도 | 분류 | 내용 | 상태 |
-| :--- | :--- | :--- | :---: |
-| **CRITICAL** | iOS Core | `AMMediation.shared.initialize()` 호출 누락 | ✅ 해결 |
-| **CRITICAL** | iOS ObjC | `NativeAdView`/`VideoAdView` 클래스 명칭 충돌 | ✅ 해결 |
-| **HIGH** | Android | `consumer-rules.pro` 내 SDK keep 규칙 누락 | ✅ 해결 |
-| **HIGH** | Android/iOS | NativeAd 전체 Placeholder 동작 | ✅ 해결 |
-| **HIGH** | Android | 전면/리워드 옵션(AdInfo.Builder) 미전달 | ✅ 해결 |
-| **MEDIUM** | Android/iOS | `onAdImpression` 이벤트 누락 | ✅ 해결 |
-| **LOW** | iOS | `Package.swift` checksum placeholder | ⚠️ 잔존 |
-| **LOW** | Gap | Kakao Bizboard 지원 (RN Surface 미노출) | ⚠️ 잔존 |
-
----
-
-## 4. 샘플 테스트 앱 (`integration-test-app`) 감사
-
-- **친절도**: `README.md`를 통해 5분 안에 실행 가능한 가이드와 완벽한 코드 블록 제공.
-- **커버리지**: 배너, 전면, 리워드, 네이티브, 비디오 등 전 포맷의 데모 코드 포함.
-- **현재 상태**: 2026-04-25 기준 Android/iOS 모두 빌드 및 시뮬레이터 실행이 가능하도록 복구되었으나, **실제 광고 Key(`mediaKey`)를 이용한 실광고 노출 검증** 단계가 최종 완료되어야 함.
-
----
-
-## 5. 결론 및 향후 과제
-
-본 프로젝트는 2026-04-20 최초 조사 당시의 많은 결함들을 Phase 1~3 작업을 통해 대부분 해소하였습니다. 현재 CI 기준 기본 품질은 확보되었으며, 다음 단계를 통해 최종 안정성을 검증해야 합니다.
-
-### 5.1 즉시 실행 과제
-1. **실광고 Key 검증**: 실제 `mediaKey` 및 `adUnitId`를 입력하여 광고 노출 및 이벤트 수집을 최종 확정.
-2. **SPM 완성**: 배포 직전 공식 SDK 체크섬을 반영하여 SPM 설치가 가능하도록 수정. (`docs/SPM_GUIDE.md` 참조)
-
-### 5.2 중장기 과제 (TODO)
-- **최종 네이티브 콜백 확인**: 최종 벤더 SDK 버전과 모든 미디에이션/이벤트 엣지의 실제 콜백 명칭 정합성 최종 확인.
-- **실기기 E2E 테스트**: 실제 기기에서 광고 응답(Real SDK Response) 기반의 엔드투엔드 네이티브 테스트 수행.
-- **배포 자동화**: 패키지 메타데이터 확정 후 배포 자동화(CI/CD) 파이프라인 구축.
-- **비즈보드 대응**: 향후 비즈보드 단독 지면 정책에 따른 RN API 추가 고려.
+### 3.2 중장기 계획 (Long-term)
+- **New Architecture 대응**: JSI Spec을 기반으로 TurboModules 및 Fabric 렌더러 지원 검토.
+- **추가 지면 대응**: Kakao Bizboard 등 미구현 포맷에 대한 API 추가 논의.
+- **배포 자동화**: NPM 배포 및 CI 파이프라인(GitHub Actions) 고도화.
