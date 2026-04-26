@@ -1,7 +1,0 @@
-platform=android
-out_dir=/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/android-soak-60m-20260425-223138
-flow=/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/android-ad-validation.yaml
-start_time=2026-04-25 22:31:38
-duration_seconds=1800
-[2026-04-25 22:31:38] android recovery: restarting maestro + adb/app bridge
-[2026-04-25 22:31:46] iteration=1 starting

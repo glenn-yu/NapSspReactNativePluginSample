@@ -254,8 +254,10 @@ const App = () => {
     ad.addAdEventListener('skipped', () => addLog('IV', 'skipped'));
     ad.addAdEventListener('closed', () => { addLog('IV', 'closed'); ad.destroy(); });
     try {
-      await ad.load();
-      await ad.show();
+      addLog('IV', 'start() start');
+      await ad.start();
+      addLog('IV', 'start() resolved');
+      updateAdStatus('interstitialVideo', { lastMessage: 'startResolved' });
     } catch (e: any) {
       Alert.alert('전면 동영상 오류', e?.message ?? String(e));
       ad.destroy();

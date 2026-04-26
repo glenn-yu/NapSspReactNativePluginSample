@@ -293,6 +293,18 @@ npm run verify
 - `build`: `lib/` 생성 확인
 - `smoke:test`: 공개 API 및 기본 초기화 흐름 확인
 
+## 📚 Documentation (가이드 문서)
+
+프로젝트의 상세 가이드와 검증 리포트는 `docs/` 디렉토리에 체계적으로 정리되어 있습니다.
+
+- **[Maestro 검증 가이드](./docs/MAESTRO_GUIDE.md)**: 자동화 테스트 환경 설정 및 실행 방법
+- **[전수 조사 보고서](./docs/REVIEW_REPORT.md)**: 플러그인 구현 현황 및 기술 부채 요약
+- **[검증 계획서](./docs/REVIEW_PLAN.md)**: SDK 가이드 대비 기능 체크리스트 및 검증 단계
+- **[SPM 통합 가이드](./docs/SPM_GUIDE.md)**: Swift Package Manager 연동 및 제약 사항
+- **[네이티브 SDK 가이드](./docs/native_guides/)**: 나스미디어 네이티브 SDK 원본 가이드 (Android/iOS)
+
+---
+
 ## 지원 범위 메모
 
 - 공식 Android/iOS 네이티브 가이드에는 Bizboard 관련 내용이 포함되어 있지만, 현재 React Native 공개 API에서는 Bizboard 전용 타입이나 컴포넌트를 아직 제공하지 않습니다.

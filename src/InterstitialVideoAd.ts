@@ -94,6 +94,11 @@ export class InterstitialVideoAd {
     }
   }
 
+  async start(): Promise<void> {
+    await this.load();
+    await this.show();
+  }
+
   async show(): Promise<void> {
     if (!this._loaded) {
       throw new Error(`Interstitial video ad "${this.adUnitId}" has not been loaded.`);

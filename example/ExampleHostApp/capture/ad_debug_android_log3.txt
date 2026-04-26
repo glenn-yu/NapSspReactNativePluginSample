@@ -1,1 +1,0 @@
-04-18 17:51:36.305   555  3399 E TaskPersister: File error accessing recents directory (directory doesn't exist?).

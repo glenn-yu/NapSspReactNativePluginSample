@@ -1,6 +1,0 @@
-===== 2026-04-25 19:39:30 =====
-List of devices attached
-emulator-5554	device
-
-14
-    topResumedActivity=ActivityRecord{d0c77b6 u0 com.integrationtestapp/.MainActivity t234}

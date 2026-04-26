@@ -1,6 +1,0 @@
-platform=ios
-out_dir=/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/ios-soak-60m-20260425-223138
-flow=/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/ios-ad-validation.yaml
-sim_udid=8D90B616-14A9-4A49-A1A7-0470FF80A9F9
-start_time=2026-04-25 22:31:38
-duration_seconds=1800

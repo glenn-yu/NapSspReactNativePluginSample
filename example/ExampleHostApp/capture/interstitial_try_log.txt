@@ -1,3 +1,0 @@
-04-18 18:16:35.652 22496 22536 I ReactNativeJS: [NapSspExample] interstitial.load.start: "104704"
-04-18 18:16:35.658 22496 22536 I ReactNativeJS: [NapSspExample] interstitial.show.start: "104704"
-04-18 18:16:35.663 22496 22536 I ReactNativeJS: [NapSspExample] interstitial.failed: "Error: Interstitial ad \"104704\" has not been loaded."

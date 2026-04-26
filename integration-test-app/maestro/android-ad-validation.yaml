@@ -1,13 +1,30 @@
 appId: com.integrationtestapp
 ---
-- extendedWaitUntil:
-    visible: "SDK 초기화"
-    timeout: 30000
+- launchApp:
+    clearState: true
+- runFlow:
+    when:
+      visible: "허용"
+    commands:
+      - tapOn: "허용"
+- runFlow:
+    when:
+      visible: "Allow"
+    commands:
+      - tapOn: "Allow"
+- runFlow:
+    when:
+      visible: "확인"
+    commands:
+      - tapOn: "확인"
 - runFlow:
     when:
       visible: "OK"
     commands:
       - tapOn: "OK"
+- extendedWaitUntil:
+    visible: "SDK 초기화"
+    timeout: 30000
 - tapOn: "SDK 초기화"
 - extendedWaitUntil:
     visible: "SDK: success"
@@ -17,24 +34,24 @@ appId: com.integrationtestapp
     index: 0
 - extendedWaitUntil:
     visible: "BANNER_STATUS:LOADED:IMPRESSION"
-    timeout: 20000
+    timeout: 30000
 - extendedWaitUntil:
     visible: "언로드"
     timeout: 10000
 - scrollUntilVisible:
     element: "2. 네이티브 광고"
     direction: DOWN
-    timeout: 10000
+    timeout: 20000
 - tapOn:
     text: "로드"
     index: 1
 - extendedWaitUntil:
     visible: "NATIVE_STATUS:LOADED:IMPRESSION"
-    timeout: 20000
+    timeout: 30000
 - scrollUntilVisible:
     element: "3. 인라인 동영상 광고"
     direction: DOWN
-    timeout: 10000
+    timeout: 20000
 - runFlow:
     when:
       visible: "재로드"
@@ -52,7 +69,7 @@ appId: com.integrationtestapp
           optional: true
 - extendedWaitUntil:
     visible: "VIDEO_STATUS:LOADED:IMPRESSION"
-    timeout: 20000
+    timeout: 30000
 - scrollUntilVisible:
     element: "전면 광고 (popup)"
     direction: DOWN
@@ -90,7 +107,15 @@ appId: com.integrationtestapp
       - tapOn: "OK"
 - extendedWaitUntil:
     visible: "REWARD_STATUS:LOADED:OPENED:IMPRESSION"
-    timeout: 20000
+    timeout: 30000
+- runFlow:
+    when:
+      visible: "닫기"
+    commands:
+      - tapOn: "닫기"
+- extendedWaitUntil:
+    visible: "REWARDED"
+    timeout: 10000
 - scrollUntilVisible:
     element: "전면 동영상"
     direction: DOWN

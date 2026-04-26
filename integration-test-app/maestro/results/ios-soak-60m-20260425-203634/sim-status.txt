@@ -1,5 +1,0 @@
-===== 2026-04-25 20:36:35 =====
-== Devices ==
--- iOS 26.4 --
-    iPhone 17 Pro (8D90B616-14A9-4A49-A1A7-0470FF80A9F9) (Booted) 
-org.reactjs.native.example.IntegrationTestApp: 50172
