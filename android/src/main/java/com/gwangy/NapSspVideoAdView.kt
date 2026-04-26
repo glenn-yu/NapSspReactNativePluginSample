@@ -10,7 +10,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.facebook.react.uimanager.ThemedReactContext
 
-class NapSspVideoAdView(context: Context) : FrameLayout(context) {
+import com.facebook.react.bridge.LifecycleEventListener
+
+class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEventListener {
     private val placeholderLayout: LinearLayout = LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
         gravity = Gravity.CENTER
@@ -160,10 +162,24 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context) {
         ) { _, method, args ->
             when (method.name) {
                 "onReceivedAd" -> {
+                    val hasAd = runCatching { 
+                        adViewInstance?.javaClass?.getField("hasAd")?.getBoolean(adViewInstance) 
+                    }.getOrDefault(true) ?: true
+
+                    if (!hasAd) {
+                        currentState = NapSspLoadState.FAILED
+                        NapSspEventEmitter.emitViewEvent(
+                            this@NapSspVideoAdView,
+                            NapSspContracts.VIEW_EVENT_AD_FAILED,
+                            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO, "code" to -1, "message" to "No fill (hasAd is false)")
+                        )
+                        return@newProxyInstance null
+                    }
+
                     post {
                         val av = adViewInstance ?: return@post
                         removeAllViews()
-                        addView(av, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+                        addView(av, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
                         
                         // Force RN layout sync
                         post(measureAndLayout)
@@ -238,11 +254,28 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context) {
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        adViewInstance?.let { runCatching { it.javaClass.getMethod("onResume").invoke(it) } }
+        (context as? ThemedReactContext)?.addLifecycleEventListener(this)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        (context as? ThemedReactContext)?.removeLifecycleEventListener(this)
+        adViewInstance?.let {
+            runCatching { it.javaClass.getMethod("onPause").invoke(it) }
+            runCatching { it.javaClass.getMethod("onDestroy").invoke(it) }
+        }
+        adViewInstance = null
+    }
+
+    override fun onHostResume() {
+        adViewInstance?.let { runCatching { it.javaClass.getMethod("onResume").invoke(it) } }
+    }
+
+    override fun onHostPause() {
+        adViewInstance?.let { runCatching { it.javaClass.getMethod("onPause").invoke(it) } }
+    }
+
+    override fun onHostDestroy() {
         adViewInstance?.let {
             runCatching { it.javaClass.getMethod("onPause").invoke(it) }
             runCatching { it.javaClass.getMethod("onDestroy").invoke(it) }

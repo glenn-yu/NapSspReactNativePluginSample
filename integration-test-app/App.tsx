@@ -41,7 +41,7 @@ const DEFAULT_CONFIG = Platform.select({
       rewarded: '104710',
       native: '101626',
       video: '104709',
-      interstitialVideo: '104711',
+      interstitialVideo: '103868',
     },
   },
   default: {
@@ -222,10 +222,7 @@ const App = () => {
   // ── Rewarded ─────────────────────────────────────────────────────────────
   const showRewarded = async () => {
     resetAdStatus('rewarded', 'requesting');
-    const ad = new RewardedAd(ids.rewarded, {
-      customParams: { userId: 'user_001', session: 'game_stage_1' },
-      mute: false,
-    });
+    const ad = new RewardedAd(ids.rewarded);
     ad.addAdEventListener('loaded', () => { addLog('REWARD', 'loaded'); updateAdStatus('rewarded', { loaded: true, lastMessage: 'loaded' }); });
     ad.addAdEventListener('loadFailed', e => { addLog('REWARD', `loadFailed: ${e.message} (code:${e.nativeCode ?? '-'})`); updateAdStatus('rewarded', { lastMessage: `loadFailed:${e.message}` }); });
     ad.addAdEventListener('opened', () => { addLog('REWARD', 'opened'); updateAdStatus('rewarded', { opened: true, lastMessage: 'opened' }); });

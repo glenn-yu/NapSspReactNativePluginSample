@@ -206,10 +206,24 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
         ) { _, method, args ->
             when (method.name) {
                 "onReceivedAd" -> {
+                    val hasAd = runCatching { 
+                        adViewInstance?.javaClass?.getField("hasAd")?.getBoolean(adViewInstance) 
+                    }.getOrDefault(true) ?: true
+
+                    if (!hasAd) {
+                        currentState = NapSspLoadState.FAILED
+                        NapSspEventEmitter.emitViewEvent(
+                            this@NapSspBannerView, 
+                            NapSspContracts.VIEW_EVENT_AD_FAILED, 
+                            mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER, "code" to -1, "message" to "No fill (hasAd is false)")
+                        )
+                        return@newProxyInstance null
+                    }
+
                     post {
                         val av = adViewInstance ?: return@post
                         removeAllViews()
-                        addView(av, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+                        addView(av, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
                         // Critical: SDK guide says showAd() must be called after addView
                         runCatching { av.javaClass.getMethod("showAd").invoke(av) }
                         

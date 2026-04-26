@@ -115,8 +115,6 @@ class InterstitialModule: NSObject {
       }
       interstitial.delegate = NapSspInterstitialDelegate.shared(adUnitId: adUnitId)
       NSLog("[NapSspInterstitial] calling show on SDK adUnitId=%@ rootVC=%@", adUnitId, String(describing: type(of: rootVC)))
-      NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: ["adUnitId": adUnitId, "format": "interstitial", "source": "show_called"])
-      NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: ["adUnitId": adUnitId, "format": "interstitial", "source": "show_called"])
       interstitial.show(rootViewController: rootVC)
       resolve(nil)
       #else

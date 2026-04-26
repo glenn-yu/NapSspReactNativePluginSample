@@ -242,6 +242,27 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
             when (method.name) {
                 "onReceivedAd" -> {
                     Log.d(tag, "onReceivedAd adUnitId=$adUnitId args=${args?.contentToString()}")
+                    val hasInterstitial = runCatching {
+                        interstitial.javaClass.getField("hasInterstitial").getBoolean(interstitial)
+                    }.getOrDefault(true)
+
+                    if (!hasInterstitial) {
+                        val message = "No fill (hasInterstitial is false)"
+                        NapSspEventEmitter.emitModuleEvent(
+                            reactContext,
+                            NapSspContracts.EVENT_AD_FAILED,
+                            mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "code" to -1, "message" to message)
+                        )
+                        loadedAdUnitIds.remove(adUnitId)
+                        NapSspSdkBridge.clearInterstitial(adUnitId)
+                        if (startPromises.containsKey(adUnitId)) {
+                            startPromises.remove(adUnitId)?.reject("NAP_SSP_INTERSTITIAL_LOAD_FAILED", message)
+                        } else {
+                            loadPromises.remove(adUnitId)?.reject("NAP_SSP_INTERSTITIAL_LOAD_FAILED", message)
+                        }
+                        return@newProxyInstance null
+                    }
+
                     loadedAdUnitIds[adUnitId] = true
                     NapSspSdkBridge.markInterstitialState(adUnitId, NapSspLoadState.LOADED)
                     NapSspEventEmitter.emitModuleEvent(
@@ -255,16 +276,6 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
                         runCatching {
                             Log.d(tag, "auto-show interstitial after load adUnitId=$adUnitId")
                             NapSspSdkBridge.markInterstitialState(adUnitId, NapSspLoadState.SHOWN)
-                            NapSspEventEmitter.emitModuleEvent(
-                                reactContext,
-                                NapSspContracts.EVENT_AD_OPENED,
-                                mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "synthetic" to true, "stage" to "onReceivedAd_beforeShow"),
-                            )
-                            NapSspEventEmitter.emitModuleEvent(
-                                reactContext,
-                                NapSspContracts.EVENT_AD_IMPRESSION,
-                                mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "synthetic" to true, "stage" to "onReceivedAd_beforeShow"),
-                            )
                             interstitial.javaClass.getMethod("showInterstitial").invoke(interstitial)
                             Log.d(tag, "showInterstitial invoked from onReceivedAd adUnitId=$adUnitId")
                             startPromise.resolve(null)

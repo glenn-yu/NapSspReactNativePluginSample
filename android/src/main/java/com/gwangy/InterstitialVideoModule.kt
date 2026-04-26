@@ -234,6 +234,26 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
             when (method.name) {
                 "onReceivedAd" -> {
                     Log.d(tag, "onReceivedAd adUnitId=$adUnitId args=${args?.contentToString()}")
+                    val hasInterstitial = runCatching {
+                        interstitialVideo.javaClass.getField("hasInterstitial").getBoolean(interstitialVideo)
+                    }.getOrDefault(true)
+
+                    if (!hasInterstitial) {
+                        val message = "No fill (hasInterstitial is false)"
+                        NapSspEventEmitter.emitModuleEvent(
+                            reactContext,
+                            NapSspContracts.EVENT_AD_FAILED,
+                            mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO, "code" to -1, "message" to message)
+                        )
+                        loadedAdUnitIds.remove(adUnitId)
+                        if (startPromises.containsKey(adUnitId)) {
+                            startPromises.remove(adUnitId)?.reject("NAP_SSP_INTERSTITIAL_VIDEO_LOAD_FAILED", message)
+                        } else {
+                            loadPromises.remove(adUnitId)?.reject("NAP_SSP_INTERSTITIAL_VIDEO_LOAD_FAILED", message)
+                        }
+                        return@newProxyInstance null
+                    }
+
                     loadedAdUnitIds[adUnitId] = true
                     NapSspEventEmitter.emitModuleEvent(
                         reactContext,
@@ -245,16 +265,6 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
                         Log.d(tag, "onReceivedAd startPromise=true adUnitId=$adUnitId")
                         runCatching {
                             Log.d(tag, "auto-show interstitial video after load adUnitId=$adUnitId")
-                            NapSspEventEmitter.emitModuleEvent(
-                                reactContext,
-                                NapSspContracts.EVENT_AD_OPENED,
-                                mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO, "synthetic" to true, "stage" to "onReceivedAd_beforeShow"),
-                            )
-                            NapSspEventEmitter.emitModuleEvent(
-                                reactContext,
-                                NapSspContracts.EVENT_AD_IMPRESSION,
-                                mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL_VIDEO, "synthetic" to true, "stage" to "onReceivedAd_beforeShow"),
-                            )
                             interstitialVideo.javaClass.getMethod("showInterstitialVideoAd").invoke(interstitialVideo)
                             Log.d(tag, "showInterstitialVideoAd invoked from onReceivedAd adUnitId=$adUnitId")
                             startPromise.resolve(null)

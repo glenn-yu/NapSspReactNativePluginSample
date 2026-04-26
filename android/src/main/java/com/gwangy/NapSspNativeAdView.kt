@@ -157,15 +157,21 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context), LifecycleEven
                         val hasAd = runCatching {
                             nativeAdViewClass.getField("hasAd").getBoolean(nativeAdView)
                         }.getOrDefault(true)
-                        if (hasAd) {
-                            post {
-                                removeAllViews()
-                                addView(
-                                    nativeAdView as View,
-                                    LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT),
-                                )
-                                post(measureAndLayout)
-                            }
+                        if (!hasAd) {
+                            currentState = NapSspLoadState.FAILED
+                            NapSspEventEmitter.emitViewEvent(
+                                this, NapSspContracts.VIEW_EVENT_AD_FAILED,
+                                mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD, "code" to -1, "message" to "No fill (hasAd is false)")
+                            )
+                            return@newProxyInstance null
+                        }
+                        post {
+                            removeAllViews()
+                            addView(
+                                nativeAdView as View,
+                                LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT),
+                            )
+                            post(measureAndLayout)
                         }
                         currentState = NapSspLoadState.LOADED
                         NapSspEventEmitter.emitViewEvent(
