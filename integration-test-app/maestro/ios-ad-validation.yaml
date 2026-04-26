@@ -51,6 +51,21 @@ appId: org.reactjs.native.example.IntegrationTestApp
 - extendedWaitUntil:
     visible: "BANNER_STATUS:LOADED:IMPRESSION"
     timeout: 30000
+- tapOn: "BANNER_STATUS:LOADED:IMPRESSION"
+- runFlow:
+    when:
+      notVisible: "SDK 초기화 설정"
+    commands:
+      - launchApp:
+          appId: org.reactjs.native.example.IntegrationTestApp
+- scrollUntilVisible:
+    element: "이벤트 로그"
+    direction: DOWN
+- extendedWaitUntil:
+    visible: ".*BANNER.*clicked.*"
+- scrollUntilVisible:
+    element: "2. 네이티브 광고"
+    direction: UP
 - extendedWaitUntil:
     visible: "언로드"
     timeout: 10000
@@ -80,6 +95,21 @@ appId: org.reactjs.native.example.IntegrationTestApp
 - extendedWaitUntil:
     visible: "NATIVE_STATUS:LOADED:IMPRESSION"
     timeout: 30000
+- tapOn: "NATIVE_STATUS:LOADED:IMPRESSION"
+- runFlow:
+    when:
+      notVisible: "SDK 초기화 설정"
+    commands:
+      - launchApp:
+          appId: org.reactjs.native.example.IntegrationTestApp
+- scrollUntilVisible:
+    element: "이벤트 로그"
+    direction: DOWN
+- extendedWaitUntil:
+    visible: ".*NATIVE.*clicked.*"
+- scrollUntilVisible:
+    element: "3. 인라인 동영상 광고"
+    direction: UP
 - scrollUntilVisible:
     element: "3. 인라인 동영상 광고"
     direction: DOWN
