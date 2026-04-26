@@ -2,12 +2,14 @@
 set -uo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+source "$ROOT_DIR/maestro/common.sh"
 OUT_DIR="$ROOT_DIR/maestro/results/android-adb-soak-60m-$(date +%Y%m%d-%H%M%S)"
 mkdir -p "$OUT_DIR"
 
+# Crontab 환경을 위한 절대 경로 확보
 export JAVA_HOME="/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
 export ADB_BIN="/opt/homebrew/bin/adb"
-export PATH="$JAVA_HOME/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="$JAVA_HOME/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 END_TS=$(( $(date +%s) + 3600 ))
 ITER=0
@@ -178,3 +180,15 @@ echo "total_iterations=$ITER pass=$PASS fail=$FAIL" | tee -a "$SUMMARY"
     echo "- Stop reason: \`$STOP_REASON\`"
   fi
 } >> "$HISTORY_LOG"
+
+# Slack Notification
+SLACK_MSG="*Mode:* ADB Fallback\n*Result:* PASS=$PASS / FAIL=$FAIL (Total $ITER)\n*Log:* $OUT_DIR"
+if [ -n "$STOP_REASON" ]; then
+  SLACK_MSG="$SLACK_MSG\n*Stop Reason:* $STOP_REASON"
+fi
+
+if [ "$FAIL" -gt 0 ]; then
+  send_slack_notification "Android-ADB" "FAIL" "$SLACK_MSG"
+else
+  send_slack_notification "Android-ADB" "PASS" "$SLACK_MSG"
+fi
