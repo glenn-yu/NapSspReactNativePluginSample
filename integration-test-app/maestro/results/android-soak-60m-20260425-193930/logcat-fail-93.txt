@@ -1,0 +1,203 @@
+--------- beginning of main
+04-25 19:59:30.689  1911  1911 I BgTaskExecutorImpl: (REDACTED) Starting %s background task %s.
+04-25 19:59:30.692 21919 21962 D TrafficStats: tagSocket(77) with statsTag=0x0, statsUid=-1
+04-25 19:59:30.695  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 19:59:30.695  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 19:59:30.695  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 19:59:30.699  1911 21934 I A       : #fetchAndUpdateConfigurationInternal
+04-25 19:59:30.700  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 19:59:30.700  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 19:59:30.701  1911  2351 W A       : (REDACTED) Config group is not stored for group %s
+04-25 19:59:30.704  1911  2351 W A       : (REDACTED) Config group is not stored for group %s
+04-25 19:59:30.704  1911  2355 W A       : (REDACTED) Config group is not stored for group %s
+04-25 19:59:30.706  1911  2352 W A       : (REDACTED) Config group is not stored for group %s
+04-25 19:59:30.706  1911  2356 W A       : (REDACTED) Config group is not stored for group %s
+04-25 19:59:30.707  5048 20680 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.709  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 19:59:30.709  1911  1911 I BgTaskExecutorImpl: (REDACTED) Starting %s background task %s.
+04-25 19:59:30.712  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 19:59:30.712  1911  1911 I BgTaskExecutorImpl: (REDACTED) Starting %s background task %s.
+04-25 19:59:30.714  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 19:59:30.718  1797  2107 I AiAiEcho: [pnb-agg] Reload pnb aggregation on events deleted
+04-25 19:59:30.718  1797  2107 I AiAiEcho: [pnb-agg] pnb aggregation disabled.
+04-25 19:59:30.719  1911  1911 I BgTaskExecutorImpl: (REDACTED) Starting %s background task %s.
+04-25 19:59:30.720  1911  1911 I BgTaskExecutorImpl: (REDACTED) Starting %s background task %s.
+04-25 19:59:30.733  1911 21952 I LocationOracle: getCachedLocation(): no location is available
+04-25 19:59:30.740 24299 18674 I GmsDebugLogger: [73] 1801
+04-25 19:59:30.742 24299 18674 W ZappDownloader: No successful module downloads for requested features [].
+04-25 19:59:30.742 24299 18674 I GmsDebugLogger: [30] [VisionOcrDynamite.integ:231602402100000],[VisionBarcode.optional:231818100400],[TfliteDynamiteDynamite.integ:252130102100400],[MlkitOcrCommon.optional:231818100400],[MapsCoreDynamite.integ:231112103100400],[MlkitBarcodeUi.optional:231818100000]
+04-25 19:59:30.746 24299 18674 W ChimeraConfigService: Retry attempt was throttled. [CONTEXT service_id=264 ]
+04-25 19:59:30.753  5048  5071 I .gms.persistent: Background young concurrent copying GC freed 301329(12MB) AllocSpace objects, 22(952KB) LOS objects, 38% free, 19MB/31MB, paused 418us,12us total 125.617ms
+04-25 19:59:30.753  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 19:59:30.753  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 19:59:30.754  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 19:59:30.757  5048 21954 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.chimera.container.ConfigService finished executing. cause:5 result: 2 elapsed_millis: 124 uptime_millis: 124 exec_start_elapsed_seconds: 86620 [CONTEXT service_id=218 ]
+04-25 19:59:30.765  5048 21954 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskService finished executing. cause:5 result: 1 elapsed_millis: 61 uptime_millis: 61 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+--------- beginning of system
+04-25 19:59:30.766   555   569 D CompatibilityChangeReporter: Compat change id reported: 135634846; UID 10127; state: DISABLED
+04-25 19:59:30.767   555   569 D CompatibilityChangeReporter: Compat change id reported: 177438394; UID 10127; state: DISABLED
+04-25 19:59:30.767   555   569 D CompatibilityChangeReporter: Compat change id reported: 135772972; UID 10127; state: DISABLED
+04-25 19:59:30.767   555   569 D CompatibilityChangeReporter: Compat change id reported: 135754954; UID 10127; state: ENABLED
+04-25 19:59:30.767   555   588 D CompatibilityChangeReporter: Compat change id reported: 143937733; UID 10127; state: ENABLED
+04-25 19:59:30.770   355   355 D Zygote  : Forked child process 21979
+04-25 19:59:30.770   555   588 I ActivityManager: Start proc 21979:com.google.process.gapps/u0a127 for content provider {com.google.android.gsf/com.google.android.gsf.settings.GoogleSettingsProvider}
+04-25 19:59:30.777  5048 21970 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.778  5048 21970 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.779  5048 21970 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskService finished executing. cause:5 result: 1 elapsed_millis: 5 uptime_millis: 5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.790 21979 21979 I e.process.gapps: Using CollectorTypeCC GC.
+04-25 19:59:30.792  5048 21954 I TapAndPay: Maintaining payment bundles [CONTEXT service_id=79 ]
+04-25 19:59:30.792  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.794  5048 21954 I TapAndPay: Finished maintaining payment bundles [CONTEXT service_id=79 ]
+04-25 19:59:30.795 21979 21979 E e.process.gapps: Not starting debugger since process cannot load the jdwp agent.
+04-25 19:59:30.797  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskService finished executing. cause:5 result: 1 elapsed_millis: 16 uptime_millis: 16 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.801  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.tapandpay.gcmtask.TapAndPayGcmTaskService finished executing. cause:5 result: 1 elapsed_millis: 8 uptime_millis: 8 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.819   555  2526 D CompatibilityChangeReporter: Compat change id reported: 168419799; UID 10127; state: DISABLED
+04-25 19:59:30.819   555  2526 D CompatibilityChangeReporter: Compat change id reported: 273564678; UID 10127; state: DISABLED
+04-25 19:59:30.820 21979 21979 D CompatibilityChangeReporter: Compat change id reported: 171979766; UID 10127; state: ENABLED
+04-25 19:59:30.820 21979 21979 D CompatibilityChangeReporter: Compat change id reported: 242716250; UID 10127; state: ENABLED
+04-25 19:59:30.822   555  2526 D CompatibilityChangeReporter: Compat change id reported: 170503758; UID 10127; state: ENABLED
+04-25 19:59:30.825  5048 21927 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.chimera.container.ConfigService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.826 24299 24299 D BoundBrokerSvc: onBind: Intent { act=com.google.android.gms.semanticlocationhistory.federated.regionfetcher.RegionMddDownloadScheduleService.ACTION_TASK_READY dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsInternalBoundBrokerService }
+04-25 19:59:30.826 24299 24299 D BoundBrokerSvc: Loading bound service for intent: Intent { act=com.google.android.gms.semanticlocationhistory.federated.regionfetcher.RegionMddDownloadScheduleService.ACTION_TASK_READY dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsInternalBoundBrokerService }
+04-25 19:59:30.828  5048 21927 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.semanticlocationhistory.federated.regionfetcher.RegionMddDownloadScheduleService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.828 24299 19429 I ChimeraConfigurator: Starting update, reason: 2 urgentFeatures: 
+04-25 19:59:30.829 24299 18674 I LocationHistory: Account-level location setting is turned off. [CONTEXT service_id=314 ]
+04-25 19:59:30.830 24299 24299 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.gms.semanticlocationhistory.federated.regionfetcher.RegionMddDownloadScheduleService.ACTION_TASK_READY dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsInternalBoundBrokerService }
+04-25 19:59:30.830  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.semanticlocationhistory.federated.regionfetcher.RegionMddDownloadScheduleService finished executing. cause:5 result: 2 elapsed_millis: 4 uptime_millis: 4 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.833 21979 21979 D nativeloader: Configuring clns-shared-6 for other apk /system/framework/org.apache.http.legacy.jar. target_sdk_version=34, uses_libraries=ALL, library_path=/system_ext/priv-app/GoogleServicesFramework/lib/arm64:/system_ext/priv-app/GoogleServicesFramework/GoogleServicesFramework.apk!/lib/arm64-v8a:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gsf:/system_ext/priv-app/GoogleServicesFramework:/system/lib64:/system_ext/lib64
+04-25 19:59:30.840 24299 24299 D BoundBrokerSvc: onBind: Intent { act=com.google.android.gms.semanticlocationhistory.deidentifieddata.uploads.BatchDeidentifiedDataUploadService.ACTION_TASK_READY dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsInternalBoundBrokerService }
+04-25 19:59:30.840 24299 24299 D BoundBrokerSvc: Loading bound service for intent: Intent { act=com.google.android.gms.semanticlocationhistory.deidentifieddata.uploads.BatchDeidentifiedDataUploadService.ACTION_TASK_READY dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsInternalBoundBrokerService }
+04-25 19:59:30.842 21979 21979 D nativeloader: Configuring clns-shared-7 for other apk /system_ext/priv-app/GoogleServicesFramework/GoogleServicesFramework.apk. target_sdk_version=34, uses_libraries=, library_path=/system_ext/priv-app/GoogleServicesFramework/lib/arm64:/system_ext/priv-app/GoogleServicesFramework/GoogleServicesFramework.apk!/lib/arm64-v8a:/system/lib64:/system_ext/lib64, permitted_path=/data:/mnt/expand:/data/user/0/com.google.android.gsf:/system_ext/priv-app/GoogleServicesFramework:/system/lib64:/system_ext/lib64
+04-25 19:59:30.843  5048 21970 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.semanticlocationhistory.deidentifieddata.uploads.BatchDeidentifiedDataUploadService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.845 24299 19429 I GmsDebugLogger: [50] container:2318189190400+maps_core+mlkit.barcode.ui+mlkit.ocr.common+vision.barcode,tflite_dynamite:2521301025100400+tflite_dynamite,vision_ocr:2316024025100000+vision.ocr|6
+04-25 19:59:30.851 24299 19429 I GmsModuleFndr: Beginning GMS chimera module scan
+04-25 19:59:30.853 24299 19429 I ModuleSetMgr: Computing pending module set with APKs: [[AdsFdrDynamite.integ:231004600100000], [Cronetdynamite:231818190400], [Dynamiteloader:231818190000], [Dynamitemodulesa:231818190000], [Dynamitemodulesc:231818190000], [Googlecertificates:231818190000], [Mapsdynamite:231818190000], [Measurementdynamite:231818190000]]
+04-25 19:59:30.855  1911  1967 I earchbox:search: Background concurrent copying GC freed 618852(23MB) AllocSpace objects, 54(1176KB) LOS objects, 38% free, 39MB/63MB, paused 21us,9us total 100.497ms
+04-25 19:59:30.855  1911  1967 W earchbox:search: Reducing the number of considered missed Gc histogram windows from 1202 to 100
+04-25 19:59:30.860 24299 19429 I ModuleSetMgr: Pending container module APKs: []
+04-25 19:59:30.860 24299 19429 I ModuleSetMgr: Pending non-container module APKs: []
+04-25 19:59:30.864  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.semanticlocationhistory.deidentifieddata.uploads.BatchDeidentifiedDataUploadService finished executing. cause:5 result: 1 elapsed_millis: 25 uptime_millis: 25 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.864 24299 24299 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.gms.semanticlocationhistory.deidentifieddata.uploads.BatchDeidentifiedDataUploadService.ACTION_TASK_READY dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsInternalBoundBrokerService }
+04-25 19:59:30.866 24299 19429 W PackageParser: Unknown element under <manifest>: queries at /data/user_de/0/com.google.android.gms/app_chimera/m/00000000/AdsDynamite.apk Binary XML file line #15
+04-25 19:59:30.870 21979 21979 V GraphicsEnvironment: Currently set values for:
+04-25 19:59:30.870 21979 21979 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
+04-25 19:59:30.870 21979 21979 V GraphicsEnvironment:   angle_gl_driver_selection_values=[]
+04-25 19:59:30.870 21979 21979 V GraphicsEnvironment: ANGLE GameManagerService for com.google.android.gsf: false
+04-25 19:59:30.870 21979 21979 V GraphicsEnvironment: com.google.android.gsf is not listed in per-application setting
+04-25 19:59:30.870 21979 21979 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+04-25 19:59:30.872 24299 24299 D BoundBrokerSvc: onBind: Intent { act=com.google.android.gms.semanticlocationhistory.deidentifieddata.storevisits.StoreVisitsProcessingService.ACTION_TASK_READY dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsInternalBoundBrokerService }
+04-25 19:59:30.872 24299 24299 D BoundBrokerSvc: Loading bound service for intent: Intent { act=com.google.android.gms.semanticlocationhistory.deidentifieddata.storevisits.StoreVisitsProcessingService.ACTION_TASK_READY dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsInternalBoundBrokerService }
+04-25 19:59:30.874  5048 21970 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.semanticlocationhistory.deidentifieddata.storevisits.StoreVisitsProcessingService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.880 21979 21998 I carui   : CarUi plugin is disabled
+04-25 19:59:30.882 24299 19429 W PackageParser: Unknown element under <manifest>: queries at /data/user_de/0/com.google.android.gms/app_chimera/m/00000004/DynamiteModulesC.apk Binary XML file line #15
+04-25 19:59:30.883   555  2528 I ActivityManager: Flag disabled. Ignoring finishAttachApplication from uid: 10127. pid: 21979
+04-25 19:59:30.894 24299 19429 I GmsDebugLogger: [73] 1801
+04-25 19:59:30.895 24299 19429 W ZappDownloader: No successful module downloads for requested features [].
+04-25 19:59:30.895 24299 19429 I GmsDebugLogger: [30] [VisionOcrDynamite.integ:231602402100000],[VisionBarcode.optional:231818100400],[TfliteDynamiteDynamite.integ:252130102100400],[MlkitOcrCommon.optional:231818100400],[MapsCoreDynamite.integ:231112103100400],[MlkitBarcodeUi.optional:231818100000]
+04-25 19:59:30.899 24299 19429 I ChimeraConfigService: Scheduling checkin for one-off execution between [3300,43201] seconds from now (1777114770899) [CONTEXT service_id=264 ]
+04-25 19:59:30.900  5048 21927 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.chimera.container.ConfigService finished executing. cause:5 result: 2 elapsed_millis: 80 uptime_millis: 80 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.908  5048 21927 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.semanticlocationhistory.deidentifieddata.storevisits.StoreVisitsProcessingService finished executing. cause:5 result: 1 elapsed_millis: 33 uptime_millis: 33 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.908 24299 24299 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.gms.semanticlocationhistory.deidentifieddata.storevisits.StoreVisitsProcessingService.ACTION_TASK_READY dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsInternalBoundBrokerService }
+04-25 19:59:30.917  5048 21927 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.auth.folsom.service.FolsomPublicKeyUpdateService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.922  5048  5048 D BoundBrokerSvc: onBind: Intent { act=com.google.android.gms.gmscompliance.sync.BackgroundSyncGmsTaskService.ACTION_TASK_READY dat=chimera-action:/... cmp=com.google.android.gms/.chimera.PersistentInternalBoundBrokerService }
+04-25 19:59:30.922  5048  5048 D BoundBrokerSvc: Loading bound service for intent: Intent { act=com.google.android.gms.gmscompliance.sync.BackgroundSyncGmsTaskService.ACTION_TASK_READY dat=chimera-action:/... cmp=com.google.android.gms/.chimera.PersistentInternalBoundBrokerService }
+04-25 19:59:30.923  5048 21970 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.gmscompliance.sync.BackgroundSyncGmsTaskService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.926  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.auth.folsom.service.FolsomPublicKeyUpdateService finished executing. cause:5 result: 1 elapsed_millis: 14 uptime_millis: 14 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.927  5048  5048 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.gms.gmscompliance.sync.BackgroundSyncGmsTaskService.ACTION_TASK_READY dat=chimera-action:/... cmp=com.google.android.gms/.chimera.PersistentInternalBoundBrokerService }
+04-25 19:59:30.929  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.gmscompliance.sync.BackgroundSyncGmsTaskService finished executing. cause:5 result: 1 elapsed_millis: 6 uptime_millis: 6 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.939  5048 21970 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.telephonyspam.sync.SpamListSyncTaskService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.940 24299 18674 I TelephonySpamChimeraSer: Running Telephony Spam Chimera Service [CONTEXT service_id=150 ]
+04-25 19:59:30.942  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.gcm.HeartbeatAlarm$ConnectionInfoPersistService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.943  5048 21927 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.gcm.HeartbeatAlarm$ConnectionInfoPersistService finished executing. cause:5 result: 1 elapsed_millis: 5 uptime_millis: 5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.947 24299 18674 I TelephonySpamChimeraSer: Cleaning SIP Header local table of old entries [CONTEXT service_id=150 ]
+04-25 19:59:30.947 24299 18674 I SpamListSync: Call spam module disabled. Skipping cleaning cache sip header table. [CONTEXT service_id=150 ]
+04-25 19:59:30.947 24299 18674 I TelephonySpamChimeraSer: Syncing Call Spam List [CONTEXT service_id=150 ]
+04-25 19:59:30.947 24299 18674 I SpamListSync: SpamListSyncChimeraService.syncSpamList called with tag: telephonyspam.SpamListSyncLtePeriodicTask, extras: Bundle[{SpamList Type=0, Action=1.0}] [CONTEXT service_id=150 ]
+04-25 19:59:30.948 24299 18674 I SpamListSync: Call spam module disabled. Skipping spam list syncing. [CONTEXT service_id=150 ]
+04-25 19:59:30.954  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.telephonyspam.sync.SpamListSyncTaskService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.954 24299 19429 I TelephonySpamChimeraSer: Running Telephony Spam Chimera Service [CONTEXT service_id=150 ]
+04-25 19:59:30.954 24299 19429 I TelephonySpamChimeraSer: Cleaning SIP Header local table of old entries [CONTEXT service_id=150 ]
+04-25 19:59:30.954 24299 19429 I SpamListSync: Call spam module disabled. Skipping cleaning cache sip header table. [CONTEXT service_id=150 ]
+04-25 19:59:30.954 24299 19429 I TelephonySpamChimeraSer: Syncing Call Spam List [CONTEXT service_id=150 ]
+04-25 19:59:30.954 24299 19429 I SpamListSync: SpamListSyncChimeraService.syncSpamList called with tag: telephonyspam.SpamListSyncTask, extras: Bundle[{SpamList Type=0, Action=1.0}] [CONTEXT service_id=150 ]
+04-25 19:59:30.954 24299 19429 I SpamListSync: Call spam module disabled. Skipping spam list syncing. [CONTEXT service_id=150 ]
+04-25 19:59:30.954  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.telephonyspam.sync.SpamListSyncTaskService finished executing. cause:5 result: 1 elapsed_millis: 19 uptime_millis: 19 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.958  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.telephonyspam.sync.SpamListSyncTaskService finished executing. cause:5 result: 1 elapsed_millis: 3 uptime_millis: 3 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.974  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.974  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:5 result: 1 elapsed_millis: 10 uptime_millis: 10 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:30.978   555  2528 D IntervalStats: Unable to parse usage stats packages: [225, 226, 227, 228, 229, 231, 235, 237]
+04-25 19:59:30.993  5048 21927 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.auth.account.be.accountstate.GcmTaskService started execution. cause:5 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:31.001 24299 24299 I GmsModuleFndr: Beginning GMS chimera module scan
+04-25 19:59:31.003 24299 24299 I ModuleSetMgr: Computing pending module set with APKs: [[AdsFdrDynamite.integ:231004600100000], [Cronetdynamite:231818190400], [Dynamiteloader:231818190000], [Dynamitemodulesa:231818190000], [Dynamitemodulesc:231818190000], [Googlecertificates:231818190000], [Mapsdynamite:231818190000], [Measurementdynamite:231818190000]]
+04-25 19:59:31.004  5048 21927 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.auth.account.be.accountstate.GcmTaskService finished executing. cause:5 result: 1 elapsed_millis: 18 uptime_millis: 18 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:31.017 24299 24299 I ModuleSetMgr: Pending container module APKs: []
+04-25 19:59:31.017 24299 24299 I ModuleSetMgr: Pending non-container module APKs: []
+04-25 19:59:31.021 24299 24299 W PackageParser: Unknown element under <manifest>: queries at /data/user_de/0/com.google.android.gms/app_chimera/m/00000000/AdsDynamite.apk Binary XML file line #15
+04-25 19:59:31.025 24299 24299 W PackageParser: Unknown element under <manifest>: queries at /data/user_de/0/com.google.android.gms/app_chimera/m/00000004/DynamiteModulesC.apk Binary XML file line #15
+04-25 19:59:31.030 24299 24299 E ChimeraProxyRslvr: Chimera config error: com.google.android.chimera.config.InvalidConfigException: No registered Chimera impl for com.google.android.gms.matchstick.task.ScheduledTaskService
+04-25 19:59:31.031 24299 24299 E ChimeraSrvcProxy: Proxy without impl failing onBind()
+04-25 19:59:31.031 24299 24299 I ChimeraSrvcProxy: com.google.android.gms.matchstick.task.ScheduledTaskService returning NullBinder for action com.google.android.gms.gcm.ACTION_TASK_READY
+04-25 19:59:31.042 24299 25268 I ChimeraSrvcProxy: NullBinder for com.google.android.gms.gcm.ACTION_TASK_READY triggering remote TransactionTooLargeException due to Service without Chimera impl
+04-25 19:59:31.042 24299 25268 W gle.android.gms: Large reply transaction of 1056768 bytes, interface descriptor , code 1598968902
+04-25 19:59:31.043  5048 21927 E IPCThreadState: Binder transaction failure: 15363308/29201/-28
+04-25 19:59:31.043  5048 21927 W BinderUtils: Expected android.os.IMessenger, got  [CONTEXT service_id=218 ]
+--------- beginning of kernel
+04-25 19:59:31.042 25268 25268 I binder_alloc: 5048: binder_alloc_buf size 1056768 failed, no address space
+04-25 19:59:31.042 25268 25268 I binder_alloc: allocated: 0 (num: 0 largest: 0), free: 1040384 (num: 1 largest: 1040384)
+04-25 19:59:31.042 25268 25268 I binder  : cannot allocate buffer: no space left
+04-25 19:59:31.042 25268 25268 I binder  : 24299:25268 transaction reply to 5048:21927 failed 15363308/29201/-28, size 1056768-0 line 3406
+04-25 19:59:31.042 25268 25268 I binder  : send failed reply for transaction 15363304 to 5048:21927
+04-25 19:59:31.043  5048 21927 E NetworkScheduler.TED: Dropping task as app's play services SDK version does not support Android O. Either update the SDK or lower your app's target SDK version. Canceling all tasks for the service: ComponentInfo{com.google.android.gms/com.google.android.gms.matchstick.task.ScheduledTaskService}
+04-25 19:59:31.044  5048  5048 E NetworkScheduler.ATC: Called cancelTask for already completed task com.google.android.gms/.matchstick.task.ScheduledTaskService{u=0 tag="gms:matchstick:checkRegistrationWithLighter" trigger=window{start=86400s,end=108000s,earliest=-181s,latest=21418s} requirements=[NET_CONNECTED] attributes=[PERSISTED] scheduled=-86581s last_run=0s exec_window_multiplier=1.0000 jid=N/A status=PENDING retries=0 client_lib=GMS_TASK_SCHEDULER-231818000} :5 [CONTEXT service_id=218 ]
+04-25 19:59:31.044  5048 20114 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.matchstick.task.ScheduledTaskService finished executing. cause:5 result: 6 elapsed_millis: 51 uptime_millis: 51 exec_start_elapsed_seconds: 86621 [CONTEXT service_id=218 ]
+04-25 19:59:31.757   157   157 I logd    : logdr: UID=2000 GID=2000 PID=22003 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 19:59:31.803 21919 21962 V RkpdServerInterface: Network request completed successfully.
+04-25 19:59:31.803 21919 21962 I RkpdPeriodicProvisioner: Total services found implementing IRPC: 1
+04-25 19:59:31.803 21919 21962 I RkpdPeriodicProvisioner: Starting provisioning for com.android.rkpdapp.interfaces.SystemInterface{android.hardware.security.keymint.IRemotelyProvisionedComponent/default}
+04-25 19:59:31.804 21919 21962 I RkpdKeyPoolStats: Sufficient keys are available, no CSR needed.
+04-25 19:59:31.804 21919 21962 I RkpdKeyPoolStats: PoolStats{keysInUse=1, idealTotalSignedKeys=13, keysToGenerate=0, keysUnassigned=11}
+04-25 19:59:31.804 21919 21962 I RkpdProvisioner: Requested number of keys for provisioning: 0
+04-25 19:59:31.804 21919 21962 I RkpdPeriodicProvisioner: Logging atom metric for pool status, total: 12, numExpiring: 0, numUnassigned: 11
+04-25 19:59:31.804 21919 21962 I RkpdPeriodicProvisioner: Successfully provisioned com.android.rkpdapp.interfaces.SystemInterface{android.hardware.security.keymint.IRemotelyProvisionedComponent/default}
+04-25 19:59:31.805 21919 21955 I WM-WorkerWrapper: Worker result SUCCESS for Work [ id=d293e5e3-525d-4925-86b9-0e9e2de7d171, tags={ com.android.rkpdapp.provisioner.PeriodicProvisioner } ]
+04-25 19:59:31.808 21919 21955 D CompatibilityChangeReporter: Compat change id reported: 194532703; UID 10182; state: ENABLED
+04-25 19:59:31.808 21919 21955 D CompatibilityChangeReporter: Compat change id reported: 253665015; UID 10182; state: ENABLED
+04-25 19:59:31.808   555  2528 D CompatibilityChangeReporter: Compat change id reported: 253665015; UID 10182; state: ENABLED
+04-25 19:59:31.808   555  2528 D CompatibilityChangeReporter: Compat change id reported: 194532703; UID 10182; state: ENABLED
+04-25 19:59:31.841  1911  2463 I sb.r.PDSWriter: Updating TNG suggest bootstrap data
+04-25 19:59:31.841  1911  2499 I sb.r.PDSWriter: Updating TNG suggest bootstrap data
+04-25 19:59:31.842  1911  1911 I SearchWidgetFlow: (REDACTED) GsaWidgetProvider:onReceive(%s) started
+04-25 19:59:31.844  1911  2791 I SearchWidgetFlow: GsaWidgetSessionController:handleGenericClientEvent
+04-25 19:59:31.844  1911  2791 I SearchWidgetFlow: (REDACTED) SearchWidgetWorker:handleIntent(%s) started
+04-25 19:59:31.844  1911  2355 I sb.r.PDSWriter: Updated TNG suggest bootstrap data
+04-25 19:59:31.844  1911  1911 I SearchWidgetFlow: (REDACTED) SearchWidget:handleIntent(%s)
+04-25 19:59:31.845  1911  2499 I SearchWidgetFlow: (REDACTED) SearchWidgetWorker:handleIntent(%s) done
+04-25 19:59:31.845  1911  2355 I sb.r.PDSWriter: Updated TNG suggest bootstrap data
+04-25 19:59:31.845  1911  2463 I SearchWidgetFlow: (REDACTED) GsaWidgetProvider:onReceive(%s) done
+04-25 19:59:31.846  1911  1911 I SearchWidgetFlow: (REDACTED) GsaWidgetProvider:onReceive(%s) started
+04-25 19:59:31.846  1911  2791 I SearchWidgetFlow: GsaWidgetSessionController:handleGenericClientEvent
+04-25 19:59:31.846  1911  2791 I SearchWidgetFlow: (REDACTED) SearchWidgetWorker:handleIntent(%s) started
+04-25 19:59:31.846  1911  1911 I SearchWidgetFlow: (REDACTED) SearchWidget:handleIntent(%s)
+04-25 19:59:31.847  1911  2499 I SearchWidgetFlow: (REDACTED) SearchWidgetWorker:handleIntent(%s) done
+04-25 19:59:31.847  1911  2463 I SearchWidgetFlow: (REDACTED) GsaWidgetProvider:onReceive(%s) done
+04-25 19:59:31.851 22008 22008 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 19:59:31.851 22008 22008 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 19:59:31.860   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 19:59:31.860 22008 22009 I Gralloc4: mapper 4.x is not supported
+04-25 19:59:31.860   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 19:59:31.988   555  1002 D CoreBackPreview: Window{7be1940 u0 PopupWindow:7070158}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@684f1be, mPriority=0, mIsAnimationCallback=false}
+04-25 19:59:32.000 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 19:59:32.013 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@becbb17
+04-25 19:59:32.013   555  1002 D CoreBackPreview: Window{7be1940 u0 PopupWindow:7070158}: Setting back callback null
+04-25 19:59:32.013   555  1002 W InputManager-JNI: Input channel object '7be1940 PopupWindow:7070158 (client)' was disposed without first being removed with the input manager!
+04-25 19:59:32.123   555  1002 D CoreBackPreview: Window{79a6bca u0 PopupWindow:28a370}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@ddd058, mPriority=0, mIsAnimationCallback=false}
+04-25 19:59:32.146 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 19:59:32.148 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@975f60f
+04-25 19:59:32.149   555  1002 D CoreBackPreview: Window{79a6bca u0 PopupWindow:28a370}: Setting back callback null
+04-25 19:59:32.149   555  1002 W InputManager-JNI: Input channel object '79a6bca PopupWindow:28a370 (client)' was disposed without first being removed with the input manager!
+04-25 19:59:32.639   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 19:59:35.476   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 19:59:36.149 21979 22012 D ProfileInstaller: Installing profile for com.google.android.gsf
+04-25 19:59:40.456   555   659 D ActivityManager: freezing 16982 com.google.android.partnersetup
+04-25 19:59:40.527   555   659 D ActivityManager: freezing 15445 com.google.android.settings.intelligence
+04-25 19:59:40.569   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 

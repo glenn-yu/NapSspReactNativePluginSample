@@ -59,7 +59,32 @@ const DEFAULT_CONFIG = Platform.select({
 
 // ─── Log entry ────────────────────────────────────────────────────────────────
 interface LogEntry { ts: string; tag: string; msg: string }
+type AdStatusKey = 'banner' | 'native' | 'video' | 'interstitial' | 'rewarded' | 'interstitialVideo';
+type AdStatus = {
+  loaded: boolean;
+  impression: boolean;
+  opened: boolean;
+  completed: boolean;
+  rewarded: boolean;
+  lastMessage: string;
+};
 function now() { return new Date().toLocaleTimeString(); }
+const createEmptyAdStatus = (): AdStatus => ({
+  loaded: false,
+  impression: false,
+  opened: false,
+  completed: false,
+  rewarded: false,
+  lastMessage: 'idle',
+});
+const createInitialAdStatuses = (): Record<AdStatusKey, AdStatus> => ({
+  banner: createEmptyAdStatus(),
+  native: createEmptyAdStatus(),
+  video: createEmptyAdStatus(),
+  interstitial: createEmptyAdStatus(),
+  rewarded: createEmptyAdStatus(),
+  interstitialVideo: createEmptyAdStatus(),
+});
 
 // ─── ID input row ─────────────────────────────────────────────────────────────
 const isNumeric = (v: string) => /^\d+$/.test(v.trim());
@@ -128,6 +153,27 @@ const App = () => {
   const [nativeVisible, setNativeVisible] = useState(false);
   const [videoKey, setVideoKey] = useState(0);
   const [videoVisible, setVideoVisible] = useState(false);
+  const [adStatuses, setAdStatuses] = useState<Record<AdStatusKey, AdStatus>>(createInitialAdStatuses());
+
+  const updateAdStatus = (key: AdStatusKey, patch: Partial<AdStatus>) => {
+    setAdStatuses(prev => ({
+      ...prev,
+      [key]: {
+        ...prev[key],
+        ...patch,
+      },
+    }));
+  };
+
+  const resetAdStatus = (key: AdStatusKey, message = 'idle') => {
+    setAdStatuses(prev => ({
+      ...prev,
+      [key]: {
+        ...createEmptyAdStatus(),
+        lastMessage: message,
+      },
+    }));
+  };
 
   const addLog = (tag: string, msg: string) =>
     setLogs(prev => [...prev, { ts: now(), tag, msg }]);
@@ -136,6 +182,7 @@ const App = () => {
   const handleInitialize = () => {
     setInitStatus('idle');
     setInitError(null);
+    setAdStatuses(createInitialAdStatuses());
     NapSspAd.initialize({
       mediaKey,
       adUnitIds: Object.values(ids),
@@ -152,17 +199,21 @@ const App = () => {
 
   // ── Interstitial ────────────────────────────────────────────────────────────
   const showInterstitial = async () => {
+    resetAdStatus('interstitial', 'requesting');
     const ad = new InterstitialAd(ids.interstitial, { type: 'popup', buttonLeftText: '닫기' });
-    ad.addAdEventListener('loaded', () => addLog('INTER', 'loaded'));
-    ad.addAdEventListener('loadFailed', e => addLog('INTER', `loadFailed: ${e.message} (code:${e.nativeCode ?? '-'})`));
-    ad.addAdEventListener('opened', () => addLog('INTER', 'opened'));
-    ad.addAdEventListener('impression', () => addLog('INTER', 'impression'));
+    ad.addAdEventListener('loaded', () => { addLog('INTER', 'loaded'); updateAdStatus('interstitial', { loaded: true, lastMessage: 'loaded' }); });
+    ad.addAdEventListener('loadFailed', e => { addLog('INTER', `loadFailed: ${e.message} (code:${e.nativeCode ?? '-'})`); updateAdStatus('interstitial', { lastMessage: `loadFailed:${e.message}` }); });
+    ad.addAdEventListener('opened', () => { addLog('INTER', 'opened'); updateAdStatus('interstitial', { opened: true, lastMessage: 'opened' }); });
+    ad.addAdEventListener('impression', () => { addLog('INTER', 'impression'); updateAdStatus('interstitial', { impression: true, lastMessage: 'impression' }); });
     ad.addAdEventListener('clicked', () => addLog('INTER', 'clicked'));
     ad.addAdEventListener('closed', () => { addLog('INTER', 'closed'); ad.destroy(); });
     try {
-      await ad.load();
-      await ad.show();
+      addLog('INTER', 'start() start');
+      await ad.start();
+      addLog('INTER', 'start() resolved');
+      updateAdStatus('interstitial', { lastMessage: 'startResolved' });
     } catch (e: any) {
+      addLog('INTER', `exception:${e?.message ?? String(e)}`);
       Alert.alert('전면 광고 오류', e?.message ?? String(e));
       ad.destroy();
     }
@@ -170,19 +221,22 @@ const App = () => {
 
   // ── Rewarded ─────────────────────────────────────────────────────────────
   const showRewarded = async () => {
+    resetAdStatus('rewarded', 'requesting');
     const ad = new RewardedAd(ids.rewarded, {
       customParams: { userId: 'user_001', session: 'game_stage_1' },
       mute: false,
     });
-    ad.addAdEventListener('loaded', () => addLog('REWARD', 'loaded'));
-    ad.addAdEventListener('loadFailed', e => addLog('REWARD', `loadFailed: ${e.message} (code:${e.nativeCode ?? '-'})`));
-    ad.addAdEventListener('opened', () => addLog('REWARD', 'opened'));
-    ad.addAdEventListener('impression', () => addLog('REWARD', 'impression'));
-    (ad as any).addAdEventListener('onRewarded', (item: any) => addLog('REWARD', `🎉 rewarded! type=${item?.type} amount=${item?.amount}`));
+    ad.addAdEventListener('loaded', () => { addLog('REWARD', 'loaded'); updateAdStatus('rewarded', { loaded: true, lastMessage: 'loaded' }); });
+    ad.addAdEventListener('loadFailed', e => { addLog('REWARD', `loadFailed: ${e.message} (code:${e.nativeCode ?? '-'})`); updateAdStatus('rewarded', { lastMessage: `loadFailed:${e.message}` }); });
+    ad.addAdEventListener('opened', () => { addLog('REWARD', 'opened'); updateAdStatus('rewarded', { opened: true, lastMessage: 'opened' }); });
+    ad.addAdEventListener('impression', () => { addLog('REWARD', 'impression'); updateAdStatus('rewarded', { impression: true, lastMessage: 'impression' }); });
+    (ad as any).addAdEventListener('onRewarded', (item: any) => { addLog('REWARD', `🎉 rewarded! type=${item?.type} amount=${item?.amount}`); updateAdStatus('rewarded', { rewarded: true, lastMessage: `rewarded:${item?.amount ?? 1}` }); });
     ad.addAdEventListener('closed', () => { addLog('REWARD', 'closed'); ad.destroy(); });
     try {
-      await ad.load();
-      await ad.show();
+      addLog('REWARD', 'start() start');
+      await ad.start();
+      addLog('REWARD', 'start() resolved');
+      updateAdStatus('rewarded', { lastMessage: 'startResolved' });
     } catch (e: any) {
       Alert.alert('리워드 광고 오류', e?.message ?? String(e));
       ad.destroy();
@@ -191,11 +245,12 @@ const App = () => {
 
   // ── InterstitialVideo ───────────────────────────────────────────────────────
   const showInterstitialVideo = async () => {
+    resetAdStatus('interstitialVideo', 'requesting');
     const ad = new InterstitialVideoAd(ids.interstitialVideo, { timeout: 20, maxRetryCountInSlot: 0 });
-    ad.addAdEventListener('loaded', () => addLog('IV', 'loaded'));
-    ad.addAdEventListener('loadFailed', e => addLog('IV', `loadFailed: ${e.message}`));
-    ad.addAdEventListener('opened', () => addLog('IV', 'opened'));
-    ad.addAdEventListener('completed', () => addLog('IV', '✅ completed'));
+    ad.addAdEventListener('loaded', () => { addLog('IV', 'loaded'); updateAdStatus('interstitialVideo', { loaded: true, lastMessage: 'loaded' }); });
+    ad.addAdEventListener('loadFailed', e => { addLog('IV', `loadFailed: ${e.message}`); updateAdStatus('interstitialVideo', { lastMessage: `loadFailed:${e.message}` }); });
+    ad.addAdEventListener('opened', () => { addLog('IV', 'opened'); updateAdStatus('interstitialVideo', { opened: true, lastMessage: 'opened' }); });
+    ad.addAdEventListener('completed', () => { addLog('IV', '✅ completed'); updateAdStatus('interstitialVideo', { completed: true, lastMessage: 'completed' }); });
     ad.addAdEventListener('skipped', () => addLog('IV', 'skipped'));
     ad.addAdEventListener('closed', () => { addLog('IV', 'closed'); ad.destroy(); });
     try {
@@ -216,6 +271,15 @@ const App = () => {
         <Text style={styles.title}>Nap SSP 통합 테스트 앱</Text>
         <Text style={[styles.status, { color: statusColor }]}>SDK: {initStatus}</Text>
         {initError ? <Text style={styles.errorText}>오류: {initError}</Text> : null}
+
+        <Section title="상단 상태 요약">
+          <Text style={styles.statusLine}>INTER_STATUS:{adStatuses.interstitial.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.interstitial.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.interstitial.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
+          <Text style={styles.statusLine}>REWARD_STATUS:{adStatuses.rewarded.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.rewarded.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.rewarded.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.rewarded.rewarded ? 'REWARDED' : 'NOT_REWARDED'}</Text>
+          <Text style={styles.statusLine}>IV_STATUS:{adStatuses.interstitialVideo.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.interstitialVideo.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.interstitialVideo.completed ? 'COMPLETED' : 'NOT_COMPLETED'}</Text>
+          <Text style={styles.statusLine}>BANNER_STATUS:{adStatuses.banner.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.banner.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
+          <Text style={styles.statusLine}>NATIVE_STATUS:{adStatuses.native.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.native.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
+          <Text style={styles.statusLine}>VIDEO_STATUS:{adStatuses.video.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.video.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.video.completed ? 'COMPLETED' : 'NOT_COMPLETED'}</Text>
+        </Section>
 
         {/* ── SDK 초기화 설정 ────────────────────── */}
         <Section title="SDK 초기화 설정">
@@ -261,8 +325,9 @@ const App = () => {
               key={bannerKey}
               adUnitId={ids.banner}
               size="BANNER_320x50"
-              onAdLoaded={() => addLog('BANNER', 'loaded')}
-              onAdFailedToLoad={e => addLog('BANNER', `failed: ${e.message}`)}
+              onAdLoaded={() => { addLog('BANNER', 'loaded'); updateAdStatus('banner', { loaded: true, lastMessage: 'loaded' }); }}
+              onAdImpression={() => { addLog('BANNER', 'impression'); updateAdStatus('banner', { impression: true, lastMessage: 'impression' }); }}
+              onAdFailedToLoad={e => { addLog('BANNER', `failed: ${e.message}`); updateAdStatus('banner', { lastMessage: `failed:${e.message}` }); }}
               onAdClicked={() => addLog('BANNER', 'clicked')}
             />
           )}
@@ -283,8 +348,9 @@ const App = () => {
               key={nativeKey}
               adUnitId={ids.native}
               style={styles.nativeAd}
-              onAdLoaded={() => addLog('NATIVE', 'loaded')}
-              onAdFailedToLoad={e => addLog('NATIVE', `failed: ${e.message}`)}
+              onAdLoaded={() => { addLog('NATIVE', 'loaded'); updateAdStatus('native', { loaded: true, lastMessage: 'loaded' }); }}
+              onAdImpression={() => { addLog('NATIVE', 'impression'); updateAdStatus('native', { impression: true, lastMessage: 'impression' }); }}
+              onAdFailedToLoad={e => { addLog('NATIVE', `failed: ${e.message}`); updateAdStatus('native', { lastMessage: `failed:${e.message}` }); }}
               onAdClicked={() => addLog('NATIVE', 'clicked')}
             />
           )}
@@ -305,9 +371,10 @@ const App = () => {
               key={videoKey}
               adUnitId={ids.video}
               style={styles.videoAd}
-              onAdLoaded={() => addLog('VIDEO', 'loaded')}
-              onAdFailedToLoad={e => addLog('VIDEO', `failed: ${e.message}`)}
-              onAdCompleted={() => addLog('VIDEO', '✅ completed')}
+              onAdLoaded={() => { addLog('VIDEO', 'loaded'); updateAdStatus('video', { loaded: true, lastMessage: 'loaded' }); }}
+              onAdImpression={() => { addLog('VIDEO', 'impression'); updateAdStatus('video', { impression: true, lastMessage: 'impression' }); }}
+              onAdFailedToLoad={e => { addLog('VIDEO', `failed: ${e.message}`); updateAdStatus('video', { lastMessage: `failed:${e.message}` }); }}
+              onAdCompleted={() => { addLog('VIDEO', '✅ completed'); updateAdStatus('video', { completed: true, lastMessage: 'completed' }); }}
               onAdSkipped={() => addLog('VIDEO', 'skipped')}
               onAdClicked={() => addLog('VIDEO', 'clicked')}
             />
@@ -325,6 +392,21 @@ const App = () => {
           <TouchableOpacity disabled={!initialized} style={[styles.button, { backgroundColor: '#BF360C' }, !initialized && styles.buttonDisabled]} onPress={showInterstitialVideo}>
             <Text style={styles.buttonText}>전면 동영상</Text>
           </TouchableOpacity>
+        </Section>
+
+        <Section title="광고 응답 상태">
+          <Text style={styles.statusLine}>BANNER loaded={String(adStatuses.banner.loaded)} impression={String(adStatuses.banner.impression)} msg={adStatuses.banner.lastMessage}</Text>
+          <Text style={styles.statusLine}>BANNER_STATUS:{adStatuses.banner.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.banner.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
+          <Text style={styles.statusLine}>NATIVE loaded={String(adStatuses.native.loaded)} impression={String(adStatuses.native.impression)} msg={adStatuses.native.lastMessage}</Text>
+          <Text style={styles.statusLine}>NATIVE_STATUS:{adStatuses.native.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.native.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
+          <Text style={styles.statusLine}>VIDEO loaded={String(adStatuses.video.loaded)} impression={String(adStatuses.video.impression)} completed={String(adStatuses.video.completed)} msg={adStatuses.video.lastMessage}</Text>
+          <Text style={styles.statusLine}>VIDEO_STATUS:{adStatuses.video.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.video.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.video.completed ? 'COMPLETED' : 'NOT_COMPLETED'}</Text>
+          <Text style={styles.statusLine}>INTER loaded={String(adStatuses.interstitial.loaded)} opened={String(adStatuses.interstitial.opened)} impression={String(adStatuses.interstitial.impression)} msg={adStatuses.interstitial.lastMessage}</Text>
+          <Text style={styles.statusLine}>INTER_STATUS:{adStatuses.interstitial.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.interstitial.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.interstitial.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
+          <Text style={styles.statusLine}>REWARD loaded={String(adStatuses.rewarded.loaded)} opened={String(adStatuses.rewarded.opened)} impression={String(adStatuses.rewarded.impression)} rewarded={String(adStatuses.rewarded.rewarded)} msg={adStatuses.rewarded.lastMessage}</Text>
+          <Text style={styles.statusLine}>REWARD_STATUS:{adStatuses.rewarded.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.rewarded.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.rewarded.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.rewarded.rewarded ? 'REWARDED' : 'NOT_REWARDED'}</Text>
+          <Text style={styles.statusLine}>IV loaded={String(adStatuses.interstitialVideo.loaded)} opened={String(adStatuses.interstitialVideo.opened)} completed={String(adStatuses.interstitialVideo.completed)} msg={adStatuses.interstitialVideo.lastMessage}</Text>
+          <Text style={styles.statusLine}>IV_STATUS:{adStatuses.interstitialVideo.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.interstitialVideo.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.interstitialVideo.completed ? 'COMPLETED' : 'NOT_COMPLETED'}</Text>
         </Section>
 
         {/* ── 이벤트 로그 ────────────────────────── */}
@@ -361,6 +443,7 @@ const styles = StyleSheet.create({
   logLine: { color: '#E0E0E0', fontSize: 11, marginBottom: 2 },
   logTs: { color: '#888' },
   logTag: { color: '#4FC3F7', fontWeight: 'bold' },
+  statusLine: { fontSize: 11, color: '#333', marginBottom: 4 },
   clearButton: { alignSelf: 'flex-end', paddingHorizontal: 10, paddingVertical: 4, backgroundColor: '#EEE', borderRadius: 6, marginBottom: 6 },
   clearButtonText: { fontSize: 12, color: '#555' },
   buttonDisabled: { opacity: 0.35 },

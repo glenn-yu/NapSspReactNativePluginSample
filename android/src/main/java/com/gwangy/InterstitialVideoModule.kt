@@ -179,7 +179,6 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
                 }
                 "onFailedToReceiveAd" -> {
                     Log.d(tag, "onFailedToReceiveAd adUnitId=$adUnitId args=${args?.contentToString()}")
-                    loadedAdUnitIds.remove(adUnitId)
                     val code = args?.getOrNull(2) as? Int ?: -1
                     val message = args?.getOrNull(3)?.toString() ?: "unknown"
                     NapSspEventEmitter.emitModuleEvent(
@@ -192,7 +191,10 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
                             "message" to message,
                         ),
                     )
-                    loadPromises.remove(adUnitId)?.reject("NAP_SSP_INTERSTITIAL_VIDEO_LOAD_FAILED", message)
+                    if (loadedAdUnitIds[adUnitId] != true) {
+                        loadedAdUnitIds.remove(adUnitId)
+                        loadPromises.remove(adUnitId)?.reject("NAP_SSP_INTERSTITIAL_VIDEO_LOAD_FAILED", message)
+                    }
                 }
                 "onEventAd" -> {
                     val eventName = args?.getOrNull(1)?.toString()

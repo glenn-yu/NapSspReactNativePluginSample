@@ -1,0 +1,30 @@
+===== 2026-04-25 22:31:55 =====
+List of devices attached
+emulator-5554	device
+
+14
+    topResumedActivity=ActivityRecord{d0c71d3 u0 com.google.android.dialer/.extensions.GoogleDialtactsActivity t8}
+===== 2026-04-25 22:31:55 =====
+List of devices attached
+emulator-5554	device
+
+14
+    topResumedActivity=ActivityRecord{d0c71d3 u0 com.google.android.dialer/.extensions.GoogleDialtactsActivity t8}
+===== 2026-04-25 22:32:11 =====
+List of devices attached
+emulator-5554	device
+
+14
+    topResumedActivity=ActivityRecord{d0c71d3 u0 com.google.android.dialer/.extensions.GoogleDialtactsActivity t8}
+===== 2026-04-25 22:32:31 =====
+List of devices attached
+emulator-5554	device
+
+14
+    topResumedActivity=ActivityRecord{d0c71d3 u0 com.google.android.dialer/.extensions.GoogleDialtactsActivity t8}
+===== 2026-04-25 22:32:51 =====
+List of devices attached
+emulator-5554	device
+
+14
+    topResumedActivity=ActivityRecord{d0c71d3 u0 com.google.android.dialer/.extensions.GoogleDialtactsActivity t8}

@@ -16,6 +16,7 @@ export interface NativeAdProps {
   onAdClicked?: () => void;
   onAdOpened?: () => void;
   onAdClosed?: () => void;
+  onAdImpression?: () => void;
   style?: import('react-native').StyleProp<import('react-native').ViewStyle>;
   testID?: string;
 }
@@ -101,6 +102,7 @@ export interface VideoAdProps {
   onAdClicked?: () => void;
   onAdOpened?: () => void;
   onAdClosed?: () => void;
+  onAdImpression?: () => void;
   onAdCompleted?: () => void;
   onAdSkipped?: () => void;
   style?: import('react-native').StyleProp<import('react-native').ViewStyle>;

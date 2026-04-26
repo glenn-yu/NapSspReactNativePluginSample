@@ -1,0 +1,202 @@
+--------- beginning of main
+04-25 22:32:36.549   918   918 D StatusBarIconController: ignoring old pipeline callback because the new wifi icon is enabled
+04-25 22:32:37.247  4648  4648 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@76bf8f2
+--------- beginning of system
+04-25 22:32:37.247   555  2526 D CoreBackPreview: Window{e8c95d5 u0 PopupWindow:6d43ba7}: Setting back callback null
+04-25 22:32:37.249   555  2526 W InputManager-JNI: Input channel object 'e8c95d5 PopupWindow:6d43ba7 (client)' was disposed without first being removed with the input manager!
+04-25 22:32:37.264  4648  4725 W unknown:ReactContext: initializeMessageQueueThreads() is called.
+04-25 22:32:37.266  4648  4648 W unknown:ReactNative: Packager connection already open, nooping.
+04-25 22:32:37.284  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.traceupdateoverlay.TraceUpdateOverlayManager
+04-25 22:32:37.286  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.uimanager.LayoutShadowNode
+04-25 22:32:37.292  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.drawer.ReactDrawerLayoutManager
+04-25 22:32:37.294  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.scroll.ReactHorizontalScrollViewManager
+04-25 22:32:37.296  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.scroll.ReactHorizontalScrollContainerViewManager
+04-25 22:32:37.297  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.progressbar.ReactProgressBarViewManager
+04-25 22:32:37.297  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.progressbar.ProgressBarShadowNode
+04-25 22:32:37.298  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.scroll.ReactScrollViewManager
+04-25 22:32:37.300  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.switchview.ReactSwitchManager
+04-25 22:32:37.301  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.switchview.ReactSwitchManager$ReactSwitchShadowNode
+04-25 22:32:37.301  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.swiperefresh.SwipeRefreshLayoutManager
+04-25 22:32:37.302  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.frescosupport.FrescoBasedReactTextInlineImageViewManager
+04-25 22:32:37.302  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.frescosupport.FrescoBasedReactTextInlineImageShadowNode
+04-25 22:32:37.310  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.image.ReactImageManager
+04-25 22:32:37.312  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.modal.ReactModalHostManager
+04-25 22:32:37.313  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.modal.ModalHostShadowNode
+04-25 22:32:37.313  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.ReactRawTextManager
+04-25 22:32:37.315  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.ReactRawTextShadowNode
+04-25 22:32:37.315  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.textinput.ReactTextInputManager
+04-25 22:32:37.318  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.textinput.ReactTextInputShadowNode
+04-25 22:32:37.319  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.ReactTextViewManager
+04-25 22:32:37.320  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.ReactTextShadowNode
+04-25 22:32:37.320  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.view.ReactViewManager
+04-25 22:32:37.321  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.ReactVirtualTextViewManager
+04-25 22:32:37.321  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.text.ReactVirtualTextShadowNode
+04-25 22:32:37.322  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.facebook.react.views.unimplementedview.ReactUnimplementedViewManager
+04-25 22:32:37.326  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.gwangy.BannerViewManager
+04-25 22:32:37.327  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.gwangy.NativeAdViewManager
+04-25 22:32:37.328  4648  4727 W unknown:ViewManagerPropertyUpdater: Could not find generated setter for class com.gwangy.VideoAdViewManager
+04-25 22:32:37.330  4648  4727 W unknown:ReactContext: initializeMessageQueueThreads() is called.
+04-25 22:32:37.386   918  1011 D EGL_emulation: app_time_stats: avg=5.01ms min=0.68ms max=36.75ms count=53
+04-25 22:32:37.397  4648  4727 I WebViewFactory: Loading com.google.android.webview version 113.0.5672.136 (code 567263634)
+04-25 22:32:37.399  4648  4727 W ziparchive: Unable to open '/data/app/~~9IuQ6JQY_qrEFEZikqPTPw==/com.google.android.trichromelibrary_567263634-m-XqXNlkvrNPgmPyplrzuA==/TrichromeLibrary.dm': No such file or directory
+04-25 22:32:37.399  4648  4727 W ziparchive: Unable to open '/data/app/~~9IuQ6JQY_qrEFEZikqPTPw==/com.google.android.trichromelibrary_567263634-m-XqXNlkvrNPgmPyplrzuA==/TrichromeLibrary.dm': No such file or directory
+04-25 22:32:37.399  4648  4727 W egrationtestapp: Entry not found
+04-25 22:32:37.399  4648  4727 D nativeloader: Configuring clns-7 for other apk /data/app/~~9IuQ6JQY_qrEFEZikqPTPw==/com.google.android.trichromelibrary_567263634-m-XqXNlkvrNPgmPyplrzuA==/TrichromeLibrary.apk. target_sdk_version=34, uses_libraries=ALL, library_path=/data/app/~~hedXSx0_vP7tKeWRqWwtfw==/com.google.android.webview-dBMmFv7V4FTSPDKzxfw4sQ==/lib/arm64:/data/app/~~hedXSx0_vP7tKeWRqWwtfw==/com.google.android.webview-dBMmFv7V4FTSPDKzxfw4sQ==/WebViewGoogle.apk!/lib/arm64-v8a:/data/app/~~9IuQ6JQY_qrEFEZikqPTPw==/com.google.android.trichromelibrary_567263634-m-XqXNlkvrNPgmPyplrzuA==/TrichromeLibrary.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand
+04-25 22:32:37.400  4648  4727 D nativeloader: Configuring clns-8 for other apk /data/app/~~hedXSx0_vP7tKeWRqWwtfw==/com.google.android.webview-dBMmFv7V4FTSPDKzxfw4sQ==/WebViewGoogle.apk. target_sdk_version=34, uses_libraries=, library_path=/data/app/~~hedXSx0_vP7tKeWRqWwtfw==/com.google.android.webview-dBMmFv7V4FTSPDKzxfw4sQ==/lib/arm64:/data/app/~~hedXSx0_vP7tKeWRqWwtfw==/com.google.android.webview-dBMmFv7V4FTSPDKzxfw4sQ==/WebViewGoogle.apk!/lib/arm64-v8a:/data/app/~~9IuQ6JQY_qrEFEZikqPTPw==/com.google.android.trichromelibrary_567263634-m-XqXNlkvrNPgmPyplrzuA==/TrichromeLibrary.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{db65e0c com.android.cts.priv.ctsshim/10188} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{629f180 com.android.internal.display.cutout.emulation.corner/10021} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{7103b9 com.android.internal.display.cutout.emulation.double/10024} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{95e355 com.google.android.onetimeinitializer/10125} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{3d3e16a com.google.android.ext.shared/10108} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{6fca5ac com.android.internal.systemui.navbar.gestural_wide_back/10031} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{1e1765b com.android.virtualmachine.res/10174} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{4714ef8 com.google.android.federatedcompute/10190} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{64b9a7b com.android.managedprovisioning.auto_generated_rro_product__/10041} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{d647098 com.android.carrierconfig.auto_generated_rro_vendor__/10079} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{ba270f1 com.android.systemui.emulation.pixel_3_xl/10046} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{df9b4d6 com.android.systemui.emulation.pixel_4_xl/10012} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{bef6357 com.android.systemui.emulation.pixel_fold/10014} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{17bfe44 com.android.simappdialog.auto_generated_rro_product__/10042} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{61e5fd1 com.android.htmlviewer/10109} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{8c6aa36 com.google.android.health.connect.backuprestore/10172} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{99cddf3 com.android.systemui.auto_generated_rro_product__/10027} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{371d37 com.google.android.soundpicker/10143} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{c7d4d29 com.google.android.marvin.talkbackoverlay/10077} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{1e862a4 com.google.android.configupdater/10118} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{99d664f com.android.internal.emulation.pixel_3a_xl/10045} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{d4ad1dc com.android.internal.emulation.pixel_6_pro/10000} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{f492e5 com.android.internal.emulation.pixel_7_pro/10011} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{f0281ba com.android.internal.emulation.pixel_8_pro/10055} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{774186b com.android.internal.emulation.pixel_3a/10073} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{9a12fc8 com.android.internal.emulation.pixel_4a/10070} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{2e07861 com.android.internal.emulation.pixel_6a/10023} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{a46ff86 com.android.internal.emulation.pixel_7a/10071} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{9b9d047 com.google.android.overlay.googlewebview/10057} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{b4b33c2 com.google.android.hotspot2.osulogin/10179} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{2d655d3 com.android.simappdialog/10112} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{f038e12 com.android.internal.display.cutout.emulation.hole/10048} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{db929e3 com.android.internal.display.cutout.emulation.tall/10066} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{b2c2fe0 com.android.internal.systemui.navbar.threebutton/10033} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{fa6d299 com.android.systemui.auto_generated_rro_vendor__/10080} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{988795e com.android.internal.systemui.navbar.twobutton/10054} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{ca813f com.android.internal.systemui.navbar.gestural_extra_wide_back/10074} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{f546a0c com.android.systemui.emulation.pixel_3/10049} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{88ff55 com.android.systemui.emulation.pixel_4/10007} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{8decd6a com.android.systemui.emulation.pixel_5/10063} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{36ff25b com.android.systemui.emulation.pixel_6/10003} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{fe41af8 com.android.systemui.emulation.pixel_7/10067} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{8273bd1 com.android.systemui.emulation.pixel_8/10037} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{1945636 com.android.nfc.auto_generated_rro_product__/10015} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{79b0510 com.android.printspooler/10106} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{fbbeea4 com.android.emergency.auto_generated_rro_product__/10035} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{c92c40d com.google.android.connectivity.resources.goldfish.overlay/10081} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{2ec3809 com.android.dreams.basic/10110} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{3851d3 com.google.android.networkstack.tethering.emulator/10009} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{d1b5110 com.android.providers.settings.auto_generated_rro_product__/10013} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{79cca0e com.google.android.as.oss/10126} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{ef3f60e com.android.traceur.auto_generated_rro_product__/10044} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{8267c2f com.google.android.devicelockcontroller/10177} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{8cc6e3c com.android.internal.emulation.pixel_3/10039} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{70967c5 com.android.internal.emulation.pixel_4/10052} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{3fd651a com.android.internal.emulation.pixel_5/10064} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{3ce284b com.android.internal.emulation.pixel_6/10004} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{4103228 com.android.internal.emulation.pixel_7/10051} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{d1dbb41 com.android.internal.emulation.pixel_8/10025} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{d93623c com.google.android.captiveportallogin/10114} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{6174bc5 com.android.musicfx/10082} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{5f791a com.google.android.modulemetadata/10133} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{3a8ac4b com.google.android.markup/10145} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{94b7d72 com.android.providers.settings.auto_generated_rro_vendor__/10076} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{526628 com.google.android.rkpdapp/10182} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{a2d9179 com.android.server.telecom.auto_generated_rro_product__/10028} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{44ffebe com.google.android.overlay.googleconfig/10030} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{aa18b1f com.android.bips.auto_generated_rro_product__/10002} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{925df41 com.google.android.apps.customization.pixel/10136} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{c6c0ce6 com.google.android.tag/10095} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{b8948ca com.google.android.overlay.permissioncontroller/10005} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{5d3c227 com.google.android.partnersetup/10120} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{17bbcd4 com.google.android.apps.wallpaper.nexus/10134} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{5302e7d com.google.android.nearby.halfsheet/10184} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{65b2796 com.android.theme.font.notoserifsource/10026} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{55c1172 com.google.android.safetycenter.resources/10175} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{dfb8f04 com.android.internal.display.cutout.emulation.waterfall/10061} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{ac74ced com.android.internal.systemui.navbar.transparent/10016} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{5b059c3 com.google.android.connectivity.resources/10183} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{bdb35b3 com.android.providers.contacts.auto_generated_rro_product__/10010} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{741d240 com.google.android.feedback/10158} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{2963579 com.google.android.printservice.recommendation/10100} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{cd7936e com.android.systemui.emulation.pixel_3a_xl/10017} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{bc97a0f com.android.systemui.emulation.pixel_6_pro/10059} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{e93ba9c com.android.systemui.emulation.pixel_7_pro/10058} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{86a2ca5 com.android.systemui.emulation.pixel_8_pro/10068} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{2d5d2be com.google.mainline.telemetry/10150} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{ada82b com.android.carrierconfig.auto_generated_rro_product__/10006} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{834cf1f com.android.providers.partnerbookmarks/10104} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{691d26c com.android.wallpaper.livepicker/10098} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{64aa246 com.android.providers.telephony.auto_generated_rro_product__/10022} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{35c9c07 com.android.phone.auto_generated_rro_vendor__/10078} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{5bbb035 com.google.mainline.adservices/10137} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{5224b5d com.android.internal.emulation.pixel_2_xl/10008} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{97e9cd2 com.android.internal.emulation.pixel_3_xl/10029} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{b1cf1a3 com.android.internal.emulation.pixel_4_xl/10034} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{404bca0 com.android.internal.emulation.pixel_fold/10065} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{e985cca com.android.bookmarkprovider/10116} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{85b41e com.google.android.overlay.pixelconfigcommon/10019} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{30304ff com.android.systemui.accessibility.accessibilitymenu.auto_generated_rro_product__/10069} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{902cc com.android.systemui.emulation.pixel_3a/10020} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{8788915 com.android.systemui.emulation.pixel_4a/10047} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{54f42a com.android.systemui.emulation.pixel_6a/10040} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{90cf21b com.android.systemui.emulation.pixel_7a/10062} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{1613e3b com.google.android.uwb.resources/10170} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{c30ec53 com.android.cts.ctsshim/10189} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{3ffa958 com.google.android.wifi.resources/10178} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{b841ab1 com.google.android.wifi.dialog/10180} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{d477b96 com.google.android.odad/10119} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{5d2df64 com.android.settings.auto_generated_rro_product__/10050} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{631c5cd com.android.internal.systemui.navbar.gestural/10053} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{b1b8317 com.android.bluetoothmidiservice/10111} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{4fd8993 com.android.storagemanager.auto_generated_rro_product__/10043} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{a908dd0 com.android.phone.auto_generated_rro_product__/10072} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{9a1f1c9 android.auto_generated_rro_product__/10036} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{c1560ce com.android.internal.systemui.navbar.gestural_narrow_back/10018} BLOCKED
+04-25 22:32:37.401   555  2528 I AppsFilter: interaction: PackageSetting{766dc53 com.integrationtestapp/10490} -> PackageSetting{5ed2bef android.auto_generated_rro_vendor__/10075} BLOCKED
+04-25 22:32:37.409  4648  4727 W egrationtestapp: Accessing hidden method Landroid/os/Trace;->isTagEnabled(J)Z (unsupported, reflection, allowed)
+04-25 22:32:37.409  4648  4727 W egrationtestapp: Accessing hidden method Landroid/os/Trace;->traceBegin(JLjava/lang/String;)V (unsupported, reflection, allowed)
+04-25 22:32:37.409  4648  4727 W egrationtestapp: Accessing hidden method Landroid/os/Trace;->traceEnd(J)V (unsupported, reflection, allowed)
+04-25 22:32:37.409  4648  4727 W egrationtestapp: Accessing hidden method Landroid/os/Trace;->asyncTraceBegin(JLjava/lang/String;I)V (unsupported, reflection, allowed)
+04-25 22:32:37.409  4648  4727 W egrationtestapp: Accessing hidden method Landroid/os/Trace;->asyncTraceEnd(JLjava/lang/String;I)V (unsupported, reflection, allowed)
+04-25 22:32:37.415  4648  4727 I cr_WVCFactoryProvider: Loaded version=113.0.5672.136 minSdkVersion=29 isBundle=false multiprocess=true packageId=2
+04-25 22:32:37.442  4648  4737 I cr_VariationsUtils: Failed reading seed file "/data/user/0/com.integrationtestapp/app_webview/variations_seed_new"
+04-25 22:32:37.447  4648  4727 I cr_LibraryLoader: Successfully loaded native library
+04-25 22:32:37.448  4648  4727 I cr_CachingUmaRecorder: Flushed 8 samples from 8 histograms.
+04-25 22:32:37.462  4648  4740 D TrafficStats: tagSocket(124) with statsTag=0xffffffff, statsUid=-1
+04-25 22:32:37.478  4648  4726 I ReactNativeJS: Running "IntegrationTestApp" with {"rootTag":11}
+04-25 22:32:37.481  4648  4741 D TrafficStats: tagSocket(125) with statsTag=0xffffffff, statsUid=-1
+04-25 22:32:37.655   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 22:32:37.720  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.720  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.720  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.720  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.723  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.723  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.725  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.725  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.727  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.728  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.730  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.730  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.733  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.733  4648  4727 W unknown:ReactNative: Attempt to set local data for view with unknown tag: -1
+04-25 22:32:37.739  4648  4727 D CompatibilityChangeReporter: Compat change id reported: 289878283; UID 10490; state: ENABLED
+04-25 22:32:37.772  4648  4648 D CompatibilityChangeReporter: Compat change id reported: 171228096; UID 10490; state: ENABLED
+04-25 22:32:37.772  4648  4648 W egrationtestapp: Accessing hidden field Landroid/widget/ScrollView;->mScroller:Landroid/widget/OverScroller; (unsupported, reflection, allowed)
+04-25 22:32:37.820   354   354 I netd    : tetherGetStats() -> {[]} <0.83ms>
+04-25 22:32:37.825   354   354 I netd    : bandwidthSetGlobalAlert(2097152) <0.15ms>
+04-25 22:32:37.828   354   354 I netd    : bandwidthRemoveInterfaceQuota(eth0) <1.27ms>
+04-25 22:32:37.830   354   354 I netd    : bandwidthSetInterfaceQuota(eth0, 9223372036854775807) <0.50ms>
+04-25 22:32:38.670   555  3399 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+04-25 22:32:39.353  4648  4687 D EGL_emulation: app_time_stats: avg=1115.75ms min=66.26ms max=1942.24ms count=3
+04-25 22:32:40.916  5048  5048 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.gms.common.telemetry.service.START dat=chimera-action:/... cmp=com.google.android.gms/.chimera.PersistentApiService }
+04-25 22:32:41.027  4648  4747 D ProfileInstaller: Installing profile for com.integrationtestapp
+04-25 22:32:42.016   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 22:32:42.017   918  1011 D EGL_emulation: app_time_stats: avg=1203.63ms min=22.62ms max=5859.13ms count=5

@@ -13,6 +13,7 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
     private val loadedAdUnitIds = ConcurrentHashMap<String, Boolean>()
     private val rewardedAds = ConcurrentHashMap<String, Any>()
     private val loadPromises = ConcurrentHashMap<String, Promise>()
+    private val startPromises = ConcurrentHashMap<String, Promise>()
 
     override fun getName(): String = NapSspContracts.REWARDED_MODULE_NAME
 
@@ -56,6 +57,55 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
         } catch (error: Throwable) {
             loadPromises.remove(normalizedAdUnitId)
             promise.reject("NAP_SSP_REWARDED_LOAD_FAILED", error)
+        }
+    }
+
+    @ReactMethod
+    fun start(adUnitId: String, options: com.facebook.react.bridge.ReadableMap?, promise: Promise) {
+        val normalizedAdUnitId = adUnitId.trim()
+        if (normalizedAdUnitId.isEmpty()) {
+            promise.reject("NAP_SSP_INVALID_AD_UNIT", "Rewarded adUnitId is required")
+            return
+        }
+
+        if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
+            loadedAdUnitIds[normalizedAdUnitId] = true
+            NapSspSdkBridge.markRewardedState(normalizedAdUnitId, NapSspLoadState.SHOWN)
+            NapSspEventEmitter.emitModuleEvent(
+                reactContext,
+                NapSspContracts.EVENT_AD_LOADED,
+                mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_REWARDED),
+            )
+            NapSspEventEmitter.emitModuleEvent(
+                reactContext,
+                NapSspContracts.EVENT_AD_OPENED,
+                mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_REWARDED),
+            )
+            NapSspEventEmitter.emitModuleEvent(
+                reactContext,
+                NapSspContracts.EVENT_AD_IMPRESSION,
+                mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_REWARDED),
+            )
+            promise.resolve(null)
+            return
+        }
+
+        val activity = currentActivity
+        if (activity == null) {
+            promise.reject("NAP_SSP_ACTIVITY_REQUIRED", "Rewarded ads require a foreground Activity context")
+            return
+        }
+
+        try {
+            loadPromises.remove(normalizedAdUnitId)?.reject("NAP_SSP_REWARDED_LOAD_CANCELLED", "Superseded by start")
+            startPromises.remove(normalizedAdUnitId)?.reject("NAP_SSP_REWARDED_START_CANCELLED", "Superseded by new start")
+            startPromises[normalizedAdUnitId] = promise
+            val rewardedAd = createOrGetRewardedAd(normalizedAdUnitId, activity, options)
+            Log.d(tag, "startRewardVideoAd request adUnitId=$normalizedAdUnitId")
+            rewardedAd.javaClass.getMethod("loadRewardVideoAd").invoke(rewardedAd)
+        } catch (error: Throwable) {
+            startPromises.remove(normalizedAdUnitId)
+            promise.reject("NAP_SSP_REWARDED_START_FAILED", error)
         }
     }
 
@@ -183,12 +233,35 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
                         NapSspContracts.EVENT_AD_LOADED,
                         mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED),
                     )
-                    loadPromises.remove(adUnitId)?.resolve(null)
+                    val startPromise = startPromises.remove(adUnitId)
+                    if (startPromise != null) {
+                        Log.d(tag, "onReceivedAd startPromise=true adUnitId=$adUnitId")
+                        runCatching {
+                            NapSspSdkBridge.markRewardedState(adUnitId, NapSspLoadState.SHOWN)
+                            NapSspEventEmitter.emitModuleEvent(
+                                reactContext,
+                                NapSspContracts.EVENT_AD_OPENED,
+                                mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED, "synthetic" to true, "stage" to "onReceivedAd_beforeShow"),
+                            )
+                            NapSspEventEmitter.emitModuleEvent(
+                                reactContext,
+                                NapSspContracts.EVENT_AD_IMPRESSION,
+                                mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED, "synthetic" to true, "stage" to "onReceivedAd_beforeShow"),
+                            )
+                            Log.d(tag, "auto-show reward after load adUnitId=$adUnitId")
+                            rewardedAd.javaClass.getMethod("showRewardVideoAd").invoke(rewardedAd)
+                            Log.d(tag, "showRewardVideoAd invoked from onReceivedAd adUnitId=$adUnitId")
+                            startPromise.resolve(null)
+                        }.onFailure {
+                            Log.e(tag, "auto-show reward failed adUnitId=$adUnitId: ${it.message}", it)
+                            startPromise.reject("NAP_SSP_REWARDED_SHOW_FAILED", it)
+                        }
+                    } else {
+                        loadPromises.remove(adUnitId)?.resolve(null)
+                    }
                 }
                 "onFailedToReceiveAd" -> {
                     Log.d(tag, "onFailedToReceiveAd adUnitId=$adUnitId args=${args?.contentToString()}")
-                    loadedAdUnitIds.remove(adUnitId)
-                    NapSspSdkBridge.clearRewarded(adUnitId)
                     val code = args?.getOrNull(2) as? Int ?: -1
                     val message = args?.getOrNull(3)?.toString() ?: "unknown"
                     NapSspEventEmitter.emitModuleEvent(
@@ -201,25 +274,33 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
                             "message" to message,
                         ),
                     )
-                    loadPromises.remove(adUnitId)?.reject("NAP_SSP_REWARDED_LOAD_FAILED", message)
+                    if (startPromises.containsKey(adUnitId)) {
+                        Log.d(tag, "ignoring intermediate load failure for active start flow adUnitId=$adUnitId")
+                    } else if (loadedAdUnitIds[adUnitId] != true) {
+                        loadedAdUnitIds.remove(adUnitId)
+                        NapSspSdkBridge.clearRewarded(adUnitId)
+                        loadPromises.remove(adUnitId)?.reject("NAP_SSP_REWARDED_LOAD_FAILED", message)
+                    }
                 }
                 "onEventAd" -> {
                     val eventName = args?.getOrNull(1)?.toString()
                     Log.d(tag, "onEventAd adUnitId=$adUnitId event=$eventName args=${args?.contentToString()}")
-                    when (eventName) {
-                        "DISPLAYED" -> {
+                    val normalizedEvent = eventName?.trim()?.uppercase()
+                    Log.d(tag, "onEventAd normalized=$normalizedEvent adUnitId=$adUnitId")
+                    when (normalizedEvent) {
+                        "DISPLAYED", "OPEN", "OPENED", "SHOW", "SHOWN" -> {
                             NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_OPENED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
                             NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_IMPRESSION, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
                         }
-                        "CLICK", "LEFT_CLICK", "RIGHT_CLICK" -> NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_CLICKED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
-                        "COMPLETION" -> NapSspEventEmitter.emitModuleEvent(reactContext, "onVideoCompleted", mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
+                        "CLICK", "CLICKED", "LEFT_CLICK", "RIGHT_CLICK" -> NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_CLICKED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
+                        "COMPLETION", "COMPLETE", "COMPLETED" -> NapSspEventEmitter.emitModuleEvent(reactContext, "onVideoCompleted", mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
                         "SKIPPED" -> NapSspEventEmitter.emitModuleEvent(reactContext, "onVideoSkipped", mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
-                        "EARNEDREWARD" -> NapSspEventEmitter.emitModuleEvent(
+                        "EARNEDREWARD", "REWARDED", "REWARD" -> NapSspEventEmitter.emitModuleEvent(
                             reactContext,
                             NapSspContracts.EVENT_REWARDED,
                             mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED, "type" to "reward", "amount" to 1),
                         )
-                        "CLOSE" -> {
+                        "CLOSE", "CLOSED", "DISMISS", "DISMISSED" -> {
                             NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_CLOSED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
                             loadedAdUnitIds.remove(adUnitId)
                             NapSspSdkBridge.clearRewarded(adUnitId)

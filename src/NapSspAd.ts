@@ -30,8 +30,11 @@ class NapSspAd {
       throw createNativeModuleMissingError('initialization', NativeModuleNames.napSsp);
     }
 
-    // Setup global event bridge before calling native initialize
+    // Setup global event bridges before calling native initialize
     globalEvents.setup(NativeModuleNames.napSsp[0]);
+    globalEvents.setup(NativeModuleNames.interstitial[0]);
+    globalEvents.setup(NativeModuleNames.rewarded[0]);
+    globalEvents.setup(NativeModuleNames.interstitialVideo[0]);
 
     await nativeModule.initialize(config);
     this._initialized = true;

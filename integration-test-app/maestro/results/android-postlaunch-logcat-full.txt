@@ -1,0 +1,360 @@
+--------- beginning of main
+04-25 15:48:39.291  4245 28253 D TrafficStats: tagSocket(118) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:39.292   354 28254 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10194 0}
+04-25 15:48:40.299  4245  4282 D TrafficStats: tagSocket(118) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:41.308  4245 28255 D TrafficStats: tagSocket(118) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:41.309   354 28256 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10194 0}
+04-25 15:48:41.632   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 15:48:42.809  4245  4282 D TrafficStats: tagSocket(118) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:43.330  4245 28265 D TrafficStats: tagSocket(118) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:43.330   354 28266 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10194 0}
+04-25 15:48:44.451   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 15:48:45.313  4245  4282 D TrafficStats: tagSocket(118) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:45.352  4245 28268 D TrafficStats: tagSocket(125) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:45.353   354 28269 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10194 0}
+--------- beginning of system
+04-25 15:48:47.004   555   610 I PackageManager: Integrity check passed for file:///data/app/vmdl150525200.tmp
+04-25 15:48:47.008   555   587 I ActivityManager: Force stopping com.integrationtestapp appid=10195 user=-1: installPackageLI
+04-25 15:48:47.008   555   587 E libprocessgroup: No such cgroup attribute: /sys/fs/cgroup/uid_4294877491/cgroup.freeze
+04-25 15:48:47.008   555   587 W libprocessgroup: Failed to apply Frozen process profile: No such file or directory
+04-25 15:48:47.008   555   610 I PackageManager: Update package com.integrationtestapp code path from /data/app/~~UCdmjzZaX459bLMmCIdfaw==/com.integrationtestapp-4Fh6X7WWQOP4rFczIEoqtw== to /data/app/~~KpjcuAZGyreLsE9K0hw_1A==/com.integrationtestapp-cDGttm9RoBZkLBTCODWNqQ==; Retain data and using new
+04-25 15:48:47.009   555   587 E libprocessgroup: No such cgroup attribute: /sys/fs/cgroup/uid_4294877491/cgroup.freeze
+04-25 15:48:47.009   555   587 W libprocessgroup: Failed to apply Unfrozen process profile: No such file or directory
+04-25 15:48:47.012   555   610 I PermissionManager: Permission ownership changed. Updating all permissions.
+04-25 15:48:47.038   555   610 D PackageManager: Instant App installer not found with android.intent.action.INSTALL_INSTANT_APP_PACKAGE
+04-25 15:48:47.038   555   610 D PackageManager: Clear ephemeral installer activity
+--------- beginning of kernel
+04-25 15:48:47.038  3267  3267 I logd    : start watching /data/system/packages.list ...
+04-25 15:48:47.038  3267  3267 I logd    : ReadPackageList, total packages: 202
+04-25 15:48:47.046   162   162 I servicemanager: Since 'artd' could not be found, trying to start it as a lazy AIDL service. (if it's not configured to be a lazy service, it may be stuck starting or still starting).
+04-25 15:48:47.047     1     1 I init    : starting service 'artd'...
+04-25 15:48:47.098     1     1 I init    : ... started service 'artd' has pid 28277
+04-25 15:48:47.098     1     1 I init    : Control message: Processed ctl.interface_start for 'aidl/artd' from pid: 162 (/system/bin/servicemanager)
+04-25 15:48:47.117 28277 28277 I artd    : Starting artd
+04-25 15:48:47.117 28277 28277 I AidlLazyServiceRegistrar: Registering service artd
+04-25 15:48:47.119 28277 28278 I AidlLazyServiceRegistrar: Process has 1 (of 1 available) client(s) in use after notification artd has clients: 1
+04-25 15:48:47.118   162   162 I BpBinder: onLastStrongRef automatically unlinking death recipients:
+04-25 15:48:47.119   162   162 I servicemanager: Notifying artd they do (previously: don't) have clients when service is guaranteed to be in use
+04-25 15:48:47.127   555   610 I ActivityManager: Force stopping com.integrationtestapp appid=10195 user=0: pkg removed
+04-25 15:48:47.128   555   610 E IPCThreadState: Binder transaction failure: 11920502/29201/-28
+04-25 15:48:47.128   555   610 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 140)
+04-25 15:48:47.128   610   610 W binder_debug: 7 callbacks suppressed
+04-25 15:48:47.128   610   610 I binder  : cannot allocate buffer: no space left
+04-25 15:48:47.128   610   610 I binder  : 555:610 transaction async to 23075:0 failed 11920502/29201/-28, size 140-0 line 3406
+04-25 15:48:47.131   555   610 D CompatibilityChangeReporter: Compat change id reported: 168419799; UID 10195; state: DISABLED
+04-25 15:48:47.131   555   610 D CompatibilityChangeReporter: Compat change id reported: 273564678; UID 10195; state: DISABLED
+04-25 15:48:47.132   555   610 E IPCThreadState: Binder transaction failure: 11920536/29201/-28
+04-25 15:48:47.132   555   610 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 140)
+04-25 15:48:47.133   555   610 D PackageInstallerSession: Marking session 150525200 as applied
+04-25 15:48:47.132   610   610 I binder  : cannot allocate buffer: no space left
+04-25 15:48:47.132   610   610 I binder  : 555:610 transaction async to 23075:0 failed 11920536/29201/-28, size 140-0 line 3406
+04-25 15:48:47.137  1127  1127 V MediaPlayerList: mPackageChangedBroadcastReceiver: action: android.intent.action.PACKAGE_REMOVED
+04-25 15:48:47.137  1127  1127 V MediaPlayerList: mPackageChangedBroadcastReceiver: action: android.intent.action.PACKAGE_REMOVED
+04-25 15:48:47.137  1127  1127 V MediaPlayerList: mPackageChangedBroadcastReceiver: action: android.intent.action.PACKAGE_ADDED
+04-25 15:48:47.137   555   891 I SdkSandboxManager: No SDKs used. Skipping SDK data reconcilation for CallingInfo{mUid=10195, mPackageName='com.integrationtestapp, mAppProcessToken='null'}
+04-25 15:48:47.137   555   891 I SdkSandboxManager: No SDKs used. Skipping SDK data reconcilation for CallingInfo{mUid=10195, mPackageName='com.integrationtestapp, mAppProcessToken='null'}
+04-25 15:48:47.138   919   919 I SafetyLabelChangedBroadcastReceiver: received broadcast packageName: com.integrationtestapp, current user: UserHandle{0}, packageChangeEvent: UPDATE, intent user: UserHandle{0}
+04-25 15:48:47.139   555   555 D ActivityManager: sync unfroze 18548 com.android.keychain for 10
+04-25 15:48:47.139  1127  1127 V MediaPlayerList: mPackageChangedBroadcastReceiver: action: android.intent.action.PACKAGE_ADDED
+04-25 15:48:47.139   555   854 E AppOps  : attributionTag VCN not declared in manifest of android
+04-25 15:48:47.140   555   555 D ActivityManager: sync unfroze 16422 com.android.settings for 10
+04-25 15:48:47.140   555   682 W PackageConfigPersister: App-specific configuration not found for packageName: com.integrationtestapp and userId: 0
+04-25 15:48:47.141   555   854 E AppOps  : attributionTag VCN not declared in manifest of android
+04-25 15:48:47.142   555   854 E AppOps  : attributionTag VCN not declared in manifest of android
+04-25 15:48:47.142  1157  1157 D CarrierSvcBindHelper: onPackageUpdateFinished: com.integrationtestapp
+04-25 15:48:47.142  1157  1157 D CarrierSvcBindHelper: No carrier app for: 0
+04-25 15:48:47.142  1157  1157 D CarrierSvcBindHelper: onPackageModified: com.integrationtestapp
+04-25 15:48:47.142  1157  1157 D CarrierSvcBindHelper: No carrier app for: 0
+04-25 15:48:47.143   555   671 I InputReader: Reconfiguring input devices, changes=KEYBOARD_LAYOUTS
+04-25 15:48:47.147   555   671 I InputReader: Reconfiguring input devices, changes=KEYBOARD_LAYOUTS
+04-25 15:48:47.148   555   555 I Telecom : CarModeTracker: Package com.integrationtestapp is not tracked.: SSH.oR@FNY🔒
+04-25 15:48:47.149   555   555 I Telecom : InCallController: updateCarModeForConnections: car mode apps: : SSH.oR@FNY🔒
+04-25 15:48:47.149   555   555 I Telecom : InCallController: update carmode current:UserHandle{0} parent:null: SSH.oR@FNY🔒
+04-25 15:48:47.149   555   671 I InputReader: Reconfiguring input devices, changes=KEYBOARD_LAYOUTS
+04-25 15:48:47.150   919  7557 I PermissionControllerServiceImpl: Updating user sensitive for uid 10195
+04-25 15:48:47.151   918  1008 D StylusManager: Stylus InputDevice changed: 12 virtio_input_multi_touch_10
+04-25 15:48:47.153   353  1107 I statsd  : Bytes used 51296 is above limit 51200, need to delete something
+04-25 15:48:47.153   555   555 D CompatibilityChangeReporter: Compat change id reported: 218533173; UID 10195; state: ENABLED
+04-25 15:48:47.153   555   555 D CompatibilityChangeReporter: Compat change id reported: 171306433; UID 10195; state: ENABLED
+04-25 15:48:47.153   555   555 W AlarmManager: Package com.integrationtestapp, uid 10195 lost permission to set exact alarms!
+04-25 15:48:47.155   918  1008 D StylusManager: Stylus InputDevice changed: 13 virtio_input_multi_touch_11
+04-25 15:48:47.156   918  1008 D StylusManager: Stylus InputDevice changed: 8 virtio_input_multi_touch_6
+04-25 15:48:47.159  1157  1444 D ImsResolver: maybeAddedImsService, packageName: com.integrationtestapp
+04-25 15:48:47.159   918  1008 D StylusManager: Stylus InputDevice changed: 11 virtio_input_multi_touch_9
+04-25 15:48:47.163   918  1008 D StylusManager: Stylus InputDevice changed: 9 virtio_input_multi_touch_7
+04-25 15:48:47.164   918  1008 D StylusManager: Stylus InputDevice changed: 3 virtio_input_multi_touch_1
+04-25 15:48:47.164   918  1008 D StylusManager: Stylus InputDevice changed: 7 virtio_input_multi_touch_5
+04-25 15:48:47.164   918  1008 D StylusManager: Stylus InputDevice changed: 10 virtio_input_multi_touch_8
+04-25 15:48:47.165   918  1008 D StylusManager: Stylus InputDevice changed: 4 virtio_input_multi_touch_2
+04-25 15:48:47.165   918  1008 D StylusManager: Stylus InputDevice changed: 5 virtio_input_multi_touch_3
+04-25 15:48:47.165   918  1008 D StylusManager: Stylus InputDevice changed: 6 virtio_input_multi_touch_4
+04-25 15:48:47.166   918  1008 D StylusManager: Stylus InputDevice changed: 12 virtio_input_multi_touch_10
+04-25 15:48:47.179   555   586 W WindowMagnificationMgr: requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+04-25 15:48:47.179   555   555 E IPCThreadState: Binder transaction failure: 11921606/29201/-28
+04-25 15:48:47.179   555   555 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 136)
+04-25 15:48:47.180   555   586 W WindowMagnificationMgr: requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+04-25 15:48:47.180   555   555 E IPCThreadState: Binder transaction failure: 11921623/29201/-28
+04-25 15:48:47.180   555   555 E JavaBinder: !!! FAILED BINDER TRANSACTION !!!  (parcel size = 136)
+04-25 15:48:47.179   555   555 I binder  : cannot allocate buffer: no space left
+04-25 15:48:47.179   555   555 I binder  : 555:555 transaction async to 23075:0 failed 11921606/29201/-28, size 136-0 line 3406
+04-25 15:48:47.180   555   555 I binder  : cannot allocate buffer: no space left
+04-25 15:48:47.180   555   555 I binder  : 555:555 transaction async to 23075:0 failed 11921623/29201/-28, size 136-0 line 3406
+04-25 15:48:47.214  1797  1797 I AiAiEcho: AppFetcherImpl onPackageChanged com.integrationtestapp.
+04-25 15:48:47.215  1797 28284 I AiAiEcho: AppIndexer Package:[com.integrationtestapp] UserProfile:[0] Enabled:[true].
+04-25 15:48:47.215  1797 28284 I AiAiEcho: AppFetcherImplV2 updateApps package:[com.integrationtestapp], userId:[0], reason:[package is updated.].
+04-25 15:48:47.368  4245 28286 D TrafficStats: tagSocket(118) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:47.369   354 28287 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10194 0}
+04-25 15:48:47.641  1789  1789 W MediaProvider: WorkProfileOwnerApps cache is empty
+04-25 15:48:47.642   918   918 D ControlsListingControllerImpl: ServiceConfig reloaded, count: 0
+04-25 15:48:47.643  1839  1839 I GsaVoiceInteractionSrv: (REDACTED) O received %s
+04-25 15:48:47.643   555   568 D ActivityManager: sync unfroze 24299 com.google.android.gms for 6
+04-25 15:48:47.647   918   918 D ControlsListingControllerImpl: ServiceConfig reloaded, count: 0
+04-25 15:48:47.648   918   918 D ControlsListingControllerImpl: ServiceConfig reloaded, count: 0
+04-25 15:48:47.650  1839  1839 I GsaVoiceInteractionSrv: (REDACTED) O received %s
+04-25 15:48:47.650  1839  1839 I GsaVoiceInteractionSrv: (REDACTED) O received %s
+04-25 15:48:47.680   555   996 D ActivityManager: sync unfroze 24298 com.google.android.apps.wellbeing for 7
+04-25 15:48:47.683   555   995 D CompatibilityChangeReporter: Compat change id reported: 261072174; UID 10127; state: DISABLED
+04-25 15:48:47.690   555  2542 W ProcessStats: Tracking association SourceState{389cc96 com.google.android.googlequicksearchbox:interactor/10132 BFgs #96031} whose proc state 4 is better than process ProcessState{f2a0e22 com.google.android.googlequicksearchbox:search/10132 pkg=com.google.android.googlequicksearchbox} proc state 6 (2 skipped)
+04-25 15:48:47.697  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 15:48:47.697  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 15:48:47.698  1911  2791 W SearchServiceCore: Abort, client detached.
+04-25 15:48:47.703  1797  1821 W ogle.android.as: Reducing the number of considered missed Gc histogram windows from 756 to 100
+04-25 15:48:47.710  5048 28296 I ProximityAuth: [RecentAppsMediator] Package added: (user=UserHandle{0}) com.integrationtestapp
+04-25 15:48:47.716  5048 28292 I Fitness : FitCleanupIntentOperation received Intent android.intent.action.PACKAGE_REMOVED [CONTEXT service_id=17 ]
+04-25 15:48:47.718 24299 28290 I Auth    : [SupervisedAccountIntentOperation] onHandleIntent(): android.intent.action.PACKAGE_ADDED
+04-25 15:48:47.726 24298 24311 W .apps.wellbeing: Reducing the number of considered missed Gc histogram windows from 216 to 100
+04-25 15:48:47.741  5048  5121 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+04-25 15:48:47.742 24299 24299 D BoundBrokerSvc: onBind: Intent { act=com.google.android.gms.common.BIND_SHARED_PREFS pkg=com.google.android.gms }
+04-25 15:48:47.743 24299 24299 D BoundBrokerSvc: Loading bound service for intent: Intent { act=com.google.android.gms.common.BIND_SHARED_PREFS pkg=com.google.android.gms }
+04-25 15:48:47.743  5048  5121 W ChimeraUtils: Module com.google.android.gms.nearby_en missing resource null(0)
+04-25 15:48:47.747 24299 28311 W SQLiteLog: (28) double-quoted string literal: "com.integrationtestapp"
+04-25 15:48:47.749 24299 24299 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.gms.common.BIND_SHARED_PREFS pkg=com.google.android.gms }
+04-25 15:48:47.766 24299 25618 I Icing   : IndexChimeraService.getServiceInterface callingPackage=com.google.android.gms componentName=AppsCorpus serviceId=36
+04-25 15:48:47.769 24299 24299 D BoundBrokerSvc: onBind: Intent { act=com.google.android.gms.feedback.internal.IFeedbackService dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsBoundBrokerService }
+04-25 15:48:47.769 24299 24299 D BoundBrokerSvc: Loading bound service for intent: Intent { act=com.google.android.gms.feedback.internal.IFeedbackService dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsBoundBrokerService }
+04-25 15:48:47.775 24299 25618 I Icing   : IndexChimeraService.getServiceInterface callingPackage=com.google.android.gms componentName=null serviceId=30
+04-25 15:48:47.776 24299 25266 I Icing   : Usage reports ok 1, Failed Usage reports 0, indexed 0, rejected 0
+04-25 15:48:47.777   555  2526 D CompatibilityChangeReporter: Compat change id reported: 161145287; UID 10127; state: DISABLED
+04-25 15:48:47.777   555  2526 D CompatibilityChangeReporter: Compat change id reported: 161145287; UID 10127; state: ENABLED
+04-25 15:48:47.784 24299 25266 I Icing   : Usage reports ok 0, Failed Usage reports 0, indexed 0, rejected 0
+04-25 15:48:47.790 24299 25266 I Icing   : Indexing com.google.android.gms-apps from com.google.android.gms
+04-25 15:48:47.793 24299 25266 I Icing   : Indexing done com.google.android.gms-apps
+04-25 15:48:47.815  4245  4282 D TrafficStats: tagSocket(118) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:48.688   555  2520 W ActivityTaskManager: callingPackage for (uid=2000, pid=28323) has no WPC
+04-25 15:48:48.688   555  2520 E IPCThreadState: Binder transaction failure: 11925218/29189/-22
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 265464455; UID 10195; state: DISABLED
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 265452344; UID 10195; state: DISABLED
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 266124927; UID 10195; state: DISABLED
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 265451093; UID 10195; state: DISABLED
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 265456536; UID 10195; state: DISABLED
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 255940284; UID 10195; state: DISABLED
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 236283604; UID 10195; state: DISABLED
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 263959004; UID 10195; state: DISABLED
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 264304459; UID 10195; state: DISABLED
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 264301586; UID 10195; state: DISABLED
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 254631730; UID 10195; state: DISABLED
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 273509367; UID 10195; state: DISABLED
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 263259275; UID 10195; state: DISABLED
+04-25 15:48:48.689   555  2520 D CompatibilityChangeReporter: Compat change id reported: 174042980; UID 10195; state: DISABLED
+04-25 15:48:48.690   555  2520 D CompatibilityChangeReporter: Compat change id reported: 174042936; UID 10195; state: DISABLED
+04-25 15:48:48.690   555  2520 D CompatibilityChangeReporter: Compat change id reported: 181136395; UID 10195; state: DISABLED
+04-25 15:48:48.689  2520  2520 I binder  : 2520:555 cannot find target node
+04-25 15:48:48.689  2520  2520 I binder  : 555:2520 transaction call to 0:0 failed 11925218/29189/-22, size 384-0 line 3210
+04-25 15:48:48.691   555  2520 D CompatibilityChangeReporter: Compat change id reported: 194480991; UID 10195; state: ENABLED
+04-25 15:48:48.693   555  2520 D CompatibilityChangeReporter: Compat change id reported: 184838306; UID 10195; state: DISABLED
+04-25 15:48:48.693   555  2520 D CompatibilityChangeReporter: Compat change id reported: 185004937; UID 10195; state: DISABLED
+04-25 15:48:48.693   555  2520 D CompatibilityChangeReporter: Compat change id reported: 197654537; UID 10195; state: ENABLED
+04-25 15:48:48.693   555  2520 V SplashScreenExceptionList: SplashScreen checking exception for package com.integrationtestapp (target sdk:34) -> false
+04-25 15:48:48.694   555  2520 D CompatibilityChangeReporter: Compat change id reported: 205907456; UID 10195; state: ENABLED
+04-25 15:48:48.695   918   962 V WindowManagerShell: Transition requested: android.os.BinderProxy@c174d70 TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=206 displayId=0 isRunning=true baseIntent=Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 cmp=com.integrationtestapp/.MainActivity } baseActivity=ComponentInfo{com.integrationtestapp/com.integrationtestapp.MainActivity} topActivity=ComponentInfo{com.integrationtestapp/com.integrationtestapp.MainActivity} origActivity=null realActivity=ComponentInfo{com.integrationtestapp/com.integrationtestapp.MainActivity} numActivities=1 lastActiveTime=71579007 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{android.window.IWindowContainerToken$Stub$Proxy@42448e9} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=null topActivityInfo=ActivityInfo{ee0396e com.integrationtestapp.MainActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=false isVisibleRequested=false isSleeping=false topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= false topActivityLetterboxed= false isFromDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 locusId=null displayAreaFeatureId=1 cameraCompatControlState=hidden}, remoteTransition = null, displayChange = null }
+04-25 15:48:48.696   555  2520 D CompatibilityChangeReporter: Compat change id reported: 194833441; UID 10195; state: ENABLED
+04-25 15:48:48.696   555  2520 I ActivityTaskManager: START u0 {act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 cmp=com.integrationtestapp/.MainActivity} with LAUNCH_SINGLE_TASK from uid 2000 (BAL_ALLOW_PERMISSION) result code=0
+04-25 15:48:48.697   555   579 D CompatibilityChangeReporter: Compat change id reported: 135634846; UID 10195; state: DISABLED
+04-25 15:48:48.697   555   579 D CompatibilityChangeReporter: Compat change id reported: 177438394; UID 10195; state: DISABLED
+04-25 15:48:48.697   555   579 D CompatibilityChangeReporter: Compat change id reported: 135772972; UID 10195; state: DISABLED
+04-25 15:48:48.697   555   579 D CompatibilityChangeReporter: Compat change id reported: 135754954; UID 10195; state: ENABLED
+04-25 15:48:48.697   555   588 D CompatibilityChangeReporter: Compat change id reported: 143937733; UID 10195; state: ENABLED
+04-25 15:48:48.702   355   355 D Zygote  : Forked child process 28326
+04-25 15:48:48.702   555   588 I ActivityManager: Start proc 28326:com.integrationtestapp/u0a195 for next-top-activity {com.integrationtestapp/com.integrationtestapp.MainActivity}
+04-25 15:48:48.702   555   651 D CompatibilityChangeReporter: Compat change id reported: 265195908; UID 10195; state: ENABLED
+04-25 15:48:48.712   918   989 D SplashScreenView: Build android.window.SplashScreenView{b870a07 V.E...... ......ID 0,0-0,0}
+04-25 15:48:48.712   918   989 D SplashScreenView: Icon: view: android.widget.ImageView{5f79734 V.ED..... ......I. 0,0-0,0 #10204f0 android:id/splashscreen_icon_view} drawable: com.android.wm.shell.startingsurface.SplashscreenIconDrawableFactory$ImmobileIconDrawable@b5695d size: 420
+04-25 15:48:48.712   918   989 D SplashScreenView: Branding: view: android.view.View{e4662d2 G.ED..... ......I. 0,0-0,0 #10204ef android:id/splashscreen_branding_view} drawable: null size w: 0 h: 0
+04-25 15:48:48.713   555   568 D CoreBackPreview: Window{4d834b3 u0 Splash Screen com.integrationtestapp}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@5fbde6e, mPriority=0, mIsAnimationCallback=false}
+04-25 15:48:48.718   395   395 I BpBinder: onLastStrongRef automatically unlinking death recipients: 
+04-25 15:48:48.720   918  1011 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 15:48:48.765 28326 28326 I egrationtestapp: Late-enabling -Xcheck:jni
+04-25 15:48:48.769   157   157 I logd    : logdr: UID=2000 GID=2000 PID=28328 n tail=0 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 15:48:48.777 28326 28326 I egrationtestapp: Using CollectorTypeCC GC.
+04-25 15:48:48.784   555   576 V WindowManager: Sent Transition #382 createdAt=04-25 15:48:48.691 via request=TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=206 displayId=0 isRunning=true baseIntent=Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 cmp=com.integrationtestapp/.MainActivity } baseActivity=ComponentInfo{com.integrationtestapp/com.integrationtestapp.MainActivity} topActivity=ComponentInfo{com.integrationtestapp/com.integrationtestapp.MainActivity} origActivity=null realActivity=ComponentInfo{com.integrationtestapp/com.integrationtestapp.MainActivity} numActivities=1 lastActiveTime=71579007 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{RemoteToken{52733a5 Task{3bece17 #206 type=standard A=10195:com.integrationtestapp}}} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=null topActivityInfo=ActivityInfo{a0b737a com.integrationtestapp.MainActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=false isVisibleRequested=false isSleeping=false topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= false topActivityLetterboxed= false isFromDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 locusId=null displayAreaFeatureId=1 cameraCompatControlState=hidden}, remoteTransition = null, displayChange = null }
+04-25 15:48:48.784   555   576 V WindowManager:     startWCT=WindowContainerTransaction { changes = {} hops = [] errorCallbackToken=null taskFragmentOrganizer=null }
+04-25 15:48:48.784   555   576 V WindowManager:     info={id=382 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{RemoteToken{52733a5 Task{3bece17 #206 type=standard A=10195:com.integrationtestapp}}} m=OPEN f=NONE leash=Surface(name=Task=206)/@0x117690f sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0},{WCT{RemoteToken{bcaefe Task{1336231 #58 type=standard A=10194:com.examplehostapp}}} m=TO_BACK f=NONE leash=Surface(name=Task=58)/@0x923c480 sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0}]}
+04-25 15:48:48.792   918   962 V WindowManagerShell: onTransitionReady android.os.BinderProxy@c174d70: {id=382 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{android.window.IWindowContainerToken$Stub$Proxy@7cc001b} m=OPEN f=NONE leash=Surface(name=Task=206)/@0x2a298cc sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0},{WCT{android.window.IWindowContainerToken$Stub$Proxy@9c675b8} m=TO_BACK f=NONE leash=Surface(name=Task=58)/@0x3916715 sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0}]}
+04-25 15:48:48.792   918   962 V WindowManagerShell: Playing animation for (#382)android.os.BinderProxy@c174d70@0
+04-25 15:48:48.792   918   962 V WindowManagerShell:  try handler com.android.wm.shell.transition.DefaultMixedHandler@11687a
+04-25 15:48:48.793   918   962 V WindowManagerShell:  try handler com.android.wm.shell.keyguard.KeyguardTransitionHandler@d9ad82b
+04-25 15:48:48.793   918   962 V WindowManagerShell:  try handler com.android.wm.shell.activityembedding.ActivityEmbeddingController@50d5488
+04-25 15:48:48.793   918   962 V WindowManagerShell:  try handler com.android.wm.shell.recents.RecentsTransitionHandler@f9e9e21
+04-25 15:48:48.793   918   962 V ShellRecents: RecentsTransitionHandler.startAnimation: no controller found
+04-25 15:48:48.793   918   962 V WindowManagerShell:  try handler com.android.wm.shell.pip.PipTransition@93d9246
+04-25 15:48:48.793   918   962 V WindowManagerShell:  try handler com.android.wm.shell.splitscreen.StageCoordinator@9eccc07
+04-25 15:48:48.793   918   962 V WindowManagerShell:  try handler com.android.wm.shell.transition.RemoteTransitionHandler@4673134
+04-25 15:48:48.793   918   962 V WindowManagerShell: Transition doesn't have explicit remote, search filters for match for {id=382 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{android.window.IWindowContainerToken$Stub$Proxy@7cc001b} m=OPEN f=NONE leash=Surface(name=Task=206)/@0x2a298cc sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0},{WCT{android.window.IWindowContainerToken$Stub$Proxy@9c675b8} m=TO_BACK f=NONE leash=Surface(name=Task=58)/@0x3916715 sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0}]}
+04-25 15:48:48.793   918   962 V WindowManagerShell:  Checking filter Pair{{types=[] flags=0x0] notFlags=0x0 checks=[{atype=dream independent=true modes=[OPEN,TO_FRONT] flags=NONE mustBeTask=false order=ANY topActivity=null},{atype=home independent=true modes=[CLOSE,TO_BACK] flags=NONE mustBeTask=false order=ANY topActivity=null}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@ab69c0b, appThread = android.app.IApplicationThread$Stub$Proxy@ecdfae8, debugName = LauncherToDream }}
+04-25 15:48:48.793   918   962 V WindowManagerShell:  Checking filter Pair{{types=[] flags=0x0] notFlags=0x100 checks=[{atype=home independent=true modes=[OPEN,TO_FRONT] flags=NONE mustBeTask=false order=TOP topActivity=ComponentInfo{com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}},{atype=standard independent=true modes=[CLOSE,TO_BACK] flags=NONE mustBeTask=false order=ANY topActivity=null}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@796b501, appThread = android.app.IApplicationThread$Stub$Proxy@6178fa6, debugName = QuickstepLaunchHome }}
+04-25 15:48:48.795   918   962 V WindowManagerShell:  Delegate animation for #382 to null
+04-25 15:48:48.795   918   962 V WindowManagerShell:  try handler com.android.wm.shell.transition.DefaultTransitionHandler@325fb5d
+04-25 15:48:48.795   918   962 V WindowManagerShell: start default transition animation, info = {id=382 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{android.window.IWindowContainerToken$Stub$Proxy@7cc001b} m=OPEN f=NONE leash=Surface(name=Task=206)/@0x2a298cc sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0},{WCT{android.window.IWindowContainerToken$Stub$Proxy@9c675b8} m=TO_BACK f=NONE leash=Surface(name=Task=58)/@0x3916715 sb=Rect(0, 0 - 1080, 1920) eb=Rect(0, 0 - 1080, 1920) d=0}]}
+04-25 15:48:48.795   918   962 V WindowManagerShell: loadAnimation: anim=android.view.animation.AnimationSet@9a082f7 animAttr=0x9 type=OPEN isEntrance=false
+04-25 15:48:48.796   918   962 V WindowManagerShell: loadAnimation: anim=android.view.animation.AnimationSet@3c863cd animAttr=0x8 type=OPEN isEntrance=true
+04-25 15:48:48.796   918   962 V WindowManagerShell:  animated by com.android.wm.shell.transition.DefaultTransitionHandler@325fb5d
+04-25 15:48:48.803   428   441 I adbd    : jdwp connection from 28326
+04-25 15:48:48.816 28326 28326 D CompatibilityChangeReporter: Compat change id reported: 171979766; UID 10195; state: ENABLED
+04-25 15:48:48.816 28326 28326 D CompatibilityChangeReporter: Compat change id reported: 242716250; UID 10195; state: ENABLED
+04-25 15:48:48.827   555  2520 D CompatibilityChangeReporter: Compat change id reported: 170503758; UID 10195; state: ENABLED
+04-25 15:48:48.830 28326 28326 W ziparchive: Unable to open '/data/app/~~KpjcuAZGyreLsE9K0hw_1A==/com.integrationtestapp-cDGttm9RoBZkLBTCODWNqQ==/base.dm': No such file or directory
+04-25 15:48:48.830 28326 28326 W ziparchive: Unable to open '/data/app/~~KpjcuAZGyreLsE9K0hw_1A==/com.integrationtestapp-cDGttm9RoBZkLBTCODWNqQ==/base.dm': No such file or directory
+04-25 15:48:48.979 28326 28326 D nativeloader: Configuring clns-6 for other apk /data/app/~~KpjcuAZGyreLsE9K0hw_1A==/com.integrationtestapp-cDGttm9RoBZkLBTCODWNqQ==/base.apk. target_sdk_version=34, uses_libraries=, library_path=/data/app/~~KpjcuAZGyreLsE9K0hw_1A==/com.integrationtestapp-cDGttm9RoBZkLBTCODWNqQ==/lib/arm64:/data/app/~~KpjcuAZGyreLsE9K0hw_1A==/com.integrationtestapp-cDGttm9RoBZkLBTCODWNqQ==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.integrationtestapp
+04-25 15:48:48.993 28326 28326 V GraphicsEnvironment: Currently set values for:
+04-25 15:48:48.993 28326 28326 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
+04-25 15:48:48.993 28326 28326 V GraphicsEnvironment:   angle_gl_driver_selection_values=[]
+04-25 15:48:48.994 28326 28326 V GraphicsEnvironment: ANGLE GameManagerService for com.integrationtestapp: false
+04-25 15:48:48.994 28326 28326 V GraphicsEnvironment: com.integrationtestapp is not listed in per-application setting
+04-25 15:48:48.994 28326 28326 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+04-25 15:48:49.013 28326 28326 W AdFit3.21.17: Failed to get application package info. [package=com.kakao.adfit.libraryqa][error=android.content.pm.PackageManager$NameNotFoundException: com.kakao.adfit.libraryqa]
+04-25 15:48:49.048 28326 28326 D WM-WrkMgrInitializer: Initializing WorkManager with default configuration.
+04-25 15:48:49.044 28326 28326 W pool-2-thread-1: type=1400 audit(0.0:1652): avc:  denied  { read } for  name="version" dev="proc" ino=4026531998 scontext=u:r:untrusted_app:s0:c195,c256,c512,c768 tcontext=u:object_r:proc_version:s0 tclass=file permissive=0 app=com.integrationtestapp
+04-25 15:48:49.050   918  1011 D EGL_emulation: app_time_stats: avg=313213.50ms min=30.75ms max=2192208.75ms count=7
+04-25 15:48:49.063 28326 28326 V SoLoader: Init System Loader delegate
+04-25 15:48:49.064   555  2520 I ActivityManager: Flag disabled. Ignoring finishAttachApplication from uid: 10195. pid: 28326
+04-25 15:48:49.087 28326 28326 D AppCompatDelegate: Checking for metadata for AppLocalesMetadataHolderService : Service not found
+04-25 15:48:49.100 28326 28354 D CompatibilityChangeReporter: Compat change id reported: 160794467; UID 10195; state: ENABLED
+04-25 15:48:49.109 28326 28357 D libEGL  : loaded /vendor/lib64/egl/libEGL_emulation.so
+04-25 15:48:49.109 28326 28357 D libEGL  : loaded /vendor/lib64/egl/libGLESv1_CM_emulation.so
+04-25 15:48:49.110 28326 28357 D libEGL  : loaded /vendor/lib64/egl/libGLESv2_emulation.so
+04-25 15:48:49.113 28326 28359 D AdvertisingIdClient: Creating AdvertisingIdClient
+04-25 15:48:49.113 28326 28359 D AdvertisingIdClient: AdvertisingIdClient already created.
+04-25 15:48:49.117 28326 28326 W unknown:ReactInstanceManagerBuilder: You're not setting the JS Engine Resolution Algorithm. We'll try to load JSC first, and if it fails we'll fallback to Hermes
+04-25 15:48:49.128 28326 28359 D AdvertisingIdClient: AdvertisingIdClient is not bounded. Starting to bind it...
+04-25 15:48:49.174   555  2520 D CompatibilityChangeReporter: Compat change id reported: 261072174; UID 10195; state: ENABLED
+04-25 15:48:49.184  1127  1498 D BtGatt.ScanManager: uid 10127 isForeground true scanMode -1
+04-25 15:48:49.184  1127  1498 D BtGatt.ScanManager: uid 10127 isForeground true scanMode -1
+04-25 15:48:49.194   555   568 D CompatibilityChangeReporter: Compat change id reported: 161145287; UID 10195; state: ENABLED
+04-25 15:48:49.236 28326 28369 D TrafficStats: tagSocket(87) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:49.237 28326 28370 D TrafficStats: tagSocket(89) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:49.245 28326 28326 W egrationtestapp: Accessing hidden method Landroid/view/View;->computeFitSystemWindows(Landroid/graphics/Rect;Landroid/graphics/Rect;)Z (unsupported, reflection, allowed)
+04-25 15:48:49.246 28326 28326 W egrationtestapp: Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (unsupported, reflection, allowed)
+04-25 15:48:49.253 28326 28326 D CompatibilityChangeReporter: Compat change id reported: 237531167; UID 10195; state: DISABLED
+04-25 15:48:49.263 28326 28326 W OpenGLRenderer: Unknown dataspace 0
+04-25 15:48:49.266 28326 28368 D TrafficStats: tagSocket(91) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:49.278 28326 28326 W unknown:ReactNative: Packager connection already open, nooping.
+04-25 15:48:49.279   555  2520 D CoreBackPreview: Window{203233d u0 com.integrationtestapp/com.integrationtestapp.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@5e5de00, mPriority=0, mIsAnimationCallback=false}
+04-25 15:48:49.299 28326 28355 W OpenGLRenderer: Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+04-25 15:48:49.300 28326 28355 W OpenGLRenderer: Failed to initialize 101010-2 format, error = EGL_SUCCESS
+04-25 15:48:49.304   918   962 V WindowManagerShell: Transition animation finished (aborted=false), notifying core (#382)android.os.BinderProxy@c174d70@0
+04-25 15:48:49.305   555   576 V WindowManager: Finish Transition #382: created at 04-25 15:48:48.691 collect-started=0.029ms request-sent=3.488ms started=5.297ms ready=80.452ms sent=92.745ms finished=614.011ms
+04-25 15:48:49.313   918   962 V WindowManagerShell: Track 0 became idle
+04-25 15:48:49.313   918   962 V WindowManagerShell: All active transition animations finished
+04-25 15:48:49.319 28326 28370 W unknown:ReconnectingWebSocket: Couldn't connect to "ws://10.0.2.2:8081/message?device=sdk_gphone64_arm64%20-%2014%20-%20API%2034&app=com.integrationtestapp&clientid=BridgeDevSupportManager", will silently retry
+04-25 15:48:49.319 28326 28368 W unknown:ReactNative: The packager does not seem to be running as we got an IOException requesting its status: Failed to connect to /10.0.2.2:8081
+04-25 15:48:49.326 28326 28369 W unknown:InspectorPackagerConnection: Couldn't connect to packager, will silently retry
+04-25 15:48:49.329   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 15:48:49.333   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 15:48:49.334 28326 28355 I Gralloc4: mapper 4.x is not supported
+04-25 15:48:49.352 28326 28355 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 15:48:49.383  4245 28375 D TrafficStats: tagSocket(5) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:49.383   354 28376 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10194 0}
+04-25 15:48:49.387 28326 28359 D AdvertisingIdClient: AdvertisingIdClient is bounded
+04-25 15:48:49.393   555   576 W ziparchive: Unable to open '/data/app/~~KpjcuAZGyreLsE9K0hw_1A==/com.integrationtestapp-cDGttm9RoBZkLBTCODWNqQ==/base.dm': No such file or directory
+04-25 15:48:49.394   555   576 I ActivityTaskManager: Displayed com.integrationtestapp/.MainActivity for user 0: +699ms
+04-25 15:48:49.395 28326 28359 I AdvertisingIdClient: shouldSendLog -1
+04-25 15:48:49.396 28326 28359 I AdvertisingIdClient: GetInfoInternal elapse 267ms
+04-25 15:48:49.397 28326 28359 I AdFit3.21.17: Get Advertising Id from Google Play services. [id = 58e87c99-42d0-4141-abf1-3401321ff76b] [isLimitAdTrackingEnabled = false]
+04-25 15:48:49.398 28326 28326 I AdvertisingIdClient: getting error as 17: API: ClientTelemetry.API is not available on this device. Connection failed with: ConnectionResult{statusCode=API_DISABLED_FOR_CONNECTION, resolution=null, message=null, clientMethodKey=null}
+04-25 15:48:49.402  4245  4301 I ReactNativeJNI: Memory warning (pressure level: TRIM_MEMORY_UI_HIDDEN) received by JS VM, ignoring because it's non-severe
+04-25 15:48:49.416   555  2380 D CompatibilityChangeReporter: Compat change id reported: 214016041; UID 10195; state: ENABLED
+04-25 15:48:49.417   555  2380 I ImeTracker: com.integrationtestapp:a9cdb323: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_UNSPECIFIED_WINDOW
+04-25 15:48:49.417   555  2380 I ImeTracker: com.integrationtestapp:a9cdb323: onCancelled at PHASE_SERVER_SHOULD_HIDE
+04-25 15:48:49.427  1677  1677 I GoogleInputMethodService: GoogleInputMethodService.onFinishInput():3227 
+04-25 15:48:49.429  1677  1677 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2087 repeatCheckTimes = 0, unlocked = true
+04-25 15:48:49.429  1677  1677 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1877 onStartInput(EditorInfo{inputType=0x0(NULL) imeOptions=0x0 privateImeOptions=null actionName=UNSPECIFIED actionLabel=null actionId=0 initialSelStart=-1 initialSelEnd=-1 initialCapsMode=0x0 hintText=null label=null packageName=com.integrationtestapp fieldId=0 fieldName=null extras=null}, false)
+04-25 15:48:49.429  1677  1677 I GoogleInputMethodService: GoogleInputMethodService.shouldHideHeaderOnInitialState():4008 ShouldHideHeaderOnInitialState = false
+04-25 15:48:49.430  1677  1677 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2087 repeatCheckTimes = 2, unlocked = true
+04-25 15:48:49.434 28326 28379 W unknown:ReactContext: initializeMessageQueueThreads() is called.
+04-25 15:48:49.451 28326 28379 E unknown:ReactNative: Exception in native call
+04-25 15:48:49.451 28326 28379 E unknown:ReactNative: java.lang.RuntimeException: Unable to load script. Make sure you're either running Metro (run 'npx react-native start') or that your bundle 'index.android.bundle' is packaged correctly for release.
+04-25 15:48:49.451 28326 28379 E unknown:ReactNative: 	at com.facebook.react.bridge.CatalystInstanceImpl.jniLoadScriptFromAssets(Native Method)
+04-25 15:48:49.451 28326 28379 E unknown:ReactNative: 	at com.facebook.react.bridge.CatalystInstanceImpl.loadScriptFromAssets(CatalystInstanceImpl.java:239)
+04-25 15:48:49.451 28326 28379 E unknown:ReactNative: 	at com.facebook.react.bridge.JSBundleLoader$1.loadScript(JSBundleLoader.java:29)
+04-25 15:48:49.451 28326 28379 E unknown:ReactNative: 	at com.facebook.react.bridge.CatalystInstanceImpl.runJSBundle(CatalystInstanceImpl.java:268)
+04-25 15:48:49.451 28326 28379 E unknown:ReactNative: 	at com.facebook.react.ReactInstanceManager.createReactContext(ReactInstanceManager.java:1413)
+04-25 15:48:49.451 28326 28379 E unknown:ReactNative: 	at com.facebook.react.ReactInstanceManager.-$$Nest$mcreateReactContext(Unknown Source:0)
+04-25 15:48:49.451 28326 28379 E unknown:ReactNative: 	at com.facebook.react.ReactInstanceManager$5.run(ReactInstanceManager.java:1111)
+04-25 15:48:49.451 28326 28379 E unknown:ReactNative: 	at java.lang.Thread.run(Thread.java:1012)
+04-25 15:48:49.474   918  1011 D EGL_emulation: app_time_stats: avg=45552.55ms min=45552.55ms max=45552.55ms count=1
+04-25 15:48:49.515 28326 28326 D CompatibilityChangeReporter: Compat change id reported: 171228096; UID 10195; state: ENABLED
+04-25 15:48:49.521 28326 28326 D CompatibilityChangeReporter: Compat change id reported: 210923482; UID 10195; state: ENABLED
+04-25 15:48:49.555   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 15:48:49.585   555  2380 D CoreBackPreview: Window{12c9ae1 u0 com.integrationtestapp/com.integrationtestapp.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@b803863, mPriority=0, mIsAnimationCallback=false}
+04-25 15:48:49.626 28326 28355 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 15:48:49.860   918   981 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@6803fa3
+04-25 15:48:49.860   555  2526 D CoreBackPreview: Window{4d834b3 u0 Splash Screen com.integrationtestapp EXITING}: Setting back callback null
+04-25 15:48:49.863   555  2520 W InputManager-JNI: Input channel object '4d834b3 Splash Screen com.integrationtestapp (client)' was disposed without first being removed with the input manager!
+04-25 15:48:49.890  5048  5444 I FontLog : Received query Noto Color Emoji Compat, URI content://com.google.android.gms.fonts [CONTEXT service_id=132 ]
+04-25 15:48:49.890  5048  5444 I FontLog : Query [emojicompat-emoji-font] resolved to {Noto Color Emoji Compat, wdth 100.0, wght 400, ital 0.0, bestEffort false} [CONTEXT service_id=132 ]
+04-25 15:48:49.891  5048  5444 I FontLog : Fetch {Noto Color Emoji Compat, wdth 100.0, wght 400, ital 0.0, bestEffort false} end status Status{statusCode=SUCCESS, resolution=null} [CONTEXT service_id=132 ]
+04-25 15:48:49.904  5048  5514 I FontLog : Pulling font file for id = 476, cache size = 5 [CONTEXT service_id=132 ]
+04-25 15:48:49.909   555  2520 I ImeTracker: com.integrationtestapp:2e3d2def: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_UNSPECIFIED_WINDOW
+04-25 15:48:49.909   555  2520 I ImeTracker: com.integrationtestapp:2e3d2def: onCancelled at PHASE_SERVER_SHOULD_HIDE
+04-25 15:48:49.910  1677  1677 I GoogleInputMethodService: GoogleInputMethodService.onFinishInput():3227 
+04-25 15:48:49.915  1677  1677 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2087 repeatCheckTimes = 0, unlocked = true
+04-25 15:48:49.915  1677  1677 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1877 onStartInput(EditorInfo{inputType=0x0(NULL) imeOptions=0x0 privateImeOptions=null actionName=UNSPECIFIED actionLabel=null actionId=0 initialSelStart=-1 initialSelEnd=-1 initialCapsMode=0x0 hintText=null label=null packageName=com.integrationtestapp fieldId=0 fieldName=null extras=null}, false)
+04-25 15:48:49.915  1677  1677 I GoogleInputMethodService: GoogleInputMethodService.shouldHideHeaderOnInitialState():4008 ShouldHideHeaderOnInitialState = false
+04-25 15:48:49.915  1677  1677 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2087 repeatCheckTimes = 2, unlocked = true
+04-25 15:48:49.923  5048  5514 I FontLog : Pulling font file for id = 476, cache size = 5 [CONTEXT service_id=132 ]
+04-25 15:48:50.061   918  1011 D EGL_emulation: app_time_stats: avg=19.50ms min=0.41ms max=96.57ms count=37
+04-25 15:48:50.074 28277 28278 I AidlLazyServiceRegistrar: Process has 0 (of 1 available) client(s) in use after notification artd has clients: 0
+04-25 15:48:50.074 28277 28278 I AidlLazyServiceRegistrar: Trying to shut down the service. No clients in use for any service in process.
+04-25 15:48:50.074   162   162 I servicemanager: Notifying artd they don't (previously: do) have clients when we now have no record of a client
+04-25 15:48:50.075   162   162 I servicemanager: Unregistering artd
+04-25 15:48:50.075   162   162 I BpBinder: onLastStrongRef automatically unlinking death recipients:
+04-25 15:48:50.075 28277 28278 I AidlLazyServiceRegistrar: Unregistered all clients and exiting
+04-25 15:48:50.080     1     1 I init    : Service 'artd' (pid 28277) exited with status 0 oneshot service took 3.031000 seconds in background
+04-25 15:48:50.080     1     1 I init    : Sending signal 9 to service 'artd' (pid 28277) process group...
+04-25 15:48:50.080     1     1 I libprocessgroup: Successfully killed process cgroup uid 1082 pid 28277 in 0ms
+04-25 15:48:50.320  4245  4282 D TrafficStats: tagSocket(5) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:51.082   918  1011 D EGL_emulation: app_time_stats: avg=7.87ms min=0.31ms max=17.07ms count=43
+04-25 15:48:51.178 28326 28355 D EGL_emulation: app_time_stats: avg=447.53ms min=41.17ms max=1253.44ms count=3
+04-25 15:48:51.329 28326 28369 D TrafficStats: tagSocket(114) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:51.331 28326 28370 D TrafficStats: tagSocket(120) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:51.400  4245 28390 D TrafficStats: tagSocket(5) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:51.400   354 28391 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10194 0}
+04-25 15:48:52.210   555  3399 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+04-25 15:48:52.848  4245  4282 D TrafficStats: tagSocket(5) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:53.408  4245 28392 D TrafficStats: tagSocket(5) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:53.408   354 28393 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10194 0}
+04-25 15:48:53.836 28326 28370 D TrafficStats: tagSocket(114) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:53.837 28326 28369 D TrafficStats: tagSocket(120) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:54.596   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 15:48:55.159 28326 28394 D ProfileInstaller: Installing profile for com.integrationtestapp
+04-25 15:48:55.383  4245  4282 D TrafficStats: tagSocket(5) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:55.416  4245 28395 D TrafficStats: tagSocket(114) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:55.418   354 28396 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10194 0}
+04-25 15:48:56.339 28326 28369 D TrafficStats: tagSocket(114) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:56.339 28326 28370 D TrafficStats: tagSocket(128) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:57.466  4245 28397 D TrafficStats: tagSocket(5) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:57.468   354 28398 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10194 0}
+04-25 15:48:57.506   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 15:48:57.884  4245  4282 D TrafficStats: tagSocket(5) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:58.850 28326 28369 D TrafficStats: tagSocket(114) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:58.853 28326 28370 D TrafficStats: tagSocket(120) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:59.483  4245 28399 D TrafficStats: tagSocket(5) with statsTag=0xffffffff, statsUid=-1
+04-25 15:48:59.485   354 28400 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10194 0}
+04-25 15:49:00.020  1797  2107 I AiAiEcho: Predicting[0]: 
+04-25 15:49:00.020  1797  2107 I AiAiEcho: EchoTargets: 
+04-25 15:49:00.020  1797  2107 I AiAiEcho: Filtered by AiAi flag check: 
+04-25 15:49:00.020  1797  2107 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata: 
+04-25 15:49:00.022  1797  2107 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+04-25 15:49:00.025   918  1011 D EGL_emulation: app_time_stats: avg=2637.67ms min=44.50ms max=10332.37ms count=4
+04-25 15:49:00.029   918   918 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+04-25 15:49:00.383  4245  4282 D TrafficStats: tagSocket(5) with statsTag=0xffffffff, statsUid=-1

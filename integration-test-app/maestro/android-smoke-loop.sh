@@ -7,7 +7,8 @@ mkdir -p "$OUT_DIR"
 
 export JAVA_HOME="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
 export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk"
-export PATH="$JAVA_HOME/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH:$HOME/.maestro/bin"
+export ADB_BIN="/opt/homebrew/bin/adb"
+export PATH="$JAVA_HOME/bin:$HOME/.maestro/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export MAESTRO_CLI_NO_ANALYTICS=1
 export MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED=true
 
@@ -36,7 +37,7 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
   TS="$(date '+%Y-%m-%d %H:%M:%S')"
   LOG="$OUT_DIR/run-${ITER}.log"
   ensure_metro
-  adb reverse tcp:8081 tcp:8081 >/dev/null 2>&1 || true
+  "$ADB_BIN" reverse tcp:8081 tcp:8081 >/dev/null 2>&1 || true
   echo "[$TS] iteration=$ITER starting" | tee -a "$SUMMARY"
   if maestro test "$FLOW" >"$LOG" 2>&1; then
     PASS=$((PASS + 1))

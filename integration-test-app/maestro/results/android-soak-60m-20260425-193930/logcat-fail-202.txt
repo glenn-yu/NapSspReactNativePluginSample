@@ -1,0 +1,204 @@
+--------- beginning of main
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10154 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10154 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10154 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10152 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10152 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10149 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10149 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10149 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10149 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10148 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10148 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10148 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10147 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10147 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10147 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10147 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10144 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10144 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10144 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10143 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10143 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10143 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10141 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10141 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10141 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10135 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10135 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10135 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10132 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10132 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10132 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10131 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10131 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10130 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10130 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10128 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10128 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10128 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10127 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10127 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10127 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10123 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10123 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10123 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10123 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10122 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10122 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10122 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10121 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10121 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10121 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10121 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10120 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.612   555   595 W CpuPowerCalculator: UID 10120 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10120 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10118 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10118 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10118 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10099 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10099 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10099 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10092 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10092 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10092 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10091 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10091 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10091 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10088 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10088 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10088 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10088 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10086 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10086 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10086 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10086 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10084 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10084 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 10084 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 9999 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 2000 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1092 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1082 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1073 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1073 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1072 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1069 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1068 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1068 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1066 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1053 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1047 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1041 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1036 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1020 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1019 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1017 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1013 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1010 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1002 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1002 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1001 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1001 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 1000 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:15:12.613   555   595 W CpuPowerCalculator: UID 0 CPU freq # mismatch: Power Profile # 2 actual # 8
+--------- beginning of kernel
+04-25 20:15:15.814   157   157 I logd    : logdr: UID=2000 GID=2000 PID=23653 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 20:15:15.889 23658 23658 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 20:15:15.889 23658 23658 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 20:15:15.897   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 20:15:15.898 23658 23659 I Gralloc4: mapper 4.x is not supported
+04-25 20:15:15.897   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+--------- beginning of system
+04-25 20:15:15.998   555  2380 D CoreBackPreview: Window{65af39e u0 PopupWindow:be0c1d9}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@bb30e4c, mPriority=0, mIsAnimationCallback=false}
+04-25 20:15:16.001 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:15:16.011 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@23d924c
+04-25 20:15:16.012   555  2380 D CoreBackPreview: Window{65af39e u0 PopupWindow:be0c1d9}: Setting back callback null
+04-25 20:15:16.014   555  2380 W InputManager-JNI: Input channel object '65af39e PopupWindow:be0c1d9 (client)' was disposed without first being removed with the input manager!
+04-25 20:15:16.076   555  2380 D CoreBackPreview: Window{f28c338 u0 PopupWindow:d47d311}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@a73d876, mPriority=0, mIsAnimationCallback=false}
+04-25 20:15:16.096 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:15:16.097 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@919dee4
+04-25 20:15:16.098   555  2380 D CoreBackPreview: Window{f28c338 u0 PopupWindow:d47d311}: Setting back callback null
+04-25 20:15:16.099   555  2380 W InputManager-JNI: Input channel object 'f28c338 PopupWindow:d47d311 (client)' was disposed without first being removed with the input manager!
+04-25 20:15:16.502   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:15:21.823   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 20:15:24.730   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:15:24.786   157   157 I logd    : logdr: UID=2000 GID=2000 PID=23668 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 20:15:24.861 23674 23674 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 20:15:24.862 23674 23674 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 20:15:24.870   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 20:15:24.870 23674 23675 I Gralloc4: mapper 4.x is not supported
+04-25 20:15:24.870   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 20:15:24.968   555   835 D CoreBackPreview: Window{73d0602 u0 PopupWindow:8e8d349}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@2c4c150, mPriority=0, mIsAnimationCallback=false}
+04-25 20:15:24.974 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:15:24.985 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@970267c
+04-25 20:15:24.986   555   835 D CoreBackPreview: Window{73d0602 u0 PopupWindow:8e8d349}: Setting back callback null
+04-25 20:15:24.986   555   835 W InputManager-JNI: Input channel object '73d0602 PopupWindow:8e8d349 (client)' was disposed without first being removed with the input manager!
+04-25 20:15:25.035   555   835 D CoreBackPreview: Window{93ca27c u0 PopupWindow:32a281}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@1f1535a, mPriority=0, mIsAnimationCallback=false}
+04-25 20:15:25.041 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:15:25.042 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@324c914
+04-25 20:15:25.043   555   835 D CoreBackPreview: Window{93ca27c u0 PopupWindow:32a281}: Setting back callback null
+04-25 20:15:25.043   555   835 W InputManager-JNI: Input channel object '93ca27c PopupWindow:32a281 (client)' was disposed without first being removed with the input manager!
+04-25 20:15:31.889   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 20:15:32.628   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:15:33.923   157   157 I logd    : logdr: UID=2000 GID=2000 PID=23685 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 20:15:34.000 23690 23690 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 20:15:34.000 23690 23690 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 20:15:34.008   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 20:15:34.009 23690 23691 I Gralloc4: mapper 4.x is not supported
+04-25 20:15:34.008   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 20:15:34.051   555   835 D CoreBackPreview: Window{fe14b26 u0 PopupWindow:79020b9}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@884c514, mPriority=0, mIsAnimationCallback=false}
+04-25 20:15:34.062 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:15:34.064 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@24826ac
+04-25 20:15:34.065   555   835 W InputManager-JNI: Input channel object 'fe14b26 PopupWindow:79020b9 (client)' was disposed without first being removed with the input manager!
+04-25 20:15:34.066   555  2380 W WindowManager: Failed looking up window session=Session{37bd811 20347:u0a10490} callers=com.android.server.wm.WindowManagerService.windowForClientLocked:6034 com.android.server.wm.Session.setOnBackInvokedCallbackInfo:944 android.view.IWindowSession$Stub.onTransact:1145 
+04-25 20:15:34.066   555  2380 I WindowManager: setOnBackInvokedCallback(): No window state for package:com.integrationtestapp
+04-25 20:15:34.209   555  2380 D CoreBackPreview: Window{b731e80 u0 PopupWindow:9e82df1}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@36c98fe, mPriority=0, mIsAnimationCallback=false}
+04-25 20:15:34.232 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:15:34.234 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@8969f44
+04-25 20:15:34.235   555  2380 D CoreBackPreview: Window{b731e80 u0 PopupWindow:9e82df1}: Setting back callback null
+04-25 20:15:34.235   555  2380 W InputManager-JNI: Input channel object 'b731e80 PopupWindow:9e82df1 (client)' was disposed without first being removed with the input manager!
+04-25 20:15:37.058   363   363 W healthd : battery l=100 v=5000 t=25.0 h=2 st=4 c=900000 fc=3000000 cc=10 chg=
+04-25 20:15:40.620   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:15:41.968   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 20:15:42.992   157   157 I logd    : logdr: UID=2000 GID=2000 PID=23700 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 20:15:43.067 23705 23705 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 20:15:43.067 23705 23705 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 20:15:43.075   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 20:15:43.075 23705 23706 I Gralloc4: mapper 4.x is not supported
+04-25 20:15:43.075   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 20:15:43.160   555  2380 D CoreBackPreview: Window{a75470a u0 PopupWindow:c1daa29}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@3063d98, mPriority=0, mIsAnimationCallback=false}
+04-25 20:15:43.199 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:15:43.229 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@6f892dc
+04-25 20:15:43.230   555  2380 D CoreBackPreview: Window{a75470a u0 PopupWindow:c1daa29}: Setting back callback null
+04-25 20:15:43.231   555  2380 W InputManager-JNI: Input channel object 'a75470a PopupWindow:c1daa29 (client)' was disposed without first being removed with the input manager!
+04-25 20:15:43.295   555  2380 W InputManager-JNI: Input channel object '3ed9b44 PopupWindow:8f7561 (client)' was disposed without first being removed with the input manager!
+04-25 20:15:48.500   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:15:51.984   157   157 I logd    : logdr: UID=2000 GID=2000 PID=23714 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 20:15:52.010   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 20:15:52.019   918  1011 D EGL_emulation: app_time_stats: avg=51962.79ms min=51962.79ms max=51962.79ms count=1
+04-25 20:15:52.065 23719 23719 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 20:15:52.065 23719 23719 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 20:15:52.076   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 20:15:52.076 23719 23720 I Gralloc4: mapper 4.x is not supported
+04-25 20:15:52.076   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 20:15:52.160   555  2380 D CoreBackPreview: Window{4cb27b0 u0 PopupWindow:96d069d}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@e6f3dae, mPriority=0, mIsAnimationCallback=false}
+04-25 20:15:52.180 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:15:52.182 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@c9e20e0
+04-25 20:15:52.183   555   835 W InputManager-JNI: Input channel object '4cb27b0 PopupWindow:96d069d (client)' was disposed without first being removed with the input manager!
+04-25 20:15:52.183   555  2380 W WindowManager: Failed looking up window session=Session{37bd811 20347:u0a10490} callers=com.android.server.wm.WindowManagerService.windowForClientLocked:6034 com.android.server.wm.Session.setOnBackInvokedCallbackInfo:944 android.view.IWindowSession$Stub.onTransact:1145 
+04-25 20:15:52.183   555  2380 I WindowManager: setOnBackInvokedCallback(): No window state for package:com.integrationtestapp
+04-25 20:15:52.236   555  2380 D CoreBackPreview: Window{17586ba u0 PopupWindow:5776c55}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@5d03cc8, mPriority=0, mIsAnimationCallback=false}
+04-25 20:15:52.241 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:15:52.243 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@d832bf8
+04-25 20:15:52.243   555  2380 D CoreBackPreview: Window{17586ba u0 PopupWindow:5776c55}: Setting back callback null
+04-25 20:15:52.244   555  2380 W InputManager-JNI: Input channel object '17586ba PopupWindow:5776c55 (client)' was disposed without first being removed with the input manager!
+04-25 20:15:56.725   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:16:00.003  1797  2107 I AiAiEcho: Predicting[0]: 
+04-25 20:16:00.003  1797  2107 I AiAiEcho: EchoTargets: 
+04-25 20:16:00.003  1797  2107 I AiAiEcho: Filtered by AiAi flag check: 
+04-25 20:16:00.003  1797  2107 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata: 
+04-25 20:16:00.003  1797  2107 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+04-25 20:16:00.051   918  1011 D EGL_emulation: app_time_stats: avg=8031.81ms min=8031.81ms max=8031.81ms count=1
+04-25 20:16:00.051   918   918 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.

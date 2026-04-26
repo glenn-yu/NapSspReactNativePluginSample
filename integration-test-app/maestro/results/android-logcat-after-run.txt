@@ -1,0 +1,4 @@
+--------- beginning of main
+04-25 15:47:53.762   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 15:47:54.778  4245 28196 D TrafficStats: tagSocket(118) with statsTag=0xffffffff, statsUid=-1
+04-25 15:47:54.778   354 28198 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10194 0}

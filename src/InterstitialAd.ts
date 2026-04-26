@@ -5,6 +5,7 @@ import type { InterstitialAdEventMap, InterstitialAdOptions } from './types';
 
 interface NativeInterstitialModule {
   load?: (adUnitId: string, options?: InterstitialAdOptions) => Promise<void>;
+  start?: (adUnitId: string, options?: InterstitialAdOptions) => Promise<void>;
   show?: (adUnitId: string) => Promise<void>;
   destroy?: (adUnitId: string) => void;
 }
@@ -84,6 +85,24 @@ export class InterstitialAd {
       this.emitter.emit('loadFailed', adError);
       throw adError;
     }
+  }
+
+  async start(): Promise<void> {
+    const nativeModule = getNativeModuleFromNames<NativeInterstitialModule>(NativeModuleNames.interstitial);
+    if (nativeModule?.start) {
+      try {
+        await nativeModule.start(this.adUnitId, this.options);
+        this._loaded = false;
+        return;
+      } catch (error) {
+        const adError = normalizeAdError(error, 'interstitial_start_failed');
+        this.emitter.emit('loadFailed', adError);
+        throw adError;
+      }
+    }
+
+    await this.load();
+    await this.show();
   }
 
   async show(): Promise<void> {

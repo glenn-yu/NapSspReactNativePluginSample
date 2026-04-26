@@ -12,7 +12,8 @@ export MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED=true
 
 FLOW="$ROOT_DIR/maestro/ios-ad-validation.yaml"
 SIM_UDID="8D90B616-14A9-4A49-A1A7-0470FF80A9F9"
-END_TS=$(( $(date +%s) + 3600 ))
+DURATION_SECONDS="${SOAK_DURATION_SECONDS:-3600}"
+END_TS=$(( $(date +%s) + DURATION_SECONDS ))
 ITER=0
 PASS=0
 FAIL=0
@@ -41,6 +42,7 @@ echo "out_dir=$OUT_DIR" | tee -a "$SUMMARY"
 echo "flow=$FLOW" | tee -a "$SUMMARY"
 echo "sim_udid=$SIM_UDID" | tee -a "$SUMMARY"
 echo "start_time=$RUN_START" | tee -a "$SUMMARY"
+echo "duration_seconds=$DURATION_SECONDS" | tee -a "$SUMMARY"
 
 ensure_metro() {
   if ! lsof -ti tcp:8081 >/dev/null 2>&1; then

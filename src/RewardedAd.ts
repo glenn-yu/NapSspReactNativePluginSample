@@ -5,6 +5,7 @@ import type { RewardedAdEventMap, RewardedAdOptions } from './types';
 
 interface NativeRewardedModule {
   load?: (adUnitId: string, options?: RewardedAdOptions) => Promise<void>;
+  start?: (adUnitId: string, options?: RewardedAdOptions) => Promise<void>;
   show?: (adUnitId: string) => Promise<void>;
   destroy?: (adUnitId: string) => void;
 }
@@ -90,6 +91,24 @@ export class RewardedAd {
       this.emitter.emit('loadFailed', adError);
       throw adError;
     }
+  }
+
+  async start(): Promise<void> {
+    const nativeModule = getNativeModuleFromNames<NativeRewardedModule>(NativeModuleNames.rewarded);
+    if (nativeModule?.start) {
+      try {
+        await nativeModule.start(this.adUnitId, this.options);
+        this._loaded = false;
+        return;
+      } catch (error) {
+        const adError = normalizeAdError(error, 'rewarded_start_failed');
+        this.emitter.emit('loadFailed', adError);
+        throw adError;
+      }
+    }
+
+    await this.load();
+    await this.show();
   }
 
   async show(): Promise<void> {

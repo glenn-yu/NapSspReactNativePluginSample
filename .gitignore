@@ -80,3 +80,9 @@ Thumbs.db
 
 # TypeScript
 tsconfig.tsbuildinfo
+
+# Ignore Gradle build output directory
+build
+
+# Ignore Kotlin plugin data
+.kotlin

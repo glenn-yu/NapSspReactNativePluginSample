@@ -18,3 +18,27 @@ This file accumulates Maestro soak-test results across runs.
   - Android Maestro flow remained stable through at least 17 consecutive passes.
   - Metro-backed React Native debug runtime stayed healthy during the observed soak window.
   - No fail artifacts were created up to this capture point.
+
+## 2026-04-25 21:27:21 Android soak run
+- Started: 2026-04-25 21:27:21 (Asia/Seoul)
+- Ended: 2026-04-25 21:28:20 (Asia/Seoul)
+- Total iterations: 3
+- Pass: 0
+- Fail: 3
+- Flow: `integration-test-app/maestro/android-ad-validation.yaml`
+- Output directory: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/android-soak-60m-20260425-212721`
+- Summary: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/android-soak-60m-20260425-212721/summary.txt`
+- Stop reason: `repeat_failure_threshold:maestro_android_transport`
+- Failure artifacts present: yes
+
+## 2026-04-25 22:31:47 Android soak run
+- Started: 2026-04-25 22:31:47 (Asia/Seoul)
+- Ended: 2026-04-25 22:32:51 (Asia/Seoul)
+- Total iterations: 3
+- Pass: 0
+- Fail: 3
+- Flow: `integration-test-app/maestro/android-ad-validation.yaml`
+- Output directory: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/android-soak-60m-20260425-223147`
+- Summary: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/android-soak-60m-20260425-223147/summary.txt`
+- Stop reason: `repeat_failure_threshold:maestro_android_transport`
+- Failure artifacts present: yes

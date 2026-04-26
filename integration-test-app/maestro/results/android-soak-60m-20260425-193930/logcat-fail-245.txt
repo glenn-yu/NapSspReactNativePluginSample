@@ -1,0 +1,204 @@
+--------- beginning of main
+04-25 20:21:05.578   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+--------- beginning of kernel
+04-25 20:21:05.578   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 20:21:05.578 24251 24252 I Gralloc4: mapper 4.x is not supported
+--------- beginning of system
+04-25 20:21:05.602   555  1002 D CoreBackPreview: Window{6958025 u0 PopupWindow:7acc19c}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@7ade7ab, mPriority=0, mIsAnimationCallback=false}
+04-25 20:21:05.605 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:21:05.606 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@b839b2b
+04-25 20:21:05.607   555  1002 D CoreBackPreview: Window{6958025 u0 PopupWindow:7acc19c}: Setting back callback null
+04-25 20:21:05.607   555  1002 W InputManager-JNI: Input channel object '6958025 PopupWindow:7acc19c (client)' was disposed without first being removed with the input manager!
+04-25 20:21:05.737   555  1002 D CoreBackPreview: Window{6e15387 u0 PopupWindow:eb5a834}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@bf48edd, mPriority=0, mIsAnimationCallback=false}
+04-25 20:21:05.748 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:21:05.749 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@65e44a3
+04-25 20:21:05.751   555  1002 D CoreBackPreview: Window{6e15387 u0 PopupWindow:eb5a834}: Setting back callback null
+04-25 20:21:05.751   555  1785 W InputManager-JNI: Input channel object '6e15387 PopupWindow:eb5a834 (client)' was disposed without first being removed with the input manager!
+04-25 20:21:08.770   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:21:14.323   157   157 I logd    : logdr: UID=2000 GID=2000 PID=24261 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 20:21:14.395 24266 24266 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 20:21:14.395 24266 24266 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 20:21:14.402   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 20:21:14.402 24266 24267 I Gralloc4: mapper 4.x is not supported
+04-25 20:21:14.402   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 20:21:14.510   555  1785 D CoreBackPreview: Window{3b03bd9 u0 PopupWindow:f1c9cc}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@c772c7f, mPriority=0, mIsAnimationCallback=false}
+04-25 20:21:14.520 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:21:14.532 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@ac5a51b
+04-25 20:21:14.533   555  1785 W InputManager-JNI: Input channel object '3b03bd9 PopupWindow:f1c9cc (client)' was disposed without first being removed with the input manager!
+04-25 20:21:14.533   555  2520 W WindowManager: Failed looking up window session=Session{37bd811 20347:u0a10490} callers=com.android.server.wm.WindowManagerService.windowForClientLocked:6034 com.android.server.wm.Session.setOnBackInvokedCallbackInfo:944 android.view.IWindowSession$Stub.onTransact:1145 
+04-25 20:21:14.533   555  2520 I WindowManager: setOnBackInvokedCallback(): No window state for package:com.integrationtestapp
+04-25 20:21:14.607   555  2520 D CoreBackPreview: Window{65c119b u0 PopupWindow:42d8664}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@c4c8d11, mPriority=0, mIsAnimationCallback=false}
+04-25 20:21:14.614 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:21:14.615 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@8b99c93
+04-25 20:21:14.615   555  1785 D CoreBackPreview: Window{65c119b u0 PopupWindow:42d8664}: Setting back callback null
+04-25 20:21:14.616   555  2520 W InputManager-JNI: Input channel object '65c119b PopupWindow:42d8664 (client)' was disposed without first being removed with the input manager!
+04-25 20:21:15.205   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 20:21:16.726   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:21:23.309   157   157 I logd    : logdr: UID=2000 GID=2000 PID=24276 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 20:21:23.384 24281 24281 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 20:21:23.384 24281 24281 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 20:21:23.391   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 20:21:23.392 24281 24282 I Gralloc4: mapper 4.x is not supported
+04-25 20:21:23.391   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 20:21:23.470   555  2520 D CoreBackPreview: Window{ddbe94d u0 PopupWindow:f613dfc}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@a211913, mPriority=0, mIsAnimationCallback=false}
+04-25 20:21:23.473 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:21:23.474 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@4560b0b
+04-25 20:21:23.475   555  2520 D CoreBackPreview: Window{ddbe94d u0 PopupWindow:f613dfc}: Setting back callback null
+04-25 20:21:23.475   555  2520 W InputManager-JNI: Input channel object 'ddbe94d PopupWindow:f613dfc (client)' was disposed without first being removed with the input manager!
+04-25 20:21:23.572   555  1785 D CoreBackPreview: Window{e7a336f u0 PopupWindow:4315094}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@129f505, mPriority=0, mIsAnimationCallback=false}
+04-25 20:21:23.585 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:21:23.596 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@d52d083
+04-25 20:21:23.597   555  1785 D CoreBackPreview: Window{e7a336f u0 PopupWindow:4315094}: Setting back callback null
+04-25 20:21:23.597   555  2520 W InputManager-JNI: Input channel object 'e7a336f PopupWindow:4315094 (client)' was disposed without first being removed with the input manager!
+04-25 20:21:24.663   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:21:25.333   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 20:21:32.295   157   157 I logd    : logdr: UID=2000 GID=2000 PID=24291 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 20:21:32.368 24296 24296 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 20:21:32.368 24296 24296 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 20:21:32.376   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 20:21:32.376 24296 24297 I Gralloc4: mapper 4.x is not supported
+04-25 20:21:32.376   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 20:21:32.440   555  2520 D CoreBackPreview: Window{ed9dc81 u0 PopupWindow:86e1e2c}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@57f2167, mPriority=0, mIsAnimationCallback=false}
+04-25 20:21:32.463 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:21:32.465 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@683ccfb
+04-25 20:21:32.466   555  2520 D CoreBackPreview: Window{ed9dc81 u0 PopupWindow:86e1e2c}: Setting back callback null
+04-25 20:21:32.466   555  2520 W InputManager-JNI: Input channel object 'ed9dc81 PopupWindow:86e1e2c (client)' was disposed without first being removed with the input manager!
+04-25 20:21:32.531   555  2520 W InputManager-JNI: Input channel object 'fd26d03 PopupWindow:f9406c4 (client)' was disposed without first being removed with the input manager!
+04-25 20:21:32.564   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:21:35.462   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 20:21:40.500   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:21:41.333   157   157 I logd    : logdr: UID=2000 GID=2000 PID=24330 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 20:21:41.439 24336 24336 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 20:21:41.439 24336 24336 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 20:21:41.465   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 20:21:41.465 24336 24339 I Gralloc4: mapper 4.x is not supported
+04-25 20:21:41.465   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 20:21:41.491   555  2520 D CoreBackPreview: Window{f84d65f u0 PopupWindow:f2ccb30}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@6b2975, mPriority=0, mIsAnimationCallback=false}
+04-25 20:21:41.498 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:21:41.564 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@d5710cf
+04-25 20:21:41.571   555  1785 D CoreBackPreview: Window{f84d65f u0 PopupWindow:f2ccb30}: Setting back callback null
+04-25 20:21:41.573   555  2520 W InputManager-JNI: Input channel object 'f84d65f PopupWindow:f2ccb30 (client)' was disposed without first being removed with the input manager!
+04-25 20:21:41.837   555  1002 D CoreBackPreview: Window{5d1e7f1 u0 PopupWindow:f52d048}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@4fd3257, mPriority=0, mIsAnimationCallback=false}
+04-25 20:21:41.841 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:21:41.843 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@ae4ac7
+04-25 20:21:41.844   555  1002 D CoreBackPreview: Window{5d1e7f1 u0 PopupWindow:f52d048}: Setting back callback null
+04-25 20:21:41.844   555  1002 W InputManager-JNI: Input channel object '5d1e7f1 PopupWindow:f52d048 (client)' was disposed without first being removed with the input manager!
+04-25 20:21:45.603   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 20:21:48.698   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:21:50.475   157   157 I logd    : logdr: UID=2000 GID=2000 PID=24352 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 20:21:50.549 24357 24357 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 20:21:50.549 24357 24357 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 20:21:50.557   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 20:21:50.557 24357 24358 I Gralloc4: mapper 4.x is not supported
+04-25 20:21:50.557   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 20:21:50.656   555  2520 D CoreBackPreview: Window{7389cf3 u0 PopupWindow:616060}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@44a429, mPriority=0, mIsAnimationCallback=false}
+04-25 20:21:50.666 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:21:50.668 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@d83cbbf
+04-25 20:21:50.668   555  2520 D CoreBackPreview: Window{7389cf3 u0 PopupWindow:616060}: Setting back callback null
+04-25 20:21:50.678   555  2520 W InputManager-JNI: Input channel object '7389cf3 PopupWindow:616060 (client)' was disposed without first being removed with the input manager!
+04-25 20:21:50.735   555  2520 D CoreBackPreview: Window{f5a59e5 u0 PopupWindow:f7edb78}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@6e8b76b, mPriority=0, mIsAnimationCallback=false}
+04-25 20:21:50.741 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:21:50.742 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@e7973b7
+04-25 20:21:50.743   555  2520 D CoreBackPreview: Window{f5a59e5 u0 PopupWindow:f7edb78}: Setting back callback null
+04-25 20:21:50.743   555  1002 W InputManager-JNI: Input channel object 'f5a59e5 PopupWindow:f7edb78 (client)' was disposed without first being removed with the input manager!
+04-25 20:21:55.705   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 20:21:55.720   918  1011 D EGL_emulation: app_time_stats: avg=55650.00ms min=55650.00ms max=55650.00ms count=1
+04-25 20:21:56.630   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:21:59.360   157   157 I logd    : logdr: UID=2000 GID=2000 PID=24368 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 20:21:59.438 24381 24381 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 20:21:59.439 24381 24381 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 20:21:59.441   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 20:21:59.441 24381 24382 I Gralloc4: mapper 4.x is not supported
+04-25 20:21:59.441   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 20:21:59.521   555  2520 D CoreBackPreview: Window{5595f47 u0 PopupWindow:c3da190}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@1c2e09d, mPriority=0, mIsAnimationCallback=false}
+04-25 20:21:59.535 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:21:59.547 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@48d22af
+04-25 20:21:59.548   555  1002 W InputManager-JNI: Input channel object '5595f47 PopupWindow:c3da190 (client)' was disposed without first being removed with the input manager!
+04-25 20:21:59.549   555  2520 W WindowManager: Failed looking up window session=Session{37bd811 20347:u0a10490} callers=com.android.server.wm.WindowManagerService.windowForClientLocked:6034 com.android.server.wm.Session.setOnBackInvokedCallbackInfo:944 android.view.IWindowSession$Stub.onTransact:1145 
+04-25 20:21:59.549   555  2520 I WindowManager: setOnBackInvokedCallback(): No window state for package:com.integrationtestapp
+04-25 20:21:59.603   555  2520 D CoreBackPreview: Window{b71e999 u0 PopupWindow:a1c12a8}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@ecf03f, mPriority=0, mIsAnimationCallback=false}
+04-25 20:21:59.609 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:21:59.611 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@698b8a7
+04-25 20:21:59.611   555  2520 D CoreBackPreview: Window{b71e999 u0 PopupWindow:a1c12a8}: Setting back callback null
+04-25 20:21:59.612   555  2520 W InputManager-JNI: Input channel object 'b71e999 PopupWindow:a1c12a8 (client)' was disposed without first being removed with the input manager!
+04-25 20:22:00.008  1797  2107 I AiAiEcho: Predicting[0]: 
+04-25 20:22:00.008  1797  2107 I AiAiEcho: EchoTargets: 
+04-25 20:22:00.008  1797  2107 I AiAiEcho: Filtered by AiAi flag check: 
+04-25 20:22:00.009  1797  2107 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata: 
+04-25 20:22:00.009  1797  2107 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+04-25 20:22:00.048   918  1011 D EGL_emulation: app_time_stats: avg=4328.15ms min=4328.15ms max=4328.15ms count=1
+04-25 20:22:00.050   918   918 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+04-25 20:22:04.603   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:22:05.702   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 20:22:07.362 20347 20347 D AdMixerSDK::1.0.21: Reload Config Timeout
+04-25 20:22:07.364 20347 20347 D AdMixerSDK::1.0.21: Http Request :: https://amssp.admixer.co.kr/api/v1/mda/media-conf?media_key=10771&adunit_id=104591,104701,103722,104588,104589,104703&platform=android&os=android&osv=14&sdkv=1.0.21&model=sdk_gphone64_arm64&lang=en&network=null&ifa=58e87c99-42d0-4141-abf1-3401321ff76b
+04-25 20:22:07.365   354 24390 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10490 0}
+04-25 20:22:07.365   354 24392 I resolv  : res_nmkquery: (QUERY, IN, A)
+04-25 20:22:07.366   354 24391 I resolv  : res_nmkquery: (QUERY, IN, AAAA)
+04-25 20:22:07.726   354 24392 I resolv  : res_nsend: used send_dg 53 terrno: 0
+04-25 20:22:07.726   354 24392 I resolv  : doQuery: rcode=0, ancount=1, return value=53
+04-25 20:22:07.726   354 24391 I resolv  : res_nsend: used send_dg 78 terrno: 0
+04-25 20:22:07.726   354 24391 I resolv  : doQuery: rcode=0, ancount=0, return value=78
+04-25 20:22:07.727 20347 24389 D TrafficStats: tagSocket(91) with statsTag=0xffffffff, statsUid=-1
+04-25 20:22:08.290 20347 24389 D AdMixerSDK::1.0.21: Http Response : 200
+04-25 20:22:08.301 20347 24389 D AdMixerSDK::1.0.21: adResponse : AdResponse{errorCode=, errorMsg='', body='{"media":{"media_key":"10771","interval":600,"bundle_interval":0,"bundle":"kr.co.nasmedia.biorhythm","bg_req_yn":0,"error_send_yn":0,"debug_yn":0},"adunits":[{"adunit_id":104589,"adformat":"video","width":640,"height":360,"fullscreen":0,"interval":0,"freq_use":0,"freq_cycle_type":"M","freq_interval":0,"close_btn_delay":3,"video":{"type":2,"placement":3},"network_req_type":1,"house_ads_use":1,"networks":[{"id":5,"uid":7,"name":"Pangle1","priority":2,"portion":0},{"id":6,"uid":6,"name":"Applovin","priority":3,"portion":0},{"id":7,"uid":8,"name":"Unity Ads","priority":4,"portion":0},{"id":2,"uid":2,"name":"GoogleAdManager360","key":"[{\"adunit_code\": \"\/23086310286,22649957139\/ca-mb-app-pub-3018576306493266-inapp-video\/104589\"}]","priority":5,"portion":0},{"id":1,"uid":1,"name":"AdMixer","priority":7,"portion":0}],"reward_yn":"n"},{"adunit_id":103722,"adformat":"video","width":640,"height":360,"fullscreen":1,"interval":0,"freq_use":0,"freq_cycle_type":"M","freq_interval":0,"close_btn_delay":3,"video":{"type":3,"placement":3},"network_req_type":1,"house_ads_use":1,"networks":[{"id":5,"uid":7,"name":"Pangle1","key":"[{\"placement_id\": \"982529675\"}]","priority":2,"portion":0},{"id":6,"uid":6,"name":"Applovin","key":"[{\"zone_id\": \"e46872ca56f7ef8c\"}]","priority":3,"portion":0},{"id":7,"uid":8,"name":"Unity Ads","key":"[{\"game_id\": \"5857361\", \"placement_id\": \"103722\"}]","priority":4,"portion":0},{"id":2,"uid":2,"name":"GoogleAdManager360","key":"[{\"adunit_code\": \"\/23086310286,22649957139\/ca-mb-app-pub-3018576306493266-inapp-reward\/103722_2\"}]","priority":5,"portion":0},{"id":1,"uid":1,"name":"AdMixer","priority":7,"portion":0}],"reward_yn":"n","callback_url":"https:\/\/nasadplatform.com\/"},{"adunit_id":104591,"adformat":"video","width":640,"height":360,"fullscreen":1,"interval":0,"freq_use":0,"freq_cycle_type":"M","freq_interval":0,"close_btn_delay":3,"video":{"type":1,"placement":3},"network_req_type":1,"house_ads_use":1,"networks":[{"id":5,"uid":7,"name":"Pangle1","priority":2,"portion":0},{"id":6,"uid":6,"name":"Applovin","priority":3,"portion":0},{"id":7,"uid":8,"name":"Unity Ads","priority":4,"portion":0},{"id":2,"uid":2,"name":"GoogleAdManager360","key":"[{\"adunit_code\": \"\/23086310286,22649957139\/ca-video-pub-3018576306493266-inapp\/104591\"}]","priority":5,"portion":0},{"id":1,"uid":1,"name":"AdMixer","priority":7,"portion":0}],"reward_yn":"n"},{"adunit_id":104701,"adformat":"banner","width":320,"height":50,"fullscreen":0,"interval":0,"freq_use":0,"freq_cycle_type":"M","freq_interval":0,"close_btn_delay":0,"video":{"type":0,"placement":3},"network_req_type":1,"house_ads_use":1,"networks":[{"id":12,"uid":11,"name":"Naver","key":"[{\"adunit_id\": \"test_aos_320x50-N248971943\"}]","priority":1,"portion":0},{"id":5,"uid":7,"name":"Pangle1","key":"[{\"placement_id\": \"982611225\"}]","priority":2,"portion":0},{"id":6,"uid":6,"name":"Applovin","key":"[{\"zone_id\": \"0be23da82068db98\"}]","priority":3,"portion":0},{"id":7,"uid":8,"name":"Unity Ads","key":"[{\"game_id\": \"5857361\", \"placement_id\": \"104701\"}]","priority":4,"portion":0},{"id":2,"uid":2,"name":"GoogleAdManager360","key":"[{\"adunit_code\": \"\/23086310286,22649957139\/ca-mb-app-pub-3018576306493266-inapp-banner\/104701\"}]","priority":5,"portion":0},{"id":3,"uid":4,"name":"KaKao Adfit","key":"[{\"data-ad-unit\": \"DAN-HIihYTVXASJwwm7d\"}]","priority":6,"portion":0},{"id":1,"uid":1,"name":"AdMixer","priority":7,"portion":0}],"reward_yn":"n"},{"adunit_id":104588,"adformat":"native","width":0,"height":0,"fullscreen":0,"interval":0,"freq_use":0,"freq_cycle_type":"M","freq_interval":0,"close_btn_delay":0,"video":{"type":0,"placement":3},"network_req_type":1,"house_ads_use":1,"networks":[{"id":12,"uid":11,"name":"Naver","key":"[{\"adunit_id\": \"test_aos_native-N248971943\"}]","priority":1,"portion":0},{"id":5,"uid":7,"name":"Pangle1","key":"[{\"placement_id\": \"982529662\"}]","priority":2,"portion":0},{"id":2,"uid":2,"name":"Goo
+04-25 20:22:08.302 20347 20347 D AdMixerSDK::1.0.21: Succeeded to receive config Info
+04-25 20:22:08.309 20347 20347 I System.out: Adunit Code: /23086310286,22649957139/ca-mb-app-pub-3018576306493266-inapp-video/104589
+04-25 20:22:08.309 20347 20347 I System.out: Adunit Code: null
+04-25 20:22:08.309 20347 20347 I System.out: Adunit Code: null
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: null
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: /23086310286,22649957139/ca-mb-app-pub-3018576306493266-inapp-reward/103722_2
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: /23086310286,22649957139/ca-video-pub-3018576306493266-inapp/104591
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: null
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: null
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: null
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: null
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: /23086310286,22649957139/ca-mb-app-pub-3018576306493266-inapp-banner/104701
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: null
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: null
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: null
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: /23086310286,22649957139/ca-mb-app-pub-3018576306493266-inapp-native/104588
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: null
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: null
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: /23086310286,22649957139/ca-mb-app-pub-3018576306493266-inapp-banner/104703
+04-25 20:22:08.310 20347 20347 I System.out: Adunit Code: null
+04-25 20:22:08.310 20347 20347 D AdMixerSDK::1.0.21: Config Info Listener Count : 1
+04-25 20:22:08.310 20347 20347 D AdMixerSDK::1.0.21: Start Config Reload Timer : 300000ms
+04-25 20:22:08.334   157   157 I logd    : logdr: UID=2000 GID=2000 PID=24395 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 20:22:08.408 24400 24400 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 20:22:08.408 24400 24400 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 20:22:08.417   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 20:22:08.417 24400 24401 I Gralloc4: mapper 4.x is not supported
+04-25 20:22:08.417   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 20:22:08.499   555  2520 D CoreBackPreview: Window{6508df8 u0 PopupWindow:5a323a2}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@73d8136, mPriority=0, mIsAnimationCallback=false}
+04-25 20:22:08.510 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:22:08.531 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@7a15169
+04-25 20:22:08.532   555  2520 D CoreBackPreview: Window{6508df8 u0 PopupWindow:5a323a2}: Setting back callback null
+04-25 20:22:08.532   555  2520 W InputManager-JNI: Input channel object '6508df8 PopupWindow:5a323a2 (client)' was disposed without first being removed with the input manager!
+04-25 20:22:08.572   555  1002 D CoreBackPreview: Window{fd87ac2 u0 PopupWindow:40984fa}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@432410, mPriority=0, mIsAnimationCallback=false}
+04-25 20:22:08.580 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:22:08.582 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@d78c4a1
+04-25 20:22:08.582   555  2520 D CoreBackPreview: Window{fd87ac2 u0 PopupWindow:40984fa}: Setting back callback null
+04-25 20:22:08.583   555  2520 W InputManager-JNI: Input channel object 'fd87ac2 PopupWindow:40984fa (client)' was disposed without first being removed with the input manager!
+04-25 20:22:12.563   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:22:15.743   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+04-25 20:22:17.207   157   157 I logd    : logdr: UID=2000 GID=2000 PID=24410 n tail=200 logMask=99 pid=0 start=0ns deadline=0ns
+04-25 20:22:17.282 24415 24415 W BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+04-25 20:22:17.282 24415 24415 W ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+04-25 20:22:17.289   163   163 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+04-25 20:22:17.289 24415 24416 I Gralloc4: mapper 4.x is not supported
+04-25 20:22:17.289   162   162 I servicemanager: Could not find android.hardware.graphics.allocator.IAllocator/default in the VINTF manifest.
+04-25 20:22:17.356   555  2520 D CoreBackPreview: Window{21e713c u0 PopupWindow:effb952}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@26ea01a, mPriority=0, mIsAnimationCallback=false}
+04-25 20:22:17.378 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:22:17.380 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@af466d9
+04-25 20:22:17.380   555  1002 W InputManager-JNI: Input channel object '21e713c PopupWindow:effb952 (client)' was disposed without first being removed with the input manager!
+04-25 20:22:17.381   555  2520 W WindowManager: Failed looking up window session=Session{37bd811 20347:u0a10490} callers=com.android.server.wm.WindowManagerService.windowForClientLocked:6034 com.android.server.wm.Session.setOnBackInvokedCallbackInfo:944 android.view.IWindowSession$Stub.onTransact:1145 
+04-25 20:22:17.381   555  2520 I WindowManager: setOnBackInvokedCallback(): No window state for package:com.integrationtestapp
+04-25 20:22:17.451   555  1002 D CoreBackPreview: Window{dc6a3e6 u0 PopupWindow:84d20aa}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@c79abd4, mPriority=0, mIsAnimationCallback=false}
+04-25 20:22:17.464 20347 20375 E OpenGLRenderer: Unable to match the desired swap behavior.
+04-25 20:22:17.465 20347 20347 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@c8b1811
+04-25 20:22:17.466   555  2520 W InputManager-JNI: Input channel object 'dc6a3e6 PopupWindow:84d20aa (client)' was disposed without first being removed with the input manager!
+04-25 20:22:17.467   555  1002 W WindowManager: Failed looking up window session=Session{37bd811 20347:u0a10490} callers=com.android.server.wm.WindowManagerService.windowForClientLocked:6034 com.android.server.wm.Session.setOnBackInvokedCallbackInfo:944 android.view.IWindowSession$Stub.onTransact:1145 
+04-25 20:22:17.467   555  1002 I WindowManager: setOnBackInvokedCallback(): No window state for package:com.integrationtestapp
+04-25 20:22:20.745   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:22:25.801   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled

@@ -47,12 +47,12 @@ export class TypedEventEmitter<TEvents extends Record<string, any>> {
  * Global event emitter to handle native events from RCTDeviceEventEmitter.
  */
 class GlobalEventEmitter extends TypedEventEmitter<any> {
-  private nativeEmitter?: NativeEventEmitter;
-  // One nativeEmitter subscription per event name (avoids duplicate firings)
+  private nativeEmitters = new Map<string, NativeEventEmitter>();
+  // One nativeEmitter subscription per module+event pair
   private nativeSubscriptions = new Map<string, ReturnType<NativeEventEmitter['addListener']>>();
 
   setup(nativeModuleName: string): void {
-    if (this.nativeEmitter) {
+    if (this.nativeEmitters.has(nativeModuleName)) {
       return;
     }
 
@@ -61,26 +61,32 @@ class GlobalEventEmitter extends TypedEventEmitter<any> {
       return;
     }
 
-    this.nativeEmitter = new NativeEventEmitter(nativeModule);
+    const emitter = new NativeEventEmitter(nativeModule);
+    this.nativeEmitters.set(nativeModuleName, emitter);
   }
 
   addListener(eventName: string, handler: EventHandler<any>): () => void {
     const cleanup = this.on(eventName, handler);
 
-    // Register with nativeEmitter only once per event name
-    if (this.nativeEmitter && !this.nativeSubscriptions.has(eventName)) {
-      const sub = this.nativeEmitter.addListener(eventName, (payload: any) => {
-        this.emit(eventName, payload);
-      });
-      this.nativeSubscriptions.set(eventName, sub);
+    for (const [moduleName, emitter] of this.nativeEmitters.entries()) {
+      const key = `${moduleName}:${eventName}`;
+      if (!this.nativeSubscriptions.has(key)) {
+        const sub = emitter.addListener(eventName, (payload: any) => {
+          this.emit(eventName, payload);
+        });
+        this.nativeSubscriptions.set(key, sub);
+      }
     }
 
     return () => {
       cleanup();
-      // Remove nativeEmitter subscription when no JS listeners remain
       if (!this.hasListeners(eventName)) {
-        this.nativeSubscriptions.get(eventName)?.remove();
-        this.nativeSubscriptions.delete(eventName);
+        for (const [key, sub] of this.nativeSubscriptions.entries()) {
+          if (key.endsWith(`:${eventName}`)) {
+            sub.remove();
+            this.nativeSubscriptions.delete(key);
+          }
+        }
       }
     };
   }

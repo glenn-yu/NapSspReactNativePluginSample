@@ -1,0 +1,156 @@
+platform=ios
+out_dir=/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/ios-soak-60m-20260425-223157
+flow=/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/ios-ad-validation.yaml
+sim_udid=8D90B616-14A9-4A49-A1A7-0470FF80A9F9
+start_time=2026-04-25 22:31:57
+duration_seconds=1800
+[2026-04-25 22:31:58] iteration=1 starting
+[2026-04-25 22:31:58] iteration=1 maestro_exit=143
+[2026-04-25 22:31:58] iteration=1 result=FAIL key=ios_other_failure repeat=1
+  WARNING: A restricted method in java.lang.System has been called
+  WARNING: java.lang.System::load has been called by org.fusesource.jansi.internal.JansiLoader in an unnamed module (file:/Users/gwangy.claw/.maestro/lib/jansi-2.4.1.jar)
+  WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+  WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+  
+[2026-04-25 22:32:03] ios recovery: relaunching simulator app
+[2026-04-25 22:32:14] iteration=2 starting
+[2026-04-25 22:32:14] iteration=2 maestro_exit=143
+[2026-04-25 22:32:14] iteration=2 result=FAIL key=ios_sdk_init_visibility repeat=1
+  WARNING: A restricted method in java.lang.System has been called
+  WARNING: java.lang.System::load has been called by org.fusesource.jansi.internal.JansiLoader in an unnamed module (file:/Users/gwangy.claw/.maestro/lib/jansi-2.4.1.jar)
+  WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+  WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+  
+  Running on iPhone 17 Pro - iOS 26.4 - 8D90B616-14A9-4A49-A1A7-0470FF80A9F9
+   > Flow ios-ad-validation
+  Launch app "org.reactjs.native.example.IntegrationTestApp" with clear state... COMPLETED
+  Assert that "SDK 초기화" is visible... COMPLETED
+  Run flow when "OK" is visible...
+  
+  ==== Debug output (logs & screenshots) ====
+  
+  /Users/gwangy.claw/.maestro/tests/2026-04-25_223215
+[2026-04-25 22:32:24] ios recovery: relaunching simulator app
+[2026-04-25 22:32:35] iteration=3 starting
+[2026-04-25 22:32:35] iteration=3 maestro_exit=143
+[2026-04-25 22:32:35] iteration=3 result=FAIL key=ios_sdk_init_visibility repeat=2
+  WARNING: A restricted method in java.lang.System has been called
+  WARNING: java.lang.System::load has been called by org.fusesource.jansi.internal.JansiLoader in an unnamed module (file:/Users/gwangy.claw/.maestro/lib/jansi-2.4.1.jar)
+  WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+  WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+  
+  Running on iPhone 17 Pro - iOS 26.4 - 8D90B616-14A9-4A49-A1A7-0470FF80A9F9
+   > Flow ios-ad-validation
+  Launch app "org.reactjs.native.example.IntegrationTestApp" with clear state... COMPLETED
+  Assert that "SDK 초기화" is visible...
+  ==== Debug output (logs & screenshots) ====
+  
+  /Users/gwangy.claw/.maestro/tests/2026-04-25_223236
+[2026-04-25 22:32:44] ios recovery: relaunching simulator app
+[2026-04-25 22:32:55] iteration=4 starting
+[2026-04-25 22:32:55] iteration=4 maestro_exit=0
+[2026-04-25 22:32:55] iteration=4 result=PASS
+[2026-04-25 22:34:04] iteration=5 starting
+[2026-04-25 22:34:04] iteration=5 maestro_exit=0
+[2026-04-25 22:34:04] iteration=5 result=PASS
+[2026-04-25 22:35:12] iteration=6 starting
+[2026-04-25 22:35:12] iteration=6 maestro_exit=0
+[2026-04-25 22:35:12] iteration=6 result=PASS
+[2026-04-25 22:36:20] iteration=7 starting
+[2026-04-25 22:36:20] iteration=7 maestro_exit=0
+[2026-04-25 22:36:20] iteration=7 result=PASS
+[2026-04-25 22:37:29] iteration=8 starting
+[2026-04-25 22:37:29] iteration=8 maestro_exit=0
+[2026-04-25 22:37:29] iteration=8 result=PASS
+[2026-04-25 22:38:38] iteration=9 starting
+[2026-04-25 22:38:38] iteration=9 maestro_exit=0
+[2026-04-25 22:38:38] iteration=9 result=PASS
+[2026-04-25 22:39:46] iteration=10 starting
+[2026-04-25 22:39:46] iteration=10 maestro_exit=0
+[2026-04-25 22:39:46] iteration=10 result=PASS
+[2026-04-25 22:40:56] iteration=11 starting
+[2026-04-25 22:40:56] iteration=11 maestro_exit=0
+[2026-04-25 22:40:56] iteration=11 result=PASS
+[2026-04-25 22:42:05] iteration=12 starting
+[2026-04-25 22:42:05] iteration=12 maestro_exit=0
+[2026-04-25 22:42:05] iteration=12 result=PASS
+[2026-04-25 22:43:13] iteration=13 starting
+[2026-04-25 22:43:13] iteration=13 maestro_exit=0
+[2026-04-25 22:43:13] iteration=13 result=PASS
+[2026-04-25 22:44:21] iteration=14 starting
+[2026-04-25 22:44:21] iteration=14 maestro_exit=0
+[2026-04-25 22:44:21] iteration=14 result=PASS
+[2026-04-25 22:45:30] iteration=15 starting
+[2026-04-25 22:45:30] iteration=15 maestro_exit=0
+[2026-04-25 22:45:30] iteration=15 result=PASS
+[2026-04-25 22:46:38] iteration=16 starting
+[2026-04-25 22:46:38] iteration=16 maestro_exit=0
+[2026-04-25 22:46:38] iteration=16 result=PASS
+[2026-04-25 22:47:47] iteration=17 starting
+[2026-04-25 22:47:47] iteration=17 maestro_exit=0
+[2026-04-25 22:47:47] iteration=17 result=PASS
+[2026-04-25 22:48:55] iteration=18 starting
+[2026-04-25 22:48:55] iteration=18 maestro_exit=0
+[2026-04-25 22:48:55] iteration=18 result=PASS
+[2026-04-25 22:50:07] iteration=19 starting
+[2026-04-25 22:50:07] iteration=19 maestro_exit=143
+[2026-04-25 22:50:07] iteration=19 result=FAIL key=ios_sdk_init_visibility repeat=1
+  WARNING: A restricted method in java.lang.System has been called
+  WARNING: java.lang.System::load has been called by org.fusesource.jansi.internal.JansiLoader in an unnamed module (file:/Users/gwangy.claw/.maestro/lib/jansi-2.4.1.jar)
+  WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+  WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+  
+  Running on iPhone 17 Pro - iOS 26.4 - 8D90B616-14A9-4A49-A1A7-0470FF80A9F9
+   > Flow ios-ad-validation
+  Launch app "org.reactjs.native.example.IntegrationTestApp" with clear state... COMPLETED
+  Assert that "SDK 초기화" is visible... COMPLETED
+  Run flow when "OK" is visible...
+  Run flow when "OK" is visible... SKIPPED
+  Wait for animation to end... COMPLETED
+  Assert that "SDK 초기화" is visible... COMPLETED
+  Tap on "SDK 초기화"... COMPLETED
+  Wait for animation to end... COMPLETED
+  Run flow when "OK" is visible...
+  
+  ==== Debug output (logs & screenshots) ====
+  
+  /Users/gwangy.claw/.maestro/tests/2026-04-25_225008
+[2026-04-25 22:50:26] ios recovery: relaunching simulator app
+[2026-04-25 22:50:36] iteration=20 starting
+[2026-04-25 22:50:36] iteration=20 maestro_exit=1
+[2026-04-25 22:50:36] iteration=20 result=FAIL key=ios_sdk_init_visibility repeat=2
+  WARNING: A restricted method in java.lang.System has been called
+  WARNING: java.lang.System::load has been called by org.fusesource.jansi.internal.JansiLoader in an unnamed module (file:/Users/gwangy.claw/.maestro/lib/jansi-2.4.1.jar)
+  WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+  WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+  
+  Running on iPhone 17 Pro - iOS 26.4 - 8D90B616-14A9-4A49-A1A7-0470FF80A9F9
+   > Flow ios-ad-validation
+  Launch app "org.reactjs.native.example.IntegrationTestApp" with clear state... COMPLETED
+  Assert that "SDK 초기화" is visible... COMPLETED
+  Run flow when "OK" is visible...
+  Run flow when "OK" is visible... SKIPPED
+  Wait for animation to end... COMPLETED
+  Assert that "SDK 초기화" is visible... COMPLETED
+  Tap on "SDK 초기화"... COMPLETED
+  Wait for animation to end... COMPLETED
+  Run flow when "OK" is visible...
+  Run flow when "OK" is visible... SKIPPED
+  Assert that "1. 배너 광고 (320×50)" is visible... COMPLETED
+  Tap on "로드", Index: 0... COMPLETED
+  Assert that "BANNER loaded=true impression=true" is visible... FAILED
+  
+  Assertion is false: "BANNER loaded=true impression=true" is visible
+  
+  Assertion '"BANNER loaded=true impression=true" is visible' failed. Check the UI hierarchy in debug artifacts to verify the element state and properties.
+  
+  Possible causes:
+  - Element selector may be incorrect - check if there are similar elements with slightly different names/properties.
+  - Element may be temporarily unavailable due to loading state
+  - This could be a real regression that needs to be addressed
+  
+  ==== Debug output (logs & screenshots) ====
+  
+  /Users/gwangy.claw/.maestro/tests/2026-04-25_225037
+[2026-04-25 22:51:22] ios recovery: relaunching simulator app
+[2026-04-25 22:51:33] iteration=21 starting

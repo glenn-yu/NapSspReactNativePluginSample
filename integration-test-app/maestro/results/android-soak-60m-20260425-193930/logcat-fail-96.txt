@@ -1,0 +1,203 @@
+--------- beginning of main
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10224 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10222 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10220 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10218 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10216 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10214 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10212 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10210 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10208 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10206 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10204 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10202 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10200 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10198 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10196 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10195 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10194 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10187 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10187 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10185 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10185 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10182 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10182 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.115   555  2520 W CpuPowerCalculator: UID 10182 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10182 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10181 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10181 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10177 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10177 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10177 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10176 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10176 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10176 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10176 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10173 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10173 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10173 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10169 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10169 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10168 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10168 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10168 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10164 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10164 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10164 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10156 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10156 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10156 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10155 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10155 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10155 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10154 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10154 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10154 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10152 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10152 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10149 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10149 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10149 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10149 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10148 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10148 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10148 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10147 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10147 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10147 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10147 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10144 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10144 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10144 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10143 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10143 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10143 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10141 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10141 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10141 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10135 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10135 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10135 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10132 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10132 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10132 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10131 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10131 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10130 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10130 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10128 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10128 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10128 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10127 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10127 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10127 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10123 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10123 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10123 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10123 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10122 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10122 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10122 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10121 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10121 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10121 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10121 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10120 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10120 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10120 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10118 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10118 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10118 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10099 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10099 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10099 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10092 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10092 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10092 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.116   555  2520 W CpuPowerCalculator: UID 10091 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 10091 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 10091 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 10088 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 10088 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 10088 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 10088 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 10086 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 10086 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 10086 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 10086 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 10084 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 10084 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 10084 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 9999 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 2000 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1092 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1082 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1073 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1073 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1072 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1069 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1068 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1068 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1066 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1053 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1047 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1041 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1036 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1020 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1017 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1013 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1010 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1002 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1002 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1001 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1001 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 1000 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.117   555  2520 W CpuPowerCalculator: UID 0 CPU freq # mismatch: Power Profile # 2 actual # 8
+04-25 20:00:00.118 16820 16820 D PeriodicJobManager: schedule next alarm job at Apr 25, 2026, 21:00:00
+--------- beginning of system
+04-25 20:00:00.118   555   995 I ActivityManager: Killing 15534:com.google.android.gm/u0a144 (adj 985): empty #17
+--------- beginning of kernel
+04-25 20:00:00.126 19613 19613 I binder  : undelivered transaction 14521421, process died.
+04-25 20:00:00.126 19613 19613 I binder  : undelivered transaction 14627596, process died.
+04-25 20:00:00.126 19613 19613 I binder  : undelivered transaction 14633002, process died.
+04-25 20:00:00.126 19613 19613 I binder  : undelivered transaction 14934853, process died.
+04-25 20:00:00.126 19613 19613 I binder  : undelivered transaction 14943475, process died.
+04-25 20:00:00.126 19613 19613 I binder  : undelivered transaction 15027703, process died.
+04-25 20:00:00.126 19613 19613 I binder  : undelivered transaction 15036035, process died.
+04-25 20:00:00.126 19613 19613 I binder  : undelivered transaction 15126842, process died.
+04-25 20:00:00.126 19613 19613 I binder  : undelivered transaction 15135627, process died.
+04-25 20:00:00.126 19613 19613 I binder  : undelivered transaction 15212778, process died.
+04-25 20:00:00.127   355   355 I Zygote  : Process 15534 exited due to signal 9 (Killed)
+04-25 20:00:00.128   555   848 D ConnectivityService: releasing NetworkRequest [ REQUEST id=964, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10156 RequestorUid: 10156 RequestorPkg: com.google.android.youtube UnderlyingNetworks: Null] ] (release request)
+04-25 20:00:00.128   555  1002 D ActivityManager: sync unfroze 24299 com.google.android.gms for 5
+04-25 20:00:00.128   555   848 D ConnectivityService: releasing NetworkRequest [ REQUEST id=966, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10156 RequestorUid: 10156 RequestorPkg: com.google.android.youtube UnderlyingNetworks: Null] ] (release request)
+04-25 20:00:00.128   555   848 D ConnectivityService: releasing NetworkRequest [ REQUEST id=969, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10156 RequestorUid: 10156 RequestorPkg: com.google.android.youtube UnderlyingNetworks: Null] ] (release request)
+04-25 20:00:00.128   555   848 D ConnectivityService: releasing NetworkRequest [ REQUEST id=971, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10156 RequestorUid: 10156 RequestorPkg: com.google.android.youtube UnderlyingNetworks: Null] ] (release request)
+04-25 20:00:00.128   555   848 D ConnectivityService: releasing NetworkRequest [ REQUEST id=973, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10156 RequestorUid: 10156 RequestorPkg: com.google.android.youtube UnderlyingNetworks: Null] ] (release request)
+04-25 20:00:00.129   555   577 D DisplayManagerService: Drop pending events for gone uid 10144
+04-25 20:00:00.129   355   355 I Zygote  : Process 15658 exited due to signal 9 (Killed)
+04-25 20:00:00.131   555   589 I libprocessgroup: Successfully killed process cgroup uid 10144 pid 15534 in 0ms
+04-25 20:00:00.131 24299 24299 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.mobstore.service.START pkg=com.google.android.gms }
+04-25 20:00:00.133 16820 16838 W DataProcessor: shouldShowBatteryAttributionList(): 0.1
+04-25 20:00:00.133 16820 16838 W BatteryUsageDataLoader: getBatteryEntryList() returns null or empty content
+04-25 20:00:00.133 16820 16838 D BatteryUsageDataLoader: getBatteryUsageStats() in 23/ms
+04-25 20:00:00.133   555  2539 D ActivityManager: sync unfroze 15812 com.android.chrome for 5
+04-25 20:00:00.134 24299 24299 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.gms.measurement.START pkg=com.google.android.gms }
+04-25 20:00:00.134   555   577 D DisplayManagerService: Drop pending events for gone uid 10156
+04-25 20:00:00.134 24299 24299 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.gms.potokens.service.START dat=chimera-action:/... cmp=com.google.android.gms/.chimera.GmsApiService }
+04-25 20:00:00.135  5048  5048 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.gms.phenotype.service.START pkg=com.google.android.gms }
+04-25 20:00:00.144 16820 16838 D DatabaseUtils: insert() data into database with isFullChargeStart:false
+04-25 20:00:00.144 16820 16838 D DatabaseUtils: sendBatteryEntryData() size=1 in 11/ms
+04-25 20:00:00.144 16820 22060 D AppUsageDataLoader: loadAppUsageDataSafely() in the AsyncTask
+04-25 20:00:00.145 16820 22060 D BatteryUsageContentProvider: getQueryUserId from uri: content://com.android.settings.battery.usage.provider/appUsageLatestTimestamp?userid=0
+04-25 20:00:00.146 16820 22060 D BatteryUsageContentProvider: query app usage latest timestamp 1777114800145 for user 0 in 1/ms
+04-25 20:00:00.149 16820 22060 D DatabaseUtils: getAppUsageStartTimestampOfUser() userId=0 latestTimestamp=Apr 25, 2026, 18:58:58 in 4/ms
+04-25 20:00:00.150   555  2520 D IntervalStats: Unable to parse usage stats packages: [225, 226, 227, 228, 229, 231, 235, 237]
+04-25 20:00:00.150 16820 22060 D DataProcessor: getAppUsageEventsForUser(): 0 from 1777111138619 to 1777114800145 in 1/ms
+04-25 20:00:00.150 16820 22060 D DataProcessor: getAppUsageEvents() for all unlocked users in 6/ms
+04-25 20:00:00.154 16820 22060 W DataProcessor: Read 20 relevant events (46 total) from UsageStatsManager
+04-25 20:00:00.154 16820 22060 D AppUsageDataLoader: loadAppUsageData() size=20 in 10/ms
+04-25 20:00:00.164 16820 22060 D DatabaseUtils: insert() app usage events data into database
+04-25 20:00:00.164 16820 22060 D DatabaseUtils: sendAppUsageEventData() size=20 in 10/ms
+04-25 20:00:04.649   906   906 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+04-25 20:00:05.855   918   918 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled

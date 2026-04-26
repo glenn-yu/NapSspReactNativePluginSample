@@ -5,18 +5,20 @@ Pod::Spec.new do |s|
   s.homepage     = 'https://github.com/glenn-yu/react-native-nap-ssp'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.author       = { 'gwangy' => 'gwangy@example.com' }
-  s.platform     = :ios, '13.0'
+  s.platform     = :ios, '14.0'
   s.static_framework = true
-  s.source       = { :git => 'https://github.com/glenn-yu/react-native-nap-ssp.git', :tag => s.version.to_s }
-  s.source_files = 'ios/**/*.{h,m,swift}'
-  s.exclude_files = 'ios/Package.swift'
+  s.source       = { :path => '.' }
+  s.preserve_paths = '*', 'README.md'
+  s.source_files = '*.{h,m,swift}'
+  s.exclude_files = 'Package.swift'
   s.swift_version = '5.0'
   s.frameworks = 'Foundation', 'UIKit', 'AdSupport', 'StoreKit'
   s.weak_frameworks = 'AppTrackingTransparency'
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     'CLANG_ENABLE_MODULES' => 'YES',
-    'APPLICATION_EXTENSION_API_ONLY' => 'NO'
+    'APPLICATION_EXTENSION_API_ONLY' => 'NO',
+    'OTHER_SWIFT_FLAGS' => '$(inherited) -D COCOAPODS'
   }
 
   s.dependency 'React-Core'

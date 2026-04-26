@@ -8,6 +8,7 @@ Pod::Spec.new do |s|
   s.platform     = :ios, '14.0'
   s.static_framework = true
   s.source       = { :path => '.' }
+  s.preserve_paths = 'ios/**/*', 'LICENSE', 'README.md'
   s.source_files = 'ios/**/*.{h,m,swift}'
   s.exclude_files = 'ios/Package.swift'
   s.swift_version = '5.0'

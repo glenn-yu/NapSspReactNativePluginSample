@@ -1,0 +1,5 @@
+platform=android
+out_dir=/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/android-soak-60m-20260425-203634
+flow=/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/android-ad-validation.yaml
+start_time=2026-04-25 20:36:34
+[2026-04-25 20:36:34] iteration=1 starting

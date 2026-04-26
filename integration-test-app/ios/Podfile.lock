@@ -23,8 +23,10 @@ PODS:
   - hermes-engine/Pre-built (0.72.10)
   - libevent (2.1.12)
   - NapSspPlugin/AdFit (0.1.2):
-    - AdMixerMediation
     - AdMixerMediationAdFit
+    - NapSspPlugin/Core
+  - NapSspPlugin/Core (0.1.2):
+    - AdMixerMediation
     - React-Core
   - RCT-Folly (2021.07.22.00):
     - boost
@@ -450,7 +452,8 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
-  - NapSspPlugin/AdFit (from `../node_modules/react-native-nap-ssp`)
+  - NapSspPlugin/AdFit (from `./NapSspLocalPod`)
+  - NapSspPlugin/Core (from `./NapSspLocalPod`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
@@ -510,7 +513,7 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
   NapSspPlugin:
-    :path: "../node_modules/react-native-nap-ssp"
+    :path: "./NapSspLocalPod"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -591,7 +594,7 @@ SPEC CHECKSUMS:
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   hermes-engine: 90e4033deb00bee33330a9f15eff0f874bd82f6d
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
-  NapSspPlugin: a51409057c0f9baac20ea5484c795ef0af2296b5
+  NapSspPlugin: dc6cbe091462049e0227a47807ea5660a2e76500
   RCT-Folly: 8dc08ca5a393b48b1c523ab6220dfdcc0fe000ad
   RCTRequired: b4d3068afa6f52ec5260a8417053b1f1b421483d
   RCTTypeSafety: a4551b3d338c96435f63bf06d564055c1d3cc0ac
@@ -627,6 +630,6 @@ SPEC CHECKSUMS:
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: d0003f849d2b5224c072cef6568b540d8bb15cd3
 
-PODFILE CHECKSUM: 980eabbfe90c8121c0974afbd2426a1c5297edab
+PODFILE CHECKSUM: 38ff8af0cbd0b58193ef778054a2a5e22b8e9b0a
 
 COCOAPODS: 1.16.2

@@ -13,13 +13,14 @@ import type { AdError, NativeAdProps } from './types';
 
 type NativeAdComponentProps = Omit<
   NativeAdProps,
-  'onAdLoaded' | 'onAdFailedToLoad' | 'onAdClicked' | 'onAdOpened' | 'onAdClosed'
+  'onAdLoaded' | 'onAdFailedToLoad' | 'onAdClicked' | 'onAdOpened' | 'onAdClosed' | 'onAdImpression'
 > & {
   onAdLoaded?: () => void;
   onAdFailedToLoad?: (event: { nativeEvent: AdError }) => void;
   onAdClicked?: () => void;
   onAdOpened?: () => void;
   onAdClosed?: () => void;
+  onAdImpression?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -58,6 +59,7 @@ export default function NativeAd(props: NativeAdProps) {
         onAdClicked={props.onAdClicked}
         onAdOpened={props.onAdOpened}
         onAdClosed={props.onAdClosed}
+        onAdImpression={props.onAdImpression}
       />
     );
   }

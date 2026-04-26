@@ -7,7 +7,8 @@ mkdir -p "$OUT_DIR"
 
 export JAVA_HOME="/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
 export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk"
-export PATH="$JAVA_HOME/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH:$HOME/.maestro/bin"
+export ADB_BIN="/opt/homebrew/bin/adb"
+export PATH="$JAVA_HOME/bin:$HOME/.maestro/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export MAESTRO_CLI_NO_ANALYTICS=1
 export MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED=true
 
@@ -51,9 +52,9 @@ ensure_metro() {
 record_env() {
   {
     echo "===== $(date '+%Y-%m-%d %H:%M:%S') ====="
-    adb devices
-    adb -s emulator-5554 shell getprop ro.build.version.release || true
-    adb -s emulator-5554 shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' || true
+    "$ADB_BIN" devices
+    "$ADB_BIN" -s emulator-5554 shell getprop ro.build.version.release || true
+    "$ADB_BIN" -s emulator-5554 shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' || true
   } >> "$ADB_LOG" 2>&1
 }
 
@@ -65,7 +66,7 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
   TS="$(date '+%Y-%m-%d %H:%M:%S')"
   LOG="$OUT_DIR/run-${ITER}.log"
   echo "[$TS] iteration=$ITER starting" | tee -a "$SUMMARY"
-  adb -s emulator-5554 reverse tcp:8081 tcp:8081 >/dev/null 2>&1 || true
+  "$ADB_BIN" -s emulator-5554 reverse tcp:8081 tcp:8081 >/dev/null 2>&1 || true
   if maestro test "$FLOW" >"$LOG" 2>&1; then
     PASS=$((PASS + 1))
     echo "[$TS] iteration=$ITER result=PASS" | tee -a "$SUMMARY"
@@ -73,8 +74,8 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
     FAIL=$((FAIL + 1))
     echo "[$TS] iteration=$ITER result=FAIL" | tee -a "$SUMMARY"
     tail -n 80 "$LOG" | sed 's/^/  /' | tee -a "$SUMMARY"
-    adb -s emulator-5554 logcat -d -t 200 > "$OUT_DIR/logcat-fail-${ITER}.txt" 2>&1 || true
-    adb -s emulator-5554 exec-out screencap -p > "$OUT_DIR/fail-${ITER}.png" 2>/dev/null || true
+    "$ADB_BIN" -s emulator-5554 logcat -d -t 200 > "$OUT_DIR/logcat-fail-${ITER}.txt" 2>&1 || true
+    "$ADB_BIN" -s emulator-5554 exec-out screencap -p > "$OUT_DIR/fail-${ITER}.png" 2>/dev/null || true
   fi
   sleep 5
 done

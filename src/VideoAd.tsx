@@ -13,13 +13,14 @@ import type { AdError, VideoAdProps } from './types';
 
 type NativeVideoAdComponentProps = Omit<
   VideoAdProps,
-  'onAdLoaded' | 'onAdFailedToLoad' | 'onAdClicked' | 'onAdOpened' | 'onAdClosed' | 'onAdCompleted' | 'onAdSkipped'
+  'onAdLoaded' | 'onAdFailedToLoad' | 'onAdClicked' | 'onAdOpened' | 'onAdClosed' | 'onAdImpression' | 'onAdCompleted' | 'onAdSkipped'
 > & {
   onAdLoaded?: () => void;
   onAdFailedToLoad?: (event: { nativeEvent: AdError }) => void;
   onAdClicked?: () => void;
   onAdOpened?: () => void;
   onAdClosed?: () => void;
+  onAdImpression?: () => void;
   onAdCompleted?: () => void;
   onAdSkipped?: () => void;
   style?: StyleProp<ViewStyle>;
@@ -59,6 +60,7 @@ export default function VideoAd(props: VideoAdProps) {
         onAdClicked={props.onAdClicked}
         onAdOpened={props.onAdOpened}
         onAdClosed={props.onAdClosed}
+        onAdImpression={props.onAdImpression}
         onAdCompleted={props.onAdCompleted}
         onAdSkipped={props.onAdSkipped}
       />

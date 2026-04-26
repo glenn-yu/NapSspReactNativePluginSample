@@ -16,6 +16,9 @@ appId: com.integrationtestapp
     text: "로드"
     index: 0
 - extendedWaitUntil:
+    visible: "BANNER_STATUS:LOADED:IMPRESSION"
+    timeout: 20000
+- extendedWaitUntil:
     visible: "언로드"
     timeout: 10000
 - scrollUntilVisible:
@@ -25,6 +28,9 @@ appId: com.integrationtestapp
 - tapOn:
     text: "로드"
     index: 1
+- extendedWaitUntil:
+    visible: "NATIVE_STATUS:LOADED:IMPRESSION"
+    timeout: 20000
 - scrollUntilVisible:
     element: "3. 인라인 동영상 광고"
     direction: DOWN
@@ -44,6 +50,9 @@ appId: com.integrationtestapp
           text: "로드"
           index: 2
           optional: true
+- extendedWaitUntil:
+    visible: "VIDEO_STATUS:LOADED:IMPRESSION"
+    timeout: 20000
 - scrollUntilVisible:
     element: "전면 광고 (popup)"
     direction: DOWN
@@ -60,6 +69,9 @@ appId: com.integrationtestapp
       visible: "OK"
     commands:
       - tapOn: "OK"
+- extendedWaitUntil:
+    visible: "INTER_STATUS:LOADED:OPENED:IMPRESSION"
+    timeout: 20000
 - scrollUntilVisible:
     element: "리워드 동영상"
     direction: DOWN
@@ -76,6 +88,9 @@ appId: com.integrationtestapp
       visible: "OK"
     commands:
       - tapOn: "OK"
+- extendedWaitUntil:
+    visible: "REWARD_STATUS:LOADED:OPENED:IMPRESSION"
+    timeout: 20000
 - scrollUntilVisible:
     element: "전면 동영상"
     direction: DOWN
@@ -92,6 +107,9 @@ appId: com.integrationtestapp
       visible: "OK"
     commands:
       - tapOn: "OK"
+- extendedWaitUntil:
+    visible: "IV_STATUS:LOADED:OPENED"
+    timeout: 20000
 - scrollUntilVisible:
     element: "이벤트 로그"
     direction: DOWN

@@ -39,16 +39,17 @@
 
 - 루트 CI(`verify-js`, `verify-example`)는 통과했다.
 - `example/ExampleHostApp` Jest는 통과한다.
-- `integration-test-app` iOS scaffold는 복구되었고, `pod install` 및 `run-ios` 진입까지 확인되었다.
-- 다만 iOS 실제 실행은 React Native 0.72 계열과 최신 Xcode toolchain 사이의 Yoga / Folly 호환성 이슈가 남아 있다.
+- `integration-test-app` iOS scaffold는 복구되었고, `pod install`, `xcodebuild`, `run-ios`를 통해 실제 시뮬레이터 실행까지 확인되었다.
+- `integration-test-app` Android는 JDK 17 기준으로 Gradle task 실행, emulator 구성, `run-android`를 통한 빌드/설치/앱 실행까지 확인되었다.
+- Android에서 실제 CLI blocker였던 `android/gradle.properties`의 Windows 전용 `org.gradle.java.home` 경로는 macOS OpenJDK 17 경로로 수정되었다.
 - 공식 네이티브 가이드 대비 Bizboard는 RN 공개 API에 아직 없다.
 - SPM은 구조는 있으나 checksum placeholder가 남아 있어 release-grade 상태가 아니다.
 
 ### 3.2 현재 주요 리스크
 
-- Android 실제 실행 환경은 Java / emulator / device 준비 여부에 좌우된다.
-- iOS 실제 실행 환경은 Xcode 버전과 RN 0.72 호환성 패치가 필요할 수 있다.
-- 실제 광고 검증은 테스트용 placeholder ID가 아니라 실발급 key/adUnitId가 필요하다.
+- Android/iOS 테스트 앱 실행 자체는 확인되었지만, 실광고 검증은 아직 미완료다.
+- 실제 광고 검증은 테스트용 placeholder ID가 아니라 실발급 `mediaKey` 및 포맷별 `adUnitId`가 필요하다.
+- 실광고 검증 전까지는 광고 노출/이벤트 흐름에 대해 PASS 판정을 내릴 수 없다.
 
 ---
 
@@ -106,20 +107,32 @@
 
 #### Android 환경 세팅 체크리스트
 
-- [ ] Homebrew Java 설치 여부 확인
-- [ ] Android 실행 시 사용할 JDK를 **openjdk@17**로 고정
-- [ ] `JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home` 설정
-- [ ] `PATH="$JAVA_HOME/bin:$PATH"` 적용
-- [ ] `android/gradlew` 실행권한 확인 (`chmod +x android/gradlew`)
-- [ ] `./android/gradlew -p android tasks --all` 성공 확인
-- [ ] Android SDK / platform-tools 접근 가능 확인
-- [ ] `adb devices`에서 emulator 또는 실제 기기 인식 확인
-- [ ] 인식된 대상이 없으면 emulator 기동 또는 기기 USB 연결
-- [ ] 그 다음 `npx react-native run-android` 실행
+- [x] Homebrew Java 설치 여부 확인
+- [x] Android 실행 시 사용할 JDK를 **openjdk@17**로 고정
+- [x] `JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home` 설정
+- [x] `PATH="$JAVA_HOME/bin:$PATH"` 적용
+- [x] `android/gradlew` 실행권한 확인 (`chmod +x android/gradlew`)
+- [x] `./android/gradlew -Dorg.gradle.java.home=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home -p android tasks --all` 성공 확인
+- [x] Android SDK / platform-tools 접근 가능 확인
+- [x] `adb devices`에서 emulator 또는 실제 기기 인식 확인
+- [x] 인식된 대상이 없으면 아래 둘 중 하나 준비
+  - emulator 바이너리 설치 + AVD 생성
+  - 실제 Android 기기 USB 연결
+- [x] 그 다음 `npx react-native run-android` 실행
+
+#### Android 실행 대상 준비 체크리스트
+
+- [x] `emulator -list-avds`가 동작하는지 확인
+- [x] `emulator` 바이너리가 없다면 Android Emulator 패키지 설치
+- [x] AVD가 없다면 `avdmanager`로 테스트용 디바이스 생성
+- [ ] 또는 실제 Android 기기에서 개발자 옵션 / USB 디버깅 활성화
+- [x] USB 연결 후 `adb devices -l`에서 `device` 상태 확인
+- [x] 실행 대상이 잡히면 `run-android` 재시도
 
 참고:
 - JDK 25는 현재 Gradle 8.0.1 조합에서 `Unsupported class file major version 69`로 실패할 수 있다.
 - 이 저장소의 Android 실행 검증 기준 Java는 현재 **JDK 17**이다.
+- 2026-04-25 점검 기준으로 emulator package, Android 35 ARM64 system image, AVD 생성, emulator 부팅, `run-android`까지 확인되었다.
 
 ---
 
@@ -246,10 +259,10 @@
 
 ## 8. 실행 우선순위
 
-1. iOS toolchain compatibility 해결
-2. Android 실제 실행 환경 준비
-3. 실제 key/adUnitId 확보 후 실광고 검증
-4. 결과 문서 반영
+1. 실제 `mediaKey` / adUnitId 확보 및 테스트 앱 반영
+2. iOS/Android에서 포맷별 실광고 검증
+3. 결과 문서 반영
+4. 필요 시 미지원 항목(Bizboard, SPM release-grade) 후속 작업 분리
 
 ---
 

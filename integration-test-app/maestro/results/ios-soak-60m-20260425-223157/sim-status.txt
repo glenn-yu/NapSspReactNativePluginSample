@@ -1,0 +1,30 @@
+===== 2026-04-25 22:31:57 =====
+== Devices ==
+-- iOS 26.4 --
+    iPhone 17 Pro (8D90B616-14A9-4A49-A1A7-0470FF80A9F9) (Booted) 
+org.reactjs.native.example.IntegrationTestApp: 64268
+===== 2026-04-25 22:32:09 =====
+== Devices ==
+-- iOS 26.4 --
+    iPhone 17 Pro (8D90B616-14A9-4A49-A1A7-0470FF80A9F9) (Booted) 
+org.reactjs.native.example.IntegrationTestApp: 64459
+===== 2026-04-25 22:32:30 =====
+== Devices ==
+-- iOS 26.4 --
+    iPhone 17 Pro (8D90B616-14A9-4A49-A1A7-0470FF80A9F9) (Booted) 
+org.reactjs.native.example.IntegrationTestApp: 64736
+===== 2026-04-25 22:32:50 =====
+== Devices ==
+-- iOS 26.4 --
+    iPhone 17 Pro (8D90B616-14A9-4A49-A1A7-0470FF80A9F9) (Booted) 
+org.reactjs.native.example.IntegrationTestApp: 65011
+===== 2026-04-25 22:50:31 =====
+== Devices ==
+-- iOS 26.4 --
+    iPhone 17 Pro (8D90B616-14A9-4A49-A1A7-0470FF80A9F9) (Booted) 
+org.reactjs.native.example.IntegrationTestApp: 67829
+===== 2026-04-25 22:51:27 =====
+== Devices ==
+-- iOS 26.4 --
+    iPhone 17 Pro (8D90B616-14A9-4A49-A1A7-0470FF80A9F9) (Booted) 
+org.reactjs.native.example.IntegrationTestApp: 68102

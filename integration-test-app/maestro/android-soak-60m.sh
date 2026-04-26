@@ -7,12 +7,14 @@ mkdir -p "$OUT_DIR"
 
 export JAVA_HOME="/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
 export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk"
-export PATH="$JAVA_HOME/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH:$HOME/.maestro/bin"
+export ADB_BIN="/opt/homebrew/bin/adb"
+export PATH="$JAVA_HOME/bin:$HOME/.maestro/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export MAESTRO_CLI_NO_ANALYTICS=1
 export MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED=true
 
 FLOW="$ROOT_DIR/maestro/android-ad-validation.yaml"
-END_TS=$(( $(date +%s) + 3600 ))
+DURATION_SECONDS="${SOAK_DURATION_SECONDS:-3600}"
+END_TS=$(( $(date +%s) + DURATION_SECONDS ))
 ITER=0
 PASS=0
 FAIL=0
@@ -40,6 +42,7 @@ echo "platform=android" | tee -a "$SUMMARY"
 echo "out_dir=$OUT_DIR" | tee -a "$SUMMARY"
 echo "flow=$FLOW" | tee -a "$SUMMARY"
 echo "start_time=$RUN_START" | tee -a "$SUMMARY"
+echo "duration_seconds=$DURATION_SECONDS" | tee -a "$SUMMARY"
 
 ensure_metro() {
   if ! lsof -ti tcp:8081 >/dev/null 2>&1; then
@@ -55,22 +58,24 @@ ensure_metro() {
 record_env() {
   {
     echo "===== $(date '+%Y-%m-%d %H:%M:%S') ====="
-    adb devices
-    adb -s emulator-5554 shell getprop ro.build.version.release || true
-    adb -s emulator-5554 shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' || true
+    "$ADB_BIN" devices
+    "$ADB_BIN" -s emulator-5554 shell getprop ro.build.version.release || true
+    "$ADB_BIN" -s emulator-5554 shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' || true
   } >> "$ADB_LOG" 2>&1
 }
 
 recover_android_maestro() {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] android recovery: restarting adb/app bridge" | tee -a "$SUMMARY"
-  adb kill-server >/dev/null 2>&1 || true
-  adb start-server >/dev/null 2>&1 || true
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] android recovery: restarting maestro + adb/app bridge" | tee -a "$SUMMARY"
+  pkill -f maestro >/dev/null 2>&1 || true
+  "$ADB_BIN" kill-server >/dev/null 2>&1 || true
+  "$ADB_BIN" start-server >/dev/null 2>&1 || true
   sleep 2
-  adb wait-for-device >/dev/null 2>&1 || true
-  adb -s emulator-5554 reverse --remove-all >/dev/null 2>&1 || true
-  adb -s emulator-5554 reverse tcp:8081 tcp:8081 >/dev/null 2>&1 || true
-  adb -s emulator-5554 shell am force-stop com.integrationtestapp >/dev/null 2>&1 || true
+  "$ADB_BIN" wait-for-device >/dev/null 2>&1 || true
+  "$ADB_BIN" -s emulator-5554 reverse --remove-all >/dev/null 2>&1 || true
+  "$ADB_BIN" -s emulator-5554 reverse tcp:8081 tcp:8081 >/dev/null 2>&1 || true
+  "$ADB_BIN" -s emulator-5554 shell am force-stop com.integrationtestapp >/dev/null 2>&1 || true
   sleep 2
+  lsof -i :7001 >> "$ADB_LOG" 2>&1 || true
   record_env
 }
 
@@ -90,6 +95,7 @@ classify_android_failure() {
 }
 
 ensure_metro
+recover_android_maestro
 record_env
 
 while [ "$(date +%s)" -lt "$END_TS" ]; do
@@ -97,9 +103,9 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
   TS="$(date '+%Y-%m-%d %H:%M:%S')"
   LOG="$OUT_DIR/run-${ITER}.log"
   echo "[$TS] iteration=$ITER starting" | tee -a "$SUMMARY"
-  adb -s emulator-5554 reverse tcp:8081 tcp:8081 >/dev/null 2>&1 || true
-  adb -s emulator-5554 shell am force-stop com.integrationtestapp >/dev/null 2>&1 || true
-  adb -s emulator-5554 shell am start -n com.integrationtestapp/.MainActivity >/dev/null 2>&1 || true
+  "$ADB_BIN" -s emulator-5554 reverse tcp:8081 tcp:8081 >/dev/null 2>&1 || true
+  "$ADB_BIN" -s emulator-5554 shell am force-stop com.integrationtestapp >/dev/null 2>&1 || true
+  "$ADB_BIN" -s emulator-5554 shell am start -n com.integrationtestapp/.MainActivity >/dev/null 2>&1 || true
   sleep 2
   set +e
   maestro test "$FLOW" >"$LOG" 2>&1
@@ -122,8 +128,8 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
     fi
     echo "[$TS] iteration=$ITER result=FAIL key=$FAIL_KEY repeat=$REPEAT_FAIL_COUNT" | tee -a "$SUMMARY"
     tail -n 80 "$LOG" | sed 's/^/  /' | tee -a "$SUMMARY"
-    adb -s emulator-5554 logcat -d -t 200 > "$OUT_DIR/logcat-fail-${ITER}.txt" 2>&1 || true
-    adb -s emulator-5554 exec-out screencap -p > "$OUT_DIR/fail-${ITER}.png" 2>/dev/null || true
+    "$ADB_BIN" -s emulator-5554 logcat -d -t 200 > "$OUT_DIR/logcat-fail-${ITER}.txt" 2>&1 || true
+    "$ADB_BIN" -s emulator-5554 exec-out screencap -p > "$OUT_DIR/fail-${ITER}.png" 2>/dev/null || true
     if [ "$FAIL_KEY" = 'maestro_android_transport' ] || [ "$FAIL_KEY" = 'android_launch_failed' ]; then
       recover_android_maestro
     fi

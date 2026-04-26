@@ -13,7 +13,8 @@ target 'IntegrationTestApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod 'NapSspPlugin/AdFit', :path => '../node_modules/react-native-nap-ssp'
+  pod 'NapSspPlugin/Core', :path => './NapSspLocalPod'
+  pod 'NapSspPlugin/AdFit', :path => './NapSspLocalPod'
 
   # Nap SSP SDK 의존성 추가
   pod 'AdFitSDK', '>= 3.14.7', '<= 3.18.6'

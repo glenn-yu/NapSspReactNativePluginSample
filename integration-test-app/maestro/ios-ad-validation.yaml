@@ -28,6 +28,9 @@ appId: org.reactjs.native.example.IntegrationTestApp
     text: "로드"
     index: 0
 - extendedWaitUntil:
+    visible: "BANNER loaded=true impression=true"
+    timeout: 20000
+- extendedWaitUntil:
     visible: "언로드"
     timeout: 10000
 - scrollUntilVisible:
@@ -37,6 +40,9 @@ appId: org.reactjs.native.example.IntegrationTestApp
 - tapOn:
     text: "로드"
     index: 1
+- extendedWaitUntil:
+    visible: "NATIVE loaded=true impression=true"
+    timeout: 20000
 - scrollUntilVisible:
     element: "3. 인라인 동영상 광고"
     direction: DOWN
@@ -53,6 +59,9 @@ appId: org.reactjs.native.example.IntegrationTestApp
       - tapOn:
           text: "로드"
           optional: true
+- extendedWaitUntil:
+    visible: "VIDEO loaded=true impression=true"
+    timeout: 20000
 - scrollUntilVisible:
     element: "전면 광고 (popup)"
     direction: DOWN
@@ -69,6 +78,9 @@ appId: org.reactjs.native.example.IntegrationTestApp
       visible: "OK"
     commands:
       - tapOn: "OK"
+- extendedWaitUntil:
+    visible: "INTER loaded=true opened=true impression=true"
+    timeout: 20000
 - scrollUntilVisible:
     element: "리워드 동영상"
     direction: DOWN
@@ -85,6 +97,9 @@ appId: org.reactjs.native.example.IntegrationTestApp
       visible: "OK"
     commands:
       - tapOn: "OK"
+- extendedWaitUntil:
+    visible: "REWARD loaded=true opened=true impression=true"
+    timeout: 20000
 - scrollUntilVisible:
     element: "전면 동영상"
     direction: DOWN
@@ -101,6 +116,9 @@ appId: org.reactjs.native.example.IntegrationTestApp
       visible: "OK"
     commands:
       - tapOn: "OK"
+- extendedWaitUntil:
+    visible: "IV loaded=true opened=true"
+    timeout: 20000
 - scrollUntilVisible:
     element: "이벤트 로그"
     direction: DOWN
