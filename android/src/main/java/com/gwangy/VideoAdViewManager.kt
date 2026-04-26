@@ -31,6 +31,7 @@ class VideoAdViewManager : SimpleViewManager<NapSspVideoAdView>() {
             NapSspContracts.VIEW_EVENT_AD_CLICKED to mutableMapOf("registrationName" to "onAdClicked"),
             NapSspContracts.VIEW_EVENT_AD_OPENED to mutableMapOf("registrationName" to "onAdOpened"),
             NapSspContracts.VIEW_EVENT_AD_CLOSED to mutableMapOf("registrationName" to "onAdClosed"),
+            NapSspContracts.VIEW_EVENT_AD_IMPRESSION to mutableMapOf("registrationName" to "onAdImpression"),
             "onVideoCompleted" to mutableMapOf("registrationName" to "onAdCompleted"),
             "onVideoSkipped" to mutableMapOf("registrationName" to "onAdSkipped")
         )

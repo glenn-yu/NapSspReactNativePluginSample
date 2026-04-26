@@ -17,10 +17,10 @@ export interface FullscreenAdSpec extends TurboModule {
 }
 
 export const NapSspInterstitialSpec =
-  TurboModuleRegistry.getEnforcing<FullscreenAdSpec>('NapSspInterstitialModule');
+  TurboModuleRegistry.getEnforcing<FullscreenAdSpec>('NapSspInterstitial');
 
 export const NapSspRewardedSpec =
-  TurboModuleRegistry.getEnforcing<FullscreenAdSpec>('NapSspRewardedModule');
+  TurboModuleRegistry.getEnforcing<FullscreenAdSpec>('NapSspRewarded');
 
 export const NapSspInterstitialVideoSpec =
-  TurboModuleRegistry.getEnforcing<FullscreenAdSpec>('NapSspInterstitialVideoModule');
+  TurboModuleRegistry.getEnforcing<FullscreenAdSpec>('NapSspInterstitialVideo');

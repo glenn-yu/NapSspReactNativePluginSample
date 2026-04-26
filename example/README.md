@@ -10,6 +10,14 @@ This folder contains a minimal React Native app that demonstrates the public JS/
 - `RewardedAd` load/show calls with safe error handling and `onRewarded` callbacks without payloads
 - Native availability checks via `isNativeModuleAvailable()`
 
+## 💡 Pro-tip: Understanding Placeholder Mode
+
+The example app is designed to run **even without the Nap SSP native SDKs installed**. This is called "Placeholder Mode".
+
+- **Why?**: It allows frontend developers to build and test ad placement logic, event handlers, and screen layouts without worrying about complex native environment setups.
+- **How it works**: If the native bridge detects that the SDK is missing, it renders a visual placeholder and simulates basic ad events (loaded, clicked, etc.).
+- **Transitioning to Real Ads**: Once your layout is ready, follow the [Native Setup Guide](../../README.md#⚙️-2-네이티브-필수-설정) to link the real SDKs. The JS code remains exactly the same!
+
 ## Structure
 - `ExampleHostApp/`: standalone React Native test app inside this repository
 - `ExampleHostApp/scripts/run-android-emulator.sh`: Android build, install, launch helper

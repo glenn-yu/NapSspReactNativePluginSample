@@ -9,6 +9,17 @@ KT Nasmedia Nap SSP SDK를 React Native에서 쓰기 위한 플러그인입니�
 - 현재 미지원: Bizboard 전용 RN surface
 - 예제 앱은 위 주요 흐름을 모두 커버하면서, 네이티브 브리지 없이도 화면이 렌더되는 플레이스홀더 모드도 보여줍니다.
 
+## 📱 Compatibility (호환성)
+
+| 환경 | 지원 범위 |
+| :--- | :--- |
+| **React Native** | `>= 0.72.0` |
+| **Android** | `minSdkVersion 21`, `targetSdkVersion 34+` |
+| **iOS** | `iOS 13.0+` |
+| **Architecture** | Old Architecture 전용 (New Architecture 지원 예정) |
+
+---
+
 ## 가장 먼저 할 일
 
 1. 패키지 설치
@@ -297,11 +308,26 @@ npm run verify
 
 프로젝트의 상세 가이드와 검증 리포트는 `docs/` 디렉토리에 체계적으로 정리되어 있습니다.
 
+- **[API Reference](./docs/API_REFERENCE.md)**: 컴포넌트 및 클래스 상세 명세
+- **[Troubleshooting](./docs/TROUBLESHOOTING.md)**: 설치 및 런타임 주요 에러 해결 방법
+- **[FAQ (자주 묻는 질문)](./docs/FAQ.md)**: 사용자들이 자주 겪는 상황 및 질문 정리
+- **[Android Setup Guide](./docs/ANDROID_SETUP.md)**: 안드로이드 프로젝트 상세 설정
+- **[iOS Setup Guide](./docs/IOS_SETUP.md)**: iOS 프로젝트 상세 설정 (Podfile 포함)
+- **[Mediation Setup Guide](./docs/MEDIATION_GUIDE.md)**: 광고 네트워크별 네이티브 세부 설정
+- **[Expo Compatibility Guide](./docs/EXPO_GUIDE.md)**: Expo 환경에서 사용하는 방법
+- **[Advanced Usage](./docs/ADVANCED_USAGE.md)**: 광고 사전 로딩 및 캐싱 최적화 팁
+- **[Privacy & Compliance](./docs/PRIVACY_GUIDE.md)**: COPPA, ATT, AD_ID 설정 가이드
+- **[Native Assets Guide](./docs/NATIVE_ASSETS_GUIDE.md)**: 네이티브 광고 레이아웃 구성 방법
+- **[NPM 배포 가이드](./docs/PUBLISH_GUIDE.md)**: 플러그인 배포 절차 및 체크리스트
+- **[Glossary (용어 사전)](./docs/GLOSSARY.md)**: 광고 SDK 주요 용어 정리
+- **[Version Matrix](./docs/VERSION_MATRIX.md)**: 플러그인 및 네이티브 SDK 버전 맵
+- **[Development & Architecture](./docs/DEVELOPMENT.md)**: 내부 구조 설명 및 기여 가이드
 - **[Maestro 검증 가이드](./docs/MAESTRO_GUIDE.md)**: 자동화 테스트 환경 설정 및 실행 방법
 - **[전수 조사 보고서](./docs/REVIEW_REPORT.md)**: 플러그인 구현 현황 및 기술 부채 요약
 - **[검증 계획서](./docs/REVIEW_PLAN.md)**: SDK 가이드 대비 기능 체크리스트 및 검증 단계
 - **[SPM 통합 가이드](./docs/SPM_GUIDE.md)**: Swift Package Manager 연동 및 제약 사항
-- **[NPM 배포 가이드](./docs/PUBLISH_GUIDE.md)**: 플러그인 배포 절차 및 체크리스트
+- **[Migration Guide](./docs/MIGRATION_GUIDE.md)**: 버전별 변경 사항 및 업그레이드 가이드
+- **[Roadmap](./docs/ROADMAP.md)**: 향후 업데이트 및 기능 추가 계획
 - **[네이티브 SDK 가이드](./docs/native_guides/)**: 나스미디어 네이티브 SDK 원본 가이드 (Android/iOS)
 
 ---

@@ -86,6 +86,18 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
                 NapSspContracts.EVENT_AD_IMPRESSION,
                 mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_REWARDED),
             )
+            NapSspEventEmitter.emitModuleEvent(
+                reactContext,
+                NapSspContracts.EVENT_REWARDED,
+                mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_REWARDED, "type" to "reward", "amount" to 1),
+            )
+            NapSspEventEmitter.emitModuleEvent(
+                reactContext,
+                NapSspContracts.EVENT_AD_CLOSED,
+                mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_REWARDED),
+            )
+            loadedAdUnitIds.remove(normalizedAdUnitId)
+            NapSspSdkBridge.clearRewarded(normalizedAdUnitId)
             promise.resolve(null)
             return
         }
@@ -137,6 +149,11 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
                 NapSspEventEmitter.emitModuleEvent(
                     reactContext,
                     NapSspContracts.EVENT_AD_OPENED,
+                    mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_REWARDED),
+                )
+                NapSspEventEmitter.emitModuleEvent(
+                    reactContext,
+                    NapSspContracts.EVENT_AD_IMPRESSION,
                     mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_REWARDED),
                 )
                 NapSspEventEmitter.emitModuleEvent(

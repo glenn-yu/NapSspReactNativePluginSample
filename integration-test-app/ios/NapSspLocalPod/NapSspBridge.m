@@ -57,6 +57,7 @@ RCT_EXPORT_VIEW_PROPERTY(onAdFailedToLoad, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdClicked, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdOpened, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdClosed, RCTBubblingEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onAdImpression, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdCompleted, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onAdSkipped, RCTBubblingEventBlock)
 @end

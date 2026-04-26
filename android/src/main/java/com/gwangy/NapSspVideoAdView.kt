@@ -120,6 +120,11 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context) {
                     NapSspContracts.VIEW_EVENT_AD_LOADED,
                     mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
                 )
+                NapSspEventEmitter.emitViewEvent(
+                    this,
+                    NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
+                    mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
+                )
             }, 300)
         }
     }

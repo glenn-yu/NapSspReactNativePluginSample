@@ -14,6 +14,7 @@ final class VideoAdView: UIView {
   @objc var onAdClicked: RCTBubblingEventBlock?
   @objc var onAdOpened: RCTBubblingEventBlock?
   @objc var onAdClosed: RCTBubblingEventBlock?
+  @objc var onAdImpression: RCTBubblingEventBlock?
   @objc var onAdCompleted: RCTBubblingEventBlock?
   @objc var onAdSkipped: RCTBubblingEventBlock?
 
@@ -84,6 +85,7 @@ final class VideoAdView: UIView {
       guard let self = self else { return }
       self.isLoaded = true
       self.onAdLoaded?(self.eventPayload(adUnitId: currentAdUnitId, source: "placeholder", message: "Video ad loaded"))
+      self.onAdImpression?(self.eventPayload(adUnitId: currentAdUnitId, source: "placeholder", message: "Video ad impression"))
     }
   }
 
