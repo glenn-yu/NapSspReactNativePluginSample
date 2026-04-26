@@ -86,3 +86,7 @@ build
 
 # Ignore Kotlin plugin data
 .kotlin
+
+# Swift Build Artifacts
+.build/
+**/.build/
