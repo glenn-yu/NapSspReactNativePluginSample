@@ -10,6 +10,7 @@ Pod::Spec.new do |s|
   s.source       = { :path => '.' }
   s.preserve_paths = '*', 'README.md'
   s.source_files = '*.{h,m,swift}'
+  s.resources = '*.{xib}'
   s.exclude_files = 'Package.swift'
   s.swift_version = '5.0'
   s.frameworks = 'Foundation', 'UIKit', 'AdSupport', 'StoreKit'

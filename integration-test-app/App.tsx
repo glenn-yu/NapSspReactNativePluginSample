@@ -37,7 +37,7 @@ const DEFAULT_CONFIG = Platform.select({
     mediaKey: '10347',
     ids: {
       banner: '103790',
-      interstitial: '103868',
+      interstitial: '104707',
       rewarded: '104710',
       native: '101626',
       video: '104709',
@@ -200,7 +200,7 @@ const App = () => {
   // ── Interstitial ────────────────────────────────────────────────────────────
   const showInterstitial = async () => {
     resetAdStatus('interstitial', 'requesting');
-    const ad = new InterstitialAd(ids.interstitial, { type: 'popup', buttonLeftText: '닫기' });
+    const ad = new InterstitialAd(ids.interstitial);
     ad.addAdEventListener('loaded', () => { addLog('INTER', 'loaded'); updateAdStatus('interstitial', { loaded: true, lastMessage: 'loaded' }); });
     ad.addAdEventListener('loadFailed', e => { addLog('INTER', `loadFailed: ${e.message} (code:${e.nativeCode ?? '-'})`); updateAdStatus('interstitial', { lastMessage: `loadFailed:${e.message}` }); });
     ad.addAdEventListener('opened', () => { addLog('INTER', 'opened'); updateAdStatus('interstitial', { opened: true, lastMessage: 'opened' }); });
@@ -333,6 +333,11 @@ const App = () => {
               onAdClicked={() => addLog('BANNER', 'clicked')}
             />
           )}
+          {Platform.OS === 'android' && (
+            <Text style={styles.inlineStatusLine}>
+              BANNER_STATUS:{adStatuses.banner.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.banner.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}
+            </Text>
+          )}
         </Section>
 
         {/* ── 2. 네이티브 ────────────────────────── */}
@@ -346,15 +351,20 @@ const App = () => {
             </TouchableOpacity>
           </View>
           {nativeVisible && (
-            <NativeAd
-              key={nativeKey}
-              adUnitId={ids.native}
-              style={styles.nativeAd}
-              onAdLoaded={() => { addLog('NATIVE', 'loaded'); updateAdStatus('native', { loaded: true, lastMessage: 'loaded' }); }}
-              onAdImpression={() => { addLog('NATIVE', 'impression'); updateAdStatus('native', { impression: true, lastMessage: 'impression' }); }}
-              onAdFailedToLoad={e => { addLog('NATIVE', `failed: ${e.message}`); updateAdStatus('native', { lastMessage: `failed:${e.message}` }); }}
-              onAdClicked={() => addLog('NATIVE', 'clicked')}
-            />
+            <>
+              <NativeAd
+                key={nativeKey}
+                adUnitId={ids.native}
+                style={styles.nativeAd}
+                onAdLoaded={() => { addLog('NATIVE', 'loaded'); updateAdStatus('native', { loaded: true, lastMessage: 'loaded' }); }}
+                onAdImpression={() => { addLog('NATIVE', 'impression'); updateAdStatus('native', { impression: true, lastMessage: 'impression' }); }}
+                onAdFailedToLoad={e => { addLog('NATIVE', `failed: ${e.message}`); updateAdStatus('native', { lastMessage: `failed:${e.message}` }); }}
+                onAdClicked={() => addLog('NATIVE', 'clicked')}
+              />
+              <Text style={styles.statusLine}>
+                NATIVE_STATUS:{adStatuses.native.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.native.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}
+              </Text>
+            </>
           )}
         </Section>
 
@@ -369,17 +379,22 @@ const App = () => {
             </TouchableOpacity>
           </View>
           {videoVisible && (
-            <VideoAd
-              key={videoKey}
-              adUnitId={ids.video}
-              style={styles.videoAd}
-              onAdLoaded={() => { addLog('VIDEO', 'loaded'); updateAdStatus('video', { loaded: true, lastMessage: 'loaded' }); }}
-              onAdImpression={() => { addLog('VIDEO', 'impression'); updateAdStatus('video', { impression: true, lastMessage: 'impression' }); }}
-              onAdFailedToLoad={e => { addLog('VIDEO', `failed: ${e.message}`); updateAdStatus('video', { lastMessage: `failed:${e.message}` }); }}
-              onAdCompleted={() => { addLog('VIDEO', '✅ completed'); updateAdStatus('video', { completed: true, lastMessage: 'completed' }); }}
-              onAdSkipped={() => addLog('VIDEO', 'skipped')}
-              onAdClicked={() => addLog('VIDEO', 'clicked')}
-            />
+            <>
+              <VideoAd
+                key={videoKey}
+                adUnitId={ids.video}
+                style={styles.videoAd}
+                onAdLoaded={() => { addLog('VIDEO', 'loaded'); updateAdStatus('video', { loaded: true, lastMessage: 'loaded' }); }}
+                onAdImpression={() => { addLog('VIDEO', 'impression'); updateAdStatus('video', { impression: true, lastMessage: 'impression' }); }}
+                onAdFailedToLoad={e => { addLog('VIDEO', `failed: ${e.message}`); updateAdStatus('video', { lastMessage: `failed:${e.message}` }); }}
+                onAdCompleted={() => { addLog('VIDEO', '✅ completed'); updateAdStatus('video', { completed: true, lastMessage: 'completed' }); }}
+                onAdSkipped={() => addLog('VIDEO', 'skipped')}
+                onAdClicked={() => addLog('VIDEO', 'clicked')}
+              />
+              <Text style={styles.statusLine}>
+                VIDEO_STATUS:{adStatuses.video.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.video.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.video.completed ? 'COMPLETED' : 'NOT_COMPLETED'}
+              </Text>
+            </>
           )}
         </Section>
 
@@ -388,12 +403,24 @@ const App = () => {
           <TouchableOpacity disabled={!initialized} style={[styles.button, { backgroundColor: '#1565C0' }, !initialized && styles.buttonDisabled]} onPress={showInterstitial}>
             <Text style={styles.buttonText}>전면 광고 (popup)</Text>
           </TouchableOpacity>
+          <Text style={styles.statusLine}>
+            INTER_STATUS:{adStatuses.interstitial.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.interstitial.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.interstitial.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}
+          </Text>
+          <Text style={styles.statusLine}>INTER_MSG:{adStatuses.interstitial.lastMessage}</Text>
           <TouchableOpacity disabled={!initialized} style={[styles.button, { backgroundColor: '#6A1B9A' }, !initialized && styles.buttonDisabled]} onPress={showRewarded}>
             <Text style={styles.buttonText}>리워드 동영상</Text>
           </TouchableOpacity>
+          <Text style={styles.statusLine}>
+            REWARD_STATUS:{adStatuses.rewarded.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.rewarded.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.rewarded.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.rewarded.rewarded ? 'REWARDED' : 'NOT_REWARDED'}
+          </Text>
+          <Text style={styles.statusLine}>REWARD_MSG:{adStatuses.rewarded.lastMessage}</Text>
           <TouchableOpacity disabled={!initialized} style={[styles.button, { backgroundColor: '#BF360C' }, !initialized && styles.buttonDisabled]} onPress={showInterstitialVideo}>
             <Text style={styles.buttonText}>전면 동영상</Text>
           </TouchableOpacity>
+          <Text style={styles.statusLine}>
+            IV_STATUS:{adStatuses.interstitialVideo.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.interstitialVideo.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.interstitialVideo.completed ? 'COMPLETED' : 'NOT_COMPLETED'}
+          </Text>
+          <Text style={styles.statusLine}>IV_MSG:{adStatuses.interstitialVideo.lastMessage}</Text>
         </Section>
 
         <Section title="광고 응답 상태">
@@ -446,6 +473,7 @@ const styles = StyleSheet.create({
   logTs: { color: '#888' },
   logTag: { color: '#4FC3F7', fontWeight: 'bold' },
   statusLine: { fontSize: 11, color: '#333', marginBottom: 4 },
+  inlineStatusLine: { fontSize: 11, color: '#333', marginTop: 10 },
   clearButton: { alignSelf: 'flex-end', paddingHorizontal: 10, paddingVertical: 4, backgroundColor: '#EEE', borderRadius: 6, marginBottom: 6 },
   clearButtonText: { fontSize: 12, color: '#555' },
   buttonDisabled: { opacity: 0.35 },

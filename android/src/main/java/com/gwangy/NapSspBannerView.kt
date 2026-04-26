@@ -147,13 +147,12 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
         NapSspSdkBridge.markBannerState(normalizedAdUnitId, NapSspLoadState.LOADING)
 
         // Try vendor SDK attach and load first. If vendor SDK is not present or fails, fall back to placeholder behavior.
-        var vendorLoaded = false
-        try {
+        val vendorLoaded = try {
             tryAttachVendorAdView()
             applyAdUnitToVendor(normalizedAdUnitId)
-            vendorLoaded = true
+            true
         } catch (_: Throwable) {
-            vendorLoaded = false
+            false
         }
 
         if (vendorLoaded) {
@@ -202,101 +201,93 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
 
     private fun tryAttachVendorAdView() {
         if (adViewInstance != null) return
-        try {
-            if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) return
-
-            val adViewClass = Class.forName("com.nasmedia.admixerssp.ads.AdView")
-            val ctor = adViewClass.getConstructor(android.content.Context::class.java)
-            val adView = ctor.newInstance(context)
-            adViewInstance = adView as android.view.View
-
-            // AdView를 window에 attach해야 onAttachedToWindow → ad request 시작 (공식 방법 2 step 1)
-            post {
-                removeAllViews()
-                addView(adView as android.view.View, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-            }
-
-            // wire listener
-            try {
-                val listenerInterface = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
-                val proxy = java.lang.reflect.Proxy.newProxyInstance(
-                    listenerInterface.classLoader,
-                    arrayOf(listenerInterface)
-                ) { _, method, args ->
-                    when (method.name) {
-                        "onReceivedAd" -> {
-                            // 방법 2: onReceivedAd 에서 removeView → addView → showAd() (공식 가이드 준수)
-                            post {
-                                val av = adViewInstance ?: return@post
-                                removeAllViews()
-                                addView(av, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-                                runCatching { av.javaClass.getMethod("showAd").invoke(av) }
-                                requestLayout()
-                            }
-                            NapSspEventEmitter.emitViewEvent(
-                                this@NapSspBannerView,
-                                NapSspContracts.VIEW_EVENT_AD_LOADED,
-                                mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
-                            )
-                            NapSspEventEmitter.emitViewEvent(
-                                this@NapSspBannerView,
-                                NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
-                                mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
-                            )
-                        }
-                        "onFailedToReceiveAd" -> NapSspEventEmitter.emitViewEvent(
-                            this@NapSspBannerView,
-                            NapSspContracts.VIEW_EVENT_AD_FAILED,
-                            mapOf(
-                                "adUnitId" to adUnitId,
-                                "format" to NapSspContracts.FORMAT_BANNER,
-                                "code" to (args?.get(2) as? Int ?: -1),
-                                "message" to (args?.get(3)?.toString() ?: ""),
-                            ),
-                        )
-                        "onEventAd" -> {
-                            when (args?.get(1)?.toString()) {
-                                "CLICK" -> NapSspEventEmitter.emitViewEvent(
-                                    this@NapSspBannerView,
-                                    NapSspContracts.VIEW_EVENT_AD_CLICKED,
-                                    mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
-                                )
-                                "DISPLAYED" -> NapSspEventEmitter.emitViewEvent(
-                                    this@NapSspBannerView,
-                                    NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
-                                    mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
-                                )
-                            }
-                        }
-                    }
-                    null
-                }
-                val setListener = adViewClass.getMethod("setAdViewListener", listenerInterface)
-                setListener.invoke(adView, proxy)
-            } catch (_: Throwable) {
-            }
-        } catch (_: Throwable) {
+        if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
+            throw UnsupportedOperationException("vendor SDK disabled")
         }
+
+        val adViewClass = Class.forName("com.nasmedia.admixerssp.ads.AdView")
+        val ctor = adViewClass.getConstructor(android.content.Context::class.java)
+        val adView = ctor.newInstance(context) as android.view.View
+        adViewInstance = adView
+
+        // AdView를 window에 attach해야 onAttachedToWindow → ad request 시작 (공식 방법 2 step 1)
+        post {
+            removeAllViews()
+            addView(adView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        }
+
+        val listenerInterface = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
+        val proxy = java.lang.reflect.Proxy.newProxyInstance(
+            listenerInterface.classLoader,
+            arrayOf(listenerInterface)
+        ) { _, method, args ->
+            when (method.name) {
+                "onReceivedAd" -> {
+                    // 방법 2: onReceivedAd 에서 removeView → addView → showAd() (공식 가이드 준수)
+                    post {
+                        val av = adViewInstance ?: return@post
+                        removeAllViews()
+                        addView(av, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+                        runCatching { av.javaClass.getMethod("showAd").invoke(av) }
+                        requestLayout()
+                    }
+                    NapSspEventEmitter.emitViewEvent(
+                        this@NapSspBannerView,
+                        NapSspContracts.VIEW_EVENT_AD_LOADED,
+                        mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
+                    )
+                    NapSspEventEmitter.emitViewEvent(
+                        this@NapSspBannerView,
+                        NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
+                        mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
+                    )
+                }
+                "onFailedToReceiveAd" -> NapSspEventEmitter.emitViewEvent(
+                    this@NapSspBannerView,
+                    NapSspContracts.VIEW_EVENT_AD_FAILED,
+                    mapOf(
+                        "adUnitId" to adUnitId,
+                        "format" to NapSspContracts.FORMAT_BANNER,
+                        "code" to (args?.get(2) as? Int ?: -1),
+                        "message" to (args?.get(3)?.toString() ?: ""),
+                    ),
+                )
+                "onEventAd" -> {
+                    when (args?.get(1)?.toString()) {
+                        "CLICK" -> NapSspEventEmitter.emitViewEvent(
+                            this@NapSspBannerView,
+                            NapSspContracts.VIEW_EVENT_AD_CLICKED,
+                            mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
+                        )
+                        "DISPLAYED" -> NapSspEventEmitter.emitViewEvent(
+                            this@NapSspBannerView,
+                            NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
+                            mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER),
+                        )
+                    }
+                }
+            }
+            null
+        }
+        val setListener = adViewClass.getMethod("setAdViewListener", listenerInterface)
+        setListener.invoke(adView, proxy)
     }
 
     private fun applyAdUnitToVendor(unit: String) {
-        val adView = adViewInstance ?: return
+        val adView = adViewInstance ?: throw IllegalStateException("vendor AdView was not created")
+
+        val adInfoBuilderClass = Class.forName("com.nasmedia.admixerssp.ads.AdInfo\$Builder")
+        val adInfoBuilderCtor = adInfoBuilderClass.getConstructor(String::class.java)
+        val builder = adInfoBuilderCtor.newInstance(unit)
         try {
-            val adInfoBuilderClass = Class.forName("com.nasmedia.admixerssp.ads.AdInfo\$Builder")
-            val adInfoBuilderCtor = adInfoBuilderClass.getConstructor(String::class.java)
-            val builder = adInfoBuilderCtor.newInstance(unit)
-            try {
-                val setIsUseMediation = adInfoBuilderClass.getMethod("setIsUseMediation", Boolean::class.java)
-                setIsUseMediation.invoke(builder, true)
-            } catch (_: Throwable) {}
-            val build = adInfoBuilderClass.getMethod("build")
-            val adInfo = build.invoke(builder)
-            val setAdInfo = adView.javaClass.getMethod("setAdInfo", adInfo.javaClass)
-            setAdInfo.invoke(adView, adInfo)
-            try { adView.javaClass.getMethod("loadAd").invoke(adView) } catch (_: Throwable) {}
-        } catch (_: Throwable) {
-            throw RuntimeException("vendor attach failed")
-        }
+            val setIsUseMediation = adInfoBuilderClass.getMethod("setIsUseMediation", Boolean::class.java)
+            setIsUseMediation.invoke(builder, true)
+        } catch (_: Throwable) {}
+        val build = adInfoBuilderClass.getMethod("build")
+        val adInfo = build.invoke(builder)
+        val setAdInfo = adView.javaClass.getMethod("setAdInfo", adInfo.javaClass)
+        setAdInfo.invoke(adView, adInfo)
+        adView.javaClass.getMethod("loadAd").invoke(adView)
     }
 
     override fun onAttachedToWindow() {

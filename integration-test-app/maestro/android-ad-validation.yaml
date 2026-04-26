@@ -29,9 +29,20 @@ appId: com.integrationtestapp
 - extendedWaitUntil:
     visible: "SDK: success"
     timeout: 20000
-- tapOn:
-    text: "로드"
-    index: 0
+- scrollUntilVisible:
+    element: "1. 배너 광고 (320×50)"
+    direction: DOWN
+    timeout: 20000
+- runFlow:
+    when:
+      visible: "재로드"
+    commands:
+      - tapOn: "재로드"
+- runFlow:
+    when:
+      visible: "로드"
+    commands:
+      - tapOn: "로드"
 - extendedWaitUntil:
     visible: "BANNER_STATUS:LOADED:IMPRESSION"
     timeout: 30000
@@ -42,9 +53,16 @@ appId: com.integrationtestapp
     element: "2. 네이티브 광고"
     direction: DOWN
     timeout: 20000
-- tapOn:
-    text: "로드"
-    index: 1
+- runFlow:
+    when:
+      visible: "재로드"
+    commands:
+      - tapOn: "재로드"
+- runFlow:
+    when:
+      visible: "로드"
+    commands:
+      - tapOn: "로드"
 - extendedWaitUntil:
     visible: "NATIVE_STATUS:LOADED:IMPRESSION"
     timeout: 30000

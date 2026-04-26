@@ -34,9 +34,20 @@ appId: org.reactjs.native.example.IntegrationTestApp
 - extendedWaitUntil:
     visible: "1. 배너 광고 (320×50)"
     timeout: 25000
-- tapOn:
-    text: "로드"
-    index: 0
+- runFlow:
+    when:
+      visible: "재로드"
+    commands:
+      - tapOn:
+          text: "재로드"
+          below: '1. 배너 광고 \(320×50\)'
+- runFlow:
+    when:
+      visible: "로드"
+    commands:
+      - tapOn:
+          text: "로드"
+          below: '1. 배너 광고 \(320×50\)'
 - extendedWaitUntil:
     visible: "BANNER_STATUS:LOADED:IMPRESSION"
     timeout: 30000
@@ -47,9 +58,25 @@ appId: org.reactjs.native.example.IntegrationTestApp
     element: "2. 네이티브 광고"
     direction: DOWN
     timeout: 20000
-- tapOn:
-    text: "로드"
-    index: 1
+    centerElement: true
+- runFlow:
+    when:
+      visible:
+        text: "재로드"
+        below: "2. 네이티브 광고"
+    commands:
+      - tapOn:
+          text: "재로드"
+          below: "2. 네이티브 광고"
+- runFlow:
+    when:
+      visible:
+        text: "로드"
+        below: "2. 네이티브 광고"
+    commands:
+      - tapOn:
+          text: "로드"
+          below: "2. 네이티브 광고"
 - extendedWaitUntil:
     visible: "NATIVE_STATUS:LOADED:IMPRESSION"
     timeout: 30000
@@ -57,25 +84,33 @@ appId: org.reactjs.native.example.IntegrationTestApp
     element: "3. 인라인 동영상 광고"
     direction: DOWN
     timeout: 20000
+    centerElement: true
 - runFlow:
     when:
-      visible: "재로드"
+      visible:
+        text: "재로드"
+        below: "3. 인라인 동영상 광고"
     commands:
-      - tapOn: "재로드"
+      - tapOn:
+          text: "재로드"
+          below: "3. 인라인 동영상 광고"
 - runFlow:
     when:
-      visible: "로드"
+      visible:
+        text: "로드"
+        below: "3. 인라인 동영상 광고"
     commands:
       - tapOn:
           text: "로드"
-          optional: true
+          below: "3. 인라인 동영상 광고"
 - extendedWaitUntil:
-    visible: "VIDEO_STATUS:LOADED:IMPRESSION"
+    visible: "VIDEO_STATUS:LOADED:IMPRESSION:NOT_COMPLETED"
     timeout: 30000
 - scrollUntilVisible:
     element: "전면 광고 (popup)"
     direction: DOWN
     timeout: 15000
+    centerElement: true
 - tapOn: "전면 광고 (popup)"
 - waitForAnimationToEnd
 - runFlow:
@@ -95,6 +130,7 @@ appId: org.reactjs.native.example.IntegrationTestApp
     element: "리워드 동영상"
     direction: DOWN
     timeout: 15000
+    centerElement: true
 - tapOn: "리워드 동영상"
 - waitForAnimationToEnd
 - runFlow:
@@ -122,6 +158,7 @@ appId: org.reactjs.native.example.IntegrationTestApp
     element: "전면 동영상"
     direction: DOWN
     timeout: 15000
+    centerElement: true
 - tapOn: "전면 동영상"
 - waitForAnimationToEnd
 - runFlow:

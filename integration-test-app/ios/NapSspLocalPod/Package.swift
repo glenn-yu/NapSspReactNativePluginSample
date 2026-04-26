@@ -42,6 +42,9 @@ let package = Package(
                 "InterstitialVideoModule.swift",
                 "NapSspBridge.m"
             ],
+            resources: [
+                .process("AMMNativeAdView.xib")
+            ],
             publicHeadersPath: "."
         ),
     ]

@@ -126,12 +126,106 @@ final class NativeAdView: UIView {
     container.delegate = delegate
     nativeAdContainer = container
 
-    // Attempt to load xib-based view from SDK bundle, fall back to programmatic
-    if let nibView = Bundle.main.loadNibNamed("AMMNativeAdView", owner: nil, options: nil)?.first as? AMMNativeAdView {
-      container.nativeAdView = nibView
-    }
+    let nativeAdView = loadNativeAdView() ?? makeProgrammaticNativeAdView()
+    nativeAdView.viewController = rootVC
+    nativeAdView.adUnitID = numericAdUnitId
+    nativeAdView.frame = bounds
+    nativeAdView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    container.nativeAdView = nativeAdView
 
     container.load()
+  }
+
+  private func loadNativeAdView() -> AMMNativeAdView? {
+    let nibName = "AMMNativeAdView"
+    let candidateBundles: [Bundle] = [
+      Bundle(for: NativeAdView.self),
+      Bundle.main
+    ] + Bundle.allFrameworks
+
+    for bundle in candidateBundles {
+      if bundle.path(forResource: nibName, ofType: "nib") != nil || bundle.path(forResource: nibName, ofType: "xib") != nil {
+        if let view = bundle.loadNibNamed(nibName, owner: nil, options: nil)?.first as? AMMNativeAdView {
+          return view
+        }
+      }
+    }
+
+    return nil
+  }
+
+  private func makeProgrammaticNativeAdView() -> AMMNativeAdView {
+    let nativeAdView = AMMNativeAdView()
+    nativeAdView.backgroundColor = UIColor(red: 1.0, green: 0.983, blue: 0.929, alpha: 1.0)
+
+    let iconView = UIImageView()
+    iconView.contentMode = .scaleAspectFit
+    iconView.translatesAutoresizingMaskIntoConstraints = false
+
+    let headlineLabel = UILabel()
+    headlineLabel.font = .systemFont(ofSize: 17)
+    headlineLabel.textColor = .label
+    headlineLabel.text = "Headline"
+    headlineLabel.translatesAutoresizingMaskIntoConstraints = false
+
+    let advertiserLabel = UILabel()
+    advertiserLabel.font = .systemFont(ofSize: 14)
+    advertiserLabel.textColor = .label
+    advertiserLabel.text = "Advertiser"
+    advertiserLabel.translatesAutoresizingMaskIntoConstraints = false
+
+    let descriptionLabel = UILabel()
+    descriptionLabel.font = .systemFont(ofSize: 14)
+    descriptionLabel.textColor = .label
+    descriptionLabel.numberOfLines = 0
+    descriptionLabel.text = "Body"
+    descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+
+    let mediaView = UIView()
+    mediaView.translatesAutoresizingMaskIntoConstraints = false
+
+    let ctaButton = UIButton(type: .system)
+    ctaButton.setTitle("cta", for: .normal)
+    ctaButton.titleLabel?.font = .systemFont(ofSize: 18)
+    ctaButton.translatesAutoresizingMaskIntoConstraints = false
+
+    [iconView, headlineLabel, advertiserLabel, descriptionLabel, mediaView, ctaButton].forEach { nativeAdView.addSubview($0) }
+
+    NSLayoutConstraint.activate([
+      iconView.leadingAnchor.constraint(equalTo: nativeAdView.leadingAnchor, constant: 15),
+      iconView.topAnchor.constraint(equalTo: nativeAdView.topAnchor, constant: 15),
+      iconView.widthAnchor.constraint(equalToConstant: 40),
+      iconView.heightAnchor.constraint(equalToConstant: 40),
+
+      headlineLabel.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 8),
+      headlineLabel.topAnchor.constraint(equalTo: nativeAdView.topAnchor, constant: 10),
+      headlineLabel.trailingAnchor.constraint(equalTo: nativeAdView.trailingAnchor, constant: -15),
+      headlineLabel.heightAnchor.constraint(equalToConstant: 20.5),
+
+      advertiserLabel.leadingAnchor.constraint(equalTo: headlineLabel.leadingAnchor),
+      advertiserLabel.topAnchor.constraint(equalTo: headlineLabel.bottomAnchor, constant: 10),
+
+      descriptionLabel.leadingAnchor.constraint(equalTo: iconView.leadingAnchor),
+      descriptionLabel.trailingAnchor.constraint(equalTo: nativeAdView.trailingAnchor, constant: -10),
+      descriptionLabel.topAnchor.constraint(equalTo: iconView.bottomAnchor),
+
+      mediaView.centerXAnchor.constraint(equalTo: nativeAdView.centerXAnchor),
+      mediaView.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor),
+      mediaView.widthAnchor.constraint(equalToConstant: 250),
+      mediaView.heightAnchor.constraint(equalToConstant: 150),
+
+      ctaButton.topAnchor.constraint(equalTo: mediaView.bottomAnchor, constant: 15.5),
+      ctaButton.trailingAnchor.constraint(equalTo: nativeAdView.trailingAnchor, constant: -10),
+      nativeAdView.bottomAnchor.constraint(greaterThanOrEqualTo: ctaButton.bottomAnchor, constant: 30)
+    ])
+
+    nativeAdView.iv_icon = iconView
+    nativeAdView.l_headline = headlineLabel
+    nativeAdView.l_advertiser = advertiserLabel
+    nativeAdView.l_description = descriptionLabel
+    nativeAdView.media = mediaView
+    nativeAdView.b_cta = ctaButton
+    return nativeAdView
   }
 
   func attachSdkView(_ sdkView: UIView) {

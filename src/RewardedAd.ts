@@ -86,6 +86,7 @@ export class RewardedAd {
 
     try {
       await nativeModule.load(this.adUnitId, this.options);
+      this._loaded = true;
     } catch (error) {
       const adError = normalizeAdError(error, 'rewarded_load_failed');
       this.emitter.emit('loadFailed', adError);
