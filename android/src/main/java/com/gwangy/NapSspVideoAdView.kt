@@ -36,6 +36,14 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context) {
     private var currentState: NapSspLoadState = NapSspLoadState.IDLE
     private var adViewInstance: View? = null
 
+    private val measureAndLayout = Runnable {
+        measure(
+            MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+        )
+        layout(left, top, right, bottom)
+    }
+
     var adUnitId: String? = null
         set(value) {
             field = value?.trim()?.takeIf { it.isNotEmpty() }
@@ -61,6 +69,11 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context) {
                     mapOf("adUnitId" to id, "format" to NapSspContracts.FORMAT_VIDEO),
                 )
             }
+        }
+
+        // RN 레이아웃 엔진과 네이티브 뷰 동기화
+        addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            post(measureAndLayout)
         }
     }
 
@@ -100,15 +113,13 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context) {
         }
 
         if (currentState == NapSspLoadState.LOADED) return
-
         currentState = NapSspLoadState.LOADING
 
-        var vendorLoaded = false
-        try {
-            tryAttachVendorVideoView(normalizedAdUnitId)
-            vendorLoaded = true
+        val vendorLoaded = try {
+            tryAttachVendorVideoViewAndLoad(normalizedAdUnitId)
+            true
         } catch (_: Throwable) {
-            vendorLoaded = false
+            false
         }
 
         if (!vendorLoaded) {
@@ -129,28 +140,20 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context) {
         }
     }
 
-    private fun tryAttachVendorVideoView(normalizedAdUnitId: String) {
+    private fun tryAttachVendorVideoViewAndLoad(normalizedAdUnitId: String) {
         if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) throw UnsupportedOperationException("vendor SDK disabled")
 
+        val activityContext: android.content.Context = (context as? ThemedReactContext)?.currentActivity ?: context
         val videoAdViewClass = Class.forName("com.nasmedia.admixerssp.ads.VideoAdView")
         val adInfoBuilderClass = Class.forName("com.nasmedia.admixerssp.ads.AdInfo\$Builder")
         val adInfoClass = Class.forName("com.nasmedia.admixerssp.ads.AdInfo")
         val listenerClass = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
 
-        val builder = adInfoBuilderClass.getConstructor(String::class.java).newInstance(normalizedAdUnitId)
-        try {
-            adInfoBuilderClass.getMethod("isRetry", Boolean::class.javaPrimitiveType).invoke(builder, isRetry)
-        } catch (_: Throwable) {}
-        try {
-            adInfoBuilderClass.getMethod("setIsUseMediation", Boolean::class.java).invoke(builder, true)
-        } catch (_: Throwable) {}
-        val adInfo = adInfoBuilderClass.getMethod("build").invoke(builder)
+        // 1. Create VideoAdView
+        val videoAdView = videoAdViewClass.getConstructor(android.content.Context::class.java).newInstance(activityContext)
+        adViewInstance = videoAdView as android.view.View
 
-        val videoAdView = videoAdViewClass.getConstructor(android.content.Context::class.java).newInstance(context)
-        adViewInstance = videoAdView as View
-
-        videoAdViewClass.getMethod("setAdInfo", adInfoClass).invoke(videoAdView, adInfo)
-
+        // 2. Setup Proxy Listener
         val listener = java.lang.reflect.Proxy.newProxyInstance(
             listenerClass.classLoader,
             arrayOf(listenerClass)
@@ -158,8 +161,12 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context) {
             when (method.name) {
                 "onReceivedAd" -> {
                     post {
+                        val av = adViewInstance ?: return@post
                         removeAllViews()
-                        addView(videoAdView as View, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+                        addView(av, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+                        
+                        // Force RN layout sync
+                        post(measureAndLayout)
                     }
                     currentState = NapSspLoadState.LOADED
                     NapSspEventEmitter.emitViewEvent(
@@ -208,9 +215,25 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context) {
             }
             null
         }
-
         videoAdViewClass.getMethod("setAdViewListener", listenerClass).invoke(videoAdView, listener)
-        videoAdViewClass.getMethod("loadAd").invoke(videoAdView)
+
+        // 3. Prepare AdInfo
+        val builder = adInfoBuilderClass.getConstructor(String::class.java).newInstance(normalizedAdUnitId)
+        try {
+            adInfoBuilderClass.getMethod("isRetry", Boolean::class.javaPrimitiveType).invoke(builder, isRetry)
+        } catch (_: Throwable) {}
+        try {
+            adInfoBuilderClass.getMethod("setIsUseMediation", Boolean::class.java).invoke(builder, true)
+        } catch (_: Throwable) {}
+        val adInfo = adInfoBuilderClass.getMethod("build").invoke(builder)
+        videoAdViewClass.getMethod("setAdInfo", adInfoClass).invoke(videoAdView, adInfo)
+
+        // 4. Attach first, then loadAd
+        post {
+            removeAllViews()
+            addView(videoAdView as android.view.View, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+            videoAdViewClass.getMethod("loadAd").invoke(videoAdView)
+        }
     }
 
     override fun onAttachedToWindow() {

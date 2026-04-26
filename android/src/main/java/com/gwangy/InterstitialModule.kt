@@ -177,6 +177,8 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
         val normalizedAdUnitId = adUnitId.trim()
         loadedAdUnitIds.remove(normalizedAdUnitId)
         interstitialAds.remove(normalizedAdUnitId)?.let { interstitial ->
+            val listenerClass = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
+            runCatching { interstitial.javaClass.getMethod("setListener", listenerClass).invoke(interstitial, null) }
             runCatching { interstitial.javaClass.getMethod("stopInterstitial").invoke(interstitial) }
         }
         NapSspSdkBridge.clearInterstitial(normalizedAdUnitId)
@@ -313,7 +315,7 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
                             NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_OPENED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "rawEvent" to rawEvent?.toString()))
                             NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_IMPRESSION, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "rawEvent" to rawEvent?.toString()))
                         }
-                        "CLICK", "CLICKED" -> NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_CLICKED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "rawEvent" to rawEvent?.toString()))
+                        "CLICK", "CLICKED", "LEFT_CLICK", "RIGHT_CLICK" -> NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_CLICKED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "rawEvent" to rawEvent?.toString()))
                         "CLOSE", "CLOSED", "DISMISS", "DISMISSED" -> {
                             NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_CLOSED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "rawEvent" to rawEvent?.toString()))
                             loadedAdUnitIds.remove(adUnitId)
@@ -351,4 +353,6 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
         interstitialAds.clear()
         super.invalidate()
     }
+}
+ }
 }

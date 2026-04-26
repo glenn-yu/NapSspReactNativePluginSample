@@ -326,6 +326,10 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
         startPromises.clear()
         loadedAdUnitIds.clear()
         interstitialVideoAds.values.forEach { interstitialVideo ->
+            runCatching { 
+                val listenerClass = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
+                interstitialVideo.javaClass.getMethod("setListener", listenerClass).invoke(interstitialVideo, null) 
+            }
             runCatching { interstitialVideo.javaClass.getMethod("stopInterstitialVideoAd").invoke(interstitialVideo) }
         }
         interstitialVideoAds.clear()

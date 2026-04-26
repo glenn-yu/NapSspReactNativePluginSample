@@ -346,6 +346,10 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
         startPromises.clear()
         loadedAdUnitIds.clear()
         rewardedAds.values.forEach { rewardedAd ->
+            runCatching { 
+                val listenerClass = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
+                rewardedAd.javaClass.getMethod("setListener", listenerClass).invoke(rewardedAd, null) 
+            }
             runCatching { rewardedAd.javaClass.getMethod("stopRewardVideoAd").invoke(rewardedAd) }
         }
         rewardedAds.clear()

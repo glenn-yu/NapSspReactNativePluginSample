@@ -138,9 +138,13 @@ private final class NapSspRewardedDelegate: NSObject, AMMRewardVideoDelegate {
     NapSspModule.shared?.emitEvent(name: "onRewarded", payload: ["adUnitId": adUnitId, "format": "rewarded", "type": "reward", "amount": 1])
   }
 
-  func onRewardVideoClosed() {
+  func onCloseRewardVideo() {
     NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: ["adUnitId": adUnitId, "format": "rewarded"])
     NapSspRewardedDelegate.instances.removeValue(forKey: adUnitId)
+  }
+
+  func onRewardVideoComplete() {
+    NapSspModule.shared?.emitEvent(name: "onVideoCompleted", payload: ["adUnitId": adUnitId, "format": "rewarded"])
   }
 
   func onTapRewardVideo() {

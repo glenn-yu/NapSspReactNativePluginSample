@@ -7,12 +7,21 @@ import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.uimanager.ThemedReactContext
 
-class NapSspNativeAdView(context: Context) : FrameLayout(context) {
+class NapSspNativeAdView(context: Context) : FrameLayout(context), LifecycleEventListener {
 
     private var sdkNativeAdView: Any? = null
     private var currentState: NapSspLoadState = NapSspLoadState.IDLE
+
+    private val measureAndLayout = Runnable {
+        measure(
+            MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+        )
+        layout(left, top, right, bottom)
+    }
 
     // 플레이스홀더 (SDK 미사용 시)
     private val placeholder = TextView(context).apply {
@@ -34,6 +43,12 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context) {
         if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
             addView(placeholder, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         }
+        
+        // RN 레이아웃 변화 감지
+        addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            post(measureAndLayout)
+        }
+        
         updatePlaceholder()
     }
 
@@ -97,10 +112,24 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context) {
             runCatching {
                 builderClass.getMethod("setIsUseMediation", Boolean::class.javaPrimitiveType)
                     .invoke(adInfoBuilder, true)
+                
+                // Mediation setViewIds (Google, Adfit, Pangle)
+                val adViewIds = java.util.HashMap<String, Int>()
+                adViewIds.put("iv_icon", R.id.nap_ssp_native_icon)
+                adViewIds.put("tv_title", R.id.nap_ssp_native_title)
+                adViewIds.put("tv_adv", R.id.nap_ssp_native_adv)
+                adViewIds.put("tv_desc", R.id.nap_ssp_native_desc)
+                adViewIds.put("iv_main", R.id.nap_ssp_native_main)
+                adViewIds.put("btn_cta", R.id.nap_ssp_native_cta)
+                
+                val setViewIdsMethod = builderClass.getMethod("setViewIds", String::class.java, java.util.Map::class.java)
+                setViewIdsMethod.invoke(adInfoBuilder, "ADMANAGER", adViewIds)
+                setViewIdsMethod.invoke(adInfoBuilder, "ADFIT", adViewIds)
+                setViewIdsMethod.invoke(adInfoBuilder, "PANGLE", adViewIds)
             }
             val adInfo = builderClass.getMethod("build").invoke(adInfoBuilder)
 
-            // NativeAdViewBinder — XML 레이아웃 R.layout.nap_ssp_native_ad 전달
+            // NativeAdViewBinder
             val binderBuilder = binderBuilderClass
                 .getConstructor(Int::class.javaPrimitiveType)
                 .newInstance(R.layout.nap_ssp_native_ad)
@@ -135,7 +164,7 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context) {
                                     nativeAdView as View,
                                     LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT),
                                 )
-                                requestLayout()
+                                post(measureAndLayout)
                             }
                         }
                         currentState = NapSspLoadState.LOADED
@@ -190,8 +219,15 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context) {
         }
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        (context as? ThemedReactContext)?.addLifecycleEventListener(this)
+        sdkNativeAdView?.let { runCatching { it.javaClass.getMethod("onResume").invoke(it) } }
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        (context as? ThemedReactContext)?.removeLifecycleEventListener(this)
         sdkNativeAdView?.let {
             runCatching { it.javaClass.getMethod("onPause").invoke(it) }
             runCatching { it.javaClass.getMethod("onDestroy").invoke(it) }
@@ -199,9 +235,20 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context) {
         sdkNativeAdView = null
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
+    override fun onHostResume() {
         sdkNativeAdView?.let { runCatching { it.javaClass.getMethod("onResume").invoke(it) } }
+    }
+
+    override fun onHostPause() {
+        sdkNativeAdView?.let { runCatching { it.javaClass.getMethod("onPause").invoke(it) } }
+    }
+
+    override fun onHostDestroy() {
+        sdkNativeAdView?.let {
+            runCatching { it.javaClass.getMethod("onPause").invoke(it) }
+            runCatching { it.javaClass.getMethod("onDestroy").invoke(it) }
+        }
+        sdkNativeAdView = null
     }
 
     private fun updatePlaceholder() {

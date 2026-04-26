@@ -524,6 +524,7 @@ final class NapSspRuntime {
 
   func removeStoredInterstitialVideo(adUnitId: String) {
     stateQueue.sync {
+      storedInterstitialVideos[adUnitId]?.stop()
       storedInterstitialVideos.removeValue(forKey: adUnitId)
       storedInterstitialVideoDelegates.removeValue(forKey: adUnitId)
     }

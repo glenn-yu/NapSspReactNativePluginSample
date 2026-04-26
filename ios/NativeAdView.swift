@@ -46,6 +46,17 @@ final class NativeAdView: UIView {
     reloadIfNeeded()
   }
 
+  override func willMove(toWindow newWindow: UIWindow?) {
+    super.willMove(toWindow: newWindow)
+    if newWindow == nil {
+      #if canImport(AdMixerMediation)
+      nativeAdContainer?.stop()
+      nativeAdContainer = nil
+      sdkDelegate = nil
+      #endif
+    }
+  }
+
   override func layoutSubviews() {
     super.layoutSubviews()
     containerView.frame = bounds
