@@ -52,6 +52,7 @@ integration-test-app/android/.gradle
 integration-test-app/android/local.properties
 integration-test-app/ios/Pods
 integration-test-app/ios/build
+integration-test-app/maestro/results/
 
 # Logs
 npm-debug.log*

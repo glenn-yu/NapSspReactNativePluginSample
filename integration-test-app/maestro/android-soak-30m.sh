@@ -13,14 +13,15 @@ export MAESTRO_CLI_NO_ANALYTICS=1
 export MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED=true
 
 FLOW="$ROOT_DIR/maestro/android-ad-validation.yaml"
-END_TS=$(( $(date +%s) + 1800 ))
+DURATION_SECONDS="${SOAK_DURATION_SECONDS:-1800}"
+END_TS=$(( $(date +%s) + DURATION_SECONDS ))
 ITER=0
 PASS=0
 FAIL=0
 SUMMARY="$OUT_DIR/summary.txt"
 METRO_LOG="$OUT_DIR/metro.log"
 ADB_LOG="$OUT_DIR/adb-status.txt"
-HISTORY_LOG="$ROOT_DIR/maestro/results/maestro-soak-history.md"
+HISTORY_LOG="$ROOT_DIR/maestro/maestro-soak-history.md"
 RUN_START="$(date '+%Y-%m-%d %H:%M:%S')"
 : > "$SUMMARY"
 : > "$ADB_LOG"
@@ -37,6 +38,7 @@ fi
 echo "out_dir=$OUT_DIR" | tee -a "$SUMMARY"
 echo "flow=$FLOW" | tee -a "$SUMMARY"
 echo "start_time=$RUN_START" | tee -a "$SUMMARY"
+echo "duration_seconds=$DURATION_SECONDS" | tee -a "$SUMMARY"
 
 ensure_metro() {
   if ! lsof -ti tcp:8081 >/dev/null 2>&1; then
@@ -70,7 +72,11 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
   "$ADB_BIN" -s emulator-5554 shell am force-stop com.integrationtestapp >/dev/null 2>&1 || true
   "$ADB_BIN" -s emulator-5554 shell am start -n com.integrationtestapp/com.integrationtestapp.MainActivity >/dev/null 2>&1 || true
   sleep 3
-  if maestro test "$FLOW" >"$LOG" 2>&1; then
+  if maestro test \
+      --debug-output "$OUT_DIR/debug-$ITER" \
+      --flatten-debug-output \
+      --test-output-dir "$OUT_DIR/test-output-$ITER" \
+      "$FLOW" >"$LOG" 2>&1; then
     PASS=$((PASS + 1))
     echo "[$TS] iteration=$ITER result=PASS" | tee -a "$SUMMARY"
   else

@@ -25,7 +25,7 @@ STOP_REASON=""
 SUMMARY="$OUT_DIR/summary.txt"
 METRO_LOG="$OUT_DIR/metro.log"
 SIM_LOG="$OUT_DIR/sim-status.txt"
-HISTORY_LOG="$ROOT_DIR/maestro/results/maestro-soak-history.md"
+HISTORY_LOG="$ROOT_DIR/maestro/maestro-soak-history.md"
 RUN_START="$(date '+%Y-%m-%d %H:%M:%S')"
 : > "$SUMMARY"
 : > "$SIM_LOG"
@@ -102,7 +102,11 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
   LOG="$OUT_DIR/run-${ITER}.log"
   echo "[$TS] iteration=$ITER starting" | tee -a "$SUMMARY"
   set +e
-  maestro --device "$SIM_UDID" test "$FLOW" >"$LOG" 2>&1
+  maestro --device "$SIM_UDID" test \
+    --debug-output "$OUT_DIR/debug-$ITER" \
+    --flatten-debug-output \
+    --test-output-dir "$OUT_DIR/test-output-$ITER" \
+    "$FLOW" >"$LOG" 2>&1
   CMD_EXIT=$?
   set -e
   echo "[$TS] iteration=$ITER maestro_exit=$CMD_EXIT" >> "$SUMMARY"

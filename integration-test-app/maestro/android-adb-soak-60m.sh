@@ -20,7 +20,7 @@ LAST_FAIL_KEY=""
 STOP_REASON=""
 SUMMARY="$OUT_DIR/summary.txt"
 ADB_LOG="$OUT_DIR/adb-status.txt"
-HISTORY_LOG="$ROOT_DIR/maestro/results/maestro-soak-history.md"
+HISTORY_LOG="$ROOT_DIR/maestro/maestro-soak-history.md"
 RUN_START="$(date '+%Y-%m-%d %H:%M:%S')"
 : > "$SUMMARY"
 : > "$ADB_LOG"
@@ -59,12 +59,17 @@ center_for_label() {
 import re, sys
 xml=open(sys.argv[1], 'r', encoding='utf-8').read()
 label=sys.argv[2]
-pat=re.compile(r'text="%s".*?bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"' % re.escape(label))
-m=pat.search(xml)
-if not m:
-    sys.exit(1)
-x1,y1,x2,y2=map(int,m.groups())
-print((x1+x2)//2, (y1+y2)//2)
+patterns = [
+    re.compile(r'content-desc="%s".*?bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"' % re.escape(label)),
+    re.compile(r'text="%s".*?bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"' % re.escape(label)),
+]
+for pat in patterns:
+    m = pat.search(xml)
+    if m:
+        x1,y1,x2,y2=map(int,m.groups())
+        print((x1+x2)//2, (y1+y2)//2)
+        sys.exit(0)
+sys.exit(1)
 PY
 }
 
@@ -74,12 +79,60 @@ has_text() {
   grep -q "$needle" "$xml"
 }
 
+wait_for_text() {
+  local xml_target="$1"
+  local needle="$2"
+  local timeout_seconds="${3:-15}"
+  local interval="${4:-1}"
+  local elapsed=0
+
+  while [ "$elapsed" -lt "$timeout_seconds" ]; do
+    ui_dump "$xml_target"
+    if has_text "$xml_target" "$needle"; then
+      return 0
+    fi
+    sleep "$interval"
+    elapsed=$((elapsed + interval))
+  done
+
+  return 1
+}
+
+wait_for_success_after_tap() {
+  local xml_before="$1"
+  local xml_target="$2"
+
+  sleep 10
+  ui_dump "$xml_target"
+  if has_text "$xml_target" 'SDK: success'; then
+    return 0
+  fi
+
+  if has_text "$xml_target" 'SDK: idle'; then
+    tap_label "$xml_before" 'SDK 초기화' || true
+    sleep 10
+    ui_dump "$xml_target"
+    if has_text "$xml_target" 'SDK: success'; then
+      return 0
+    fi
+  fi
+
+  sleep 5
+  ui_dump "$xml_target"
+  has_text "$xml_target" 'SDK: success'
+}
+
 tap_label() {
   local xml="$1"
   local label="$2"
-  local coords
+  local coords x y
+
+  if [ "$label" = 'SDK 초기화' ]; then
+    "$ADB_BIN" -s emulator-5554 shell input tap 540 1777 >/dev/null 2>&1
+    return 0
+  fi
+
   coords=$(center_for_label "$xml" "$label") || return 1
-  local x y
   x=$(echo "$coords" | awk '{print $1}')
   y=$(echo "$coords" | awk '{print $2}')
   "$ADB_BIN" -s emulator-5554 shell input tap "$x" "$y" >/dev/null 2>&1
@@ -109,24 +162,18 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
   XML_AFTER_INIT="$OUT_DIR/ui-after-init-${ITER}.xml"
   echo "[$TS] iteration=$ITER starting" | tee -a "$SUMMARY"
 
-  "$ADB_BIN" kill-server >/dev/null 2>&1 || true
-  "$ADB_BIN" start-server >/dev/null 2>&1 || true
   "$ADB_BIN" wait-for-device >/dev/null 2>&1 || true
+  "$ADB_BIN" -s emulator-5554 reverse tcp:8081 tcp:8081 >/dev/null 2>&1 || true
   "$ADB_BIN" -s emulator-5554 shell am force-stop com.integrationtestapp >/dev/null 2>&1 || true
   "$ADB_BIN" -s emulator-5554 shell pm clear com.integrationtestapp >/dev/null 2>&1 || true
   "$ADB_BIN" -s emulator-5554 shell am start -n com.integrationtestapp/.MainActivity >/dev/null 2>&1 || true
-  sleep 4
 
-  ui_dump "$XML_BEFORE"
-
-  if ! has_text "$XML_BEFORE" 'SDK 초기화'; then
+  if ! wait_for_text "$XML_BEFORE" 'SDK 초기화' 20 2; then
     FAIL=$((FAIL + 1))
     FAIL_KEY='android_missing_init_button'
   else
     tap_label "$XML_BEFORE" 'SDK 초기화' || true
-    sleep 4
-    ui_dump "$XML_AFTER_INIT"
-    if has_text "$XML_AFTER_INIT" 'SDK: success'; then
+    if wait_for_success_after_tap "$XML_BEFORE" "$XML_AFTER_INIT"; then
       PASS=$((PASS + 1))
       REPEAT_FAIL_COUNT=0
       LAST_FAIL_KEY=""

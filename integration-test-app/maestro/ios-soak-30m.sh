@@ -10,10 +10,11 @@ export JAVA_HOME="/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
 export PATH="$JAVA_HOME/bin:$HOME/.maestro/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 FLOW="$ROOT_DIR/maestro/ios-ad-validation.yaml"
-END_TS=$(( $(date +%s) + 1800 ))
+DURATION_SECONDS="${SOAK_DURATION_SECONDS:-1800}"
+END_TS=$(( $(date +%s) + DURATION_SECONDS ))
 ITER=0; PASS=0; FAIL=0
 SUMMARY="$OUT_DIR/summary.txt"
-HISTORY_LOG="$ROOT_DIR/maestro/results/maestro-soak-history.md"
+HISTORY_LOG="$ROOT_DIR/maestro/maestro-soak-history.md"
 RUN_START="$(date '+%Y-%m-%d %H:%M:%S')"
 : > "$SUMMARY"
 
@@ -32,7 +33,11 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
   TS="$(date '+%Y-%m-%d %H:%M:%S')"
   LOG="$OUT_DIR/run-${ITER}.log"
   echo "[$TS] iteration=$ITER starting" | tee -a "$SUMMARY"
-  if maestro --device "$SIM_UDID" test "$FLOW" >"$LOG" 2>&1; then
+  if maestro --device "$SIM_UDID" test \
+      --debug-output "$OUT_DIR/debug-$ITER" \
+      --flatten-debug-output \
+      --test-output-dir "$OUT_DIR/test-output-$ITER" \
+      "$FLOW" >"$LOG" 2>&1; then
     PASS=$((PASS + 1))
     echo "[$TS] iteration=$ITER result=PASS" | tee -a "$SUMMARY"
   else
