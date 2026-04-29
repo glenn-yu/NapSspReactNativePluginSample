@@ -6,6 +6,30 @@ PODS:
   - AdMixerMediationAdFit (1.0.7):
     - AdFitSDK (< 3.18.6, >= 3.14.7)
     - AdMixerMediation (>= 2.3.0)
+  - AdMixerMediationAppLovin (1.0.5):
+    - AdMixerMediationAppLovin/WithCore (= 1.0.5)
+  - AdMixerMediationAppLovin/WithCore (1.0.5):
+    - AdMixerMediation (>= 2.3.0)
+    - AppLovinSDK (< 13.5.2, >= 13.3.1)
+  - AdMixerMediationGAM (1.0.7):
+    - AdMixerMediation (>= 2.3.0)
+    - Google-Mobile-Ads-SDK (< 12.14.1, >= 12.7.0)
+  - AdMixerMediationPangle (1.0.6):
+    - AdMixerMediation (>= 2.3.0)
+    - Ads-Global (< 7.8.8.9, >= 7.4.0.8)
+  - AdMixerMediationUnityAds (1.0.6):
+    - AdMixerMediationUnityAds/WithCore (= 1.0.6)
+  - AdMixerMediationUnityAds/WithCore (1.0.6):
+    - AdMixerMediation (>= 2.3.0)
+    - UnityAds (< 4.16.6, >= 4.15.1)
+  - Ads-Global (7.8.5.9):
+    - Ads-Global/BUAdSDK (= 7.8.5.9)
+  - Ads-Global/BUAdSDK (7.8.5.9):
+    - Ads-Global/PangleSDK
+    - Ads-Global/TikTokBusinessSDK
+  - Ads-Global/PangleSDK (7.8.5.9)
+  - Ads-Global/TikTokBusinessSDK (7.8.5.9)
+  - AppLovinSDK (13.5.1)
   - boost (1.76.0)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.72.10)
@@ -18,15 +42,40 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.72.10)
   - fmt (6.2.1)
   - glog (0.3.5)
+  - Google-Mobile-Ads-SDK (12.14.0):
+    - GoogleUserMessagingPlatform (>= 1.1)
+  - GoogleUserMessagingPlatform (3.1.0)
   - hermes-engine (0.72.10):
     - hermes-engine/Pre-built (= 0.72.10)
   - hermes-engine/Pre-built (0.72.10)
   - libevent (2.1.12)
-  - NapSspPlugin/AdFit (0.1.2):
-    - AdMixerMediationAdFit
-    - NapSspPlugin/Core
-  - NapSspPlugin/Core (0.1.2):
+  - NapSspPlugin (0.1.2):
     - AdMixerMediation
+    - NapSspPlugin/AdFit (= 0.1.2)
+    - NapSspPlugin/AppLovin (= 0.1.2)
+    - NapSspPlugin/GAM (= 0.1.2)
+    - NapSspPlugin/Pangle (= 0.1.2)
+    - NapSspPlugin/UnityAds (= 0.1.2)
+    - React-Core
+  - NapSspPlugin/AdFit (0.1.2):
+    - AdMixerMediation
+    - AdMixerMediationAdFit
+    - React-Core
+  - NapSspPlugin/AppLovin (0.1.2):
+    - AdMixerMediation
+    - AdMixerMediationAppLovin
+    - React-Core
+  - NapSspPlugin/GAM (0.1.2):
+    - AdMixerMediation
+    - AdMixerMediationGAM
+    - React-Core
+  - NapSspPlugin/Pangle (0.1.2):
+    - AdMixerMediation
+    - AdMixerMediationPangle
+    - React-Core
+  - NapSspPlugin/UnityAds (0.1.2):
+    - AdMixerMediation
+    - AdMixerMediationUnityAds
     - React-Core
   - RCT-Folly (2021.07.22.00):
     - boost
@@ -439,6 +488,7 @@ PODS:
     - React-logger (= 0.72.10)
     - React-perflogger (= 0.72.10)
   - SocketRocket (0.6.1)
+  - UnityAds (4.16.5)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -452,8 +502,7 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
-  - NapSspPlugin/AdFit (from `./NapSspLocalPod`)
-  - NapSspPlugin/Core (from `./NapSspLocalPod`)
+  - NapSspPlugin (from `../node_modules/react-native-nap-ssp`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
@@ -495,9 +544,18 @@ SPEC REPOS:
     - AdMixer
     - AdMixerMediation
     - AdMixerMediationAdFit
+    - AdMixerMediationAppLovin
+    - AdMixerMediationGAM
+    - AdMixerMediationPangle
+    - AdMixerMediationUnityAds
+    - Ads-Global
+    - AppLovinSDK
     - fmt
+    - Google-Mobile-Ads-SDK
+    - GoogleUserMessagingPlatform
     - libevent
     - SocketRocket
+    - UnityAds
 
 EXTERNAL SOURCES:
   boost:
@@ -513,7 +571,7 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
   NapSspPlugin:
-    :path: "./NapSspLocalPod"
+    :path: "../node_modules/react-native-nap-ssp"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -586,15 +644,23 @@ SPEC CHECKSUMS:
   AdMixer: 54794be2662044147414e6e714b5c8201d59e804
   AdMixerMediation: 34ce6be36bc88f701cd064aa53187cbd33fe2864
   AdMixerMediationAdFit: 17e829b31129ab332fa5f720d168c54cf3899565
+  AdMixerMediationAppLovin: 610f319a06edf31f1a3ee1a89a4d4926d96534e9
+  AdMixerMediationGAM: e01d3627278d0bc67b6db2f371d36a791dadb096
+  AdMixerMediationPangle: 2826a4e05ab233105fad2d57ba82c0430daef762
+  AdMixerMediationUnityAds: 16d9701d17d754f0aad07d80d715a2fc9bdf5f1c
+  Ads-Global: 5462b4aeff0bc7c1cb9a1ec580fcc621bee6a2dc
+  AppLovinSDK: 8d9af6c7617e4d35b38aa8393a3e9d161a74b230
   boost: 7dcd2de282d72e344012f7d6564d024930a6a440
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: f91d538f197fa71a7d5b77ec2069d49550c0eb96
   FBReactNativeSpec: b13d1c23d6ed82d6b66aad7a253edf8ba76c4a4c
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
+  Google-Mobile-Ads-SDK: 4534fd2dfcd3f705c5485a6633c5188d03d4eed2
+  GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
   hermes-engine: 90e4033deb00bee33330a9f15eff0f874bd82f6d
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
-  NapSspPlugin: dc6cbe091462049e0227a47807ea5660a2e76500
+  NapSspPlugin: 52cf9cbd598af395ee996e0853589eafa3dd3878
   RCT-Folly: 8dc08ca5a393b48b1c523ab6220dfdcc0fe000ad
   RCTRequired: b4d3068afa6f52ec5260a8417053b1f1b421483d
   RCTTypeSafety: a4551b3d338c96435f63bf06d564055c1d3cc0ac
@@ -628,8 +694,9 @@ SPEC CHECKSUMS:
   React-utils: a4a93189d0daacb5e8215250dc87907ff303744a
   ReactCommon: 5307bd88aa11a192d8a75717e66d7b630d9bc8bd
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
+  UnityAds: 8b9e0ecf7c4aa7334d15f81efb58db279e28f502
   Yoga: d0003f849d2b5224c072cef6568b540d8bb15cd3
 
-PODFILE CHECKSUM: 38ff8af0cbd0b58193ef778054a2a5e22b8e9b0a
+PODFILE CHECKSUM: bc404dc47d0b5f720ae889ba640f991af5fba929
 
 COCOAPODS: 1.16.2

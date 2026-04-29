@@ -1,5 +1,6 @@
 package com.gwangy
 
+import android.util.Log
 import android.view.View
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactApplicationContext
@@ -8,6 +9,7 @@ import com.facebook.react.bridge.WritableMap
 import com.facebook.react.uimanager.events.RCTEventEmitter
 
 internal object NapSspEventEmitter {
+    private const val TAG = "NapSspEventEmitter"
     fun emitModuleEvent(
         reactContext: ReactApplicationContext?,
         eventName: String,
@@ -25,6 +27,7 @@ internal object NapSspEventEmitter {
         val reactContext = view.context as? ReactContext ?: return
         if (!reactContext.hasActiveReactInstance()) return
         val payload = toWritableMap(data + ("eventName" to eventName) + ("source" to "view"))
+        Log.d(TAG, "emitViewEvent view=${view.javaClass.simpleName} id=${view.id} event=$eventName data=$data")
         reactContext.getJSModule(RCTEventEmitter::class.java).receiveEvent(view.id, eventName, payload)
     }
 

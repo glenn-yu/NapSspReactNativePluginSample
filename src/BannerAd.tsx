@@ -73,20 +73,22 @@ export default function BannerAd(props: BannerAdProps) {
 
   if (NativeBannerComponent) {
     return (
-      <NativeBannerComponent
-        adUnitId={props.adUnitId}
-        size={size}
-        style={containerStyle}
-        testID={props.testID}
-        onAdLoaded={props.onAdLoaded}
-        onAdFailedToLoad={
-          props.onAdFailedToLoad ? (event) => props.onAdFailedToLoad?.(event.nativeEvent) : undefined
-        }
-        onAdClicked={props.onAdClicked}
-        onAdOpened={props.onAdOpened}
-        onAdClosed={props.onAdClosed}
-        onAdImpression={props.onAdImpression}
-      />
+      <View style={containerStyle}>
+        <NativeBannerComponent
+          adUnitId={props.adUnitId}
+          size={size}
+          style={{ width: '100%', height: '100%' }}
+          testID={props.testID}
+          onAdLoaded={props.onAdLoaded}
+          onAdFailedToLoad={
+            props.onAdFailedToLoad ? (event) => props.onAdFailedToLoad?.(event.nativeEvent) : undefined
+          }
+          onAdClicked={props.onAdClicked}
+          onAdOpened={props.onAdOpened}
+          onAdClosed={props.onAdClosed}
+          onAdImpression={props.onAdImpression}
+        />
+      </View>
     );
   }
 

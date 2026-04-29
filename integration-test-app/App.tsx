@@ -148,6 +148,40 @@ const App = () => {
   const [initError, setInitError] = useState<string | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [bannerKey, setBannerKey] = useState(0);
+  const [isSoakTesting, setIsSoakTesting] = useState(false);
+
+  // 30분 자동화 Soak Test 로직 (15초마다 모든 광고 로드 및 노출)
+  React.useEffect(() => {
+    if (!isSoakTesting || !initialized) return;
+
+    let cycleCount = 0;
+    const maxCycles = (30 * 60) / 15; // 30분 (15초 주기) = 120회
+
+    const interval = setInterval(() => {
+      cycleCount++;
+      if (cycleCount > maxCycles) {
+        setIsSoakTesting(false);
+        addLog('SOAK', '30분 부하 테스트 완료');
+        return;
+      }
+
+      addLog('SOAK', `자동 테스트 사이클 진행 중... (${cycleCount}/${maxCycles})`);
+
+      // 1. 배너/비디오 리로드 (키 변경으로 View 재생성)
+      setBannerKey(prev => prev + 1);
+
+      // 2. 전면 광고 노출
+      showInterstitial();
+
+      // 3초 후 전면 동영상 노출 시도 (전면 팝업이 닫히거나 실패했을 경우를 대비)
+      setTimeout(() => {
+        showInterstitialVideo();
+      }, 3000);
+
+    }, 15000); // 15초 간격
+
+    return () => clearInterval(interval);
+  }, [isSoakTesting, initialized]);
   const [bannerVisible, setBannerVisible] = useState(false);
   const [nativeKey, setNativeKey] = useState(0);
   const [nativeVisible, setNativeVisible] = useState(false);
@@ -208,10 +242,21 @@ const App = () => {
     ad.addAdEventListener('clicked', () => addLog('INTER', 'clicked'));
     ad.addAdEventListener('closed', () => { addLog('INTER', 'closed'); ad.destroy(); });
     try {
-      addLog('INTER', 'start() start');
-      await ad.start();
-      addLog('INTER', 'start() resolved');
-      updateAdStatus('interstitial', { lastMessage: 'startResolved' });
+      if (Platform.OS === 'android') {
+        addLog('INTER', 'start() start');
+        await ad.start();
+        addLog('INTER', 'start() resolved');
+        updateAdStatus('interstitial', { lastMessage: 'startResolved' });
+      } else {
+        addLog('INTER', 'load() start');
+        await ad.load();
+        addLog('INTER', 'load() resolved');
+        updateAdStatus('interstitial', { lastMessage: 'loadResolved' });
+        addLog('INTER', 'show() start');
+        await ad.show();
+        addLog('INTER', 'show() resolved');
+        updateAdStatus('interstitial', { lastMessage: 'showResolved' });
+      }
     } catch (e: any) {
       addLog('INTER', `exception:${e?.message ?? String(e)}`);
       Alert.alert('전면 광고 오류', e?.message ?? String(e));
@@ -304,7 +349,11 @@ const App = () => {
           <IdRow label="네이티브" value={ids.native} onChangeText={v => setIds(p => ({ ...p, native: v }))} />
           <IdRow label="인라인 동영상" value={ids.video} onChangeText={v => setIds(p => ({ ...p, video: v }))} />
           <IdRow label="전면 동영상" value={ids.interstitialVideo} onChangeText={v => setIds(p => ({ ...p, interstitialVideo: v }))} />
-          <TouchableOpacity style={[styles.button, { backgroundColor: '#00796B', marginTop: 8 }]} onPress={handleInitialize}>
+          <TouchableOpacity
+            testID="init-button"
+            accessibilityLabel="init-button"
+            style={[styles.button, { backgroundColor: '#00796B', marginTop: 8 }]}
+            onPress={handleInitialize}>
             <Text style={styles.buttonText}>SDK 초기화</Text>
           </TouchableOpacity>
         </Section>
@@ -312,7 +361,12 @@ const App = () => {
         {/* ── 1. 배너 ────────────────────────────── */}
         <Section title="1. 배너 광고 (320×50)">
           <View style={styles.adButtonRow}>
-            <TouchableOpacity disabled={!initialized} style={[styles.adButton, { backgroundColor: '#1565C0' }, !initialized && styles.buttonDisabled]} onPress={() => { setBannerVisible(true); setBannerKey(k => k + 1); }}>
+            <TouchableOpacity
+              testID="banner-load-button"
+              accessibilityLabel="banner-load-button"
+              disabled={!initialized}
+              style={[styles.adButton, { backgroundColor: '#1565C0' }, !initialized && styles.buttonDisabled]}
+              onPress={() => { setBannerVisible(true); setBannerKey(k => k + 1); }}>
               <Text style={styles.buttonText}>{bannerVisible ? '재로드' : '로드'}</Text>
             </TouchableOpacity>
             <TouchableOpacity disabled={!initialized} style={[styles.adButton, { backgroundColor: '#546E7A' }, !initialized && styles.buttonDisabled]} onPress={() => setBannerVisible(false)}>
@@ -340,7 +394,12 @@ const App = () => {
         {/* ── 2. 네이티브 ────────────────────────── */}
         <Section title="2. 네이티브 광고">
           <View style={styles.adButtonRow}>
-            <TouchableOpacity disabled={!initialized} style={[styles.adButton, { backgroundColor: '#1565C0' }, !initialized && styles.buttonDisabled]} onPress={() => { setNativeVisible(true); setNativeKey(k => k + 1); }}>
+            <TouchableOpacity
+              testID="native-load-button"
+              accessibilityLabel="native-load-button"
+              disabled={!initialized}
+              style={[styles.adButton, { backgroundColor: '#1565C0' }, !initialized && styles.buttonDisabled]}
+              onPress={() => { resetAdStatus('native', 'requesting'); setNativeVisible(true); setNativeKey(k => k + 1); }}>
               <Text style={styles.buttonText}>{nativeVisible ? '재로드' : '로드'}</Text>
             </TouchableOpacity>
             <TouchableOpacity disabled={!initialized} style={[styles.adButton, { backgroundColor: '#546E7A' }, !initialized && styles.buttonDisabled]} onPress={() => setNativeVisible(false)}>
@@ -349,6 +408,12 @@ const App = () => {
           </View>
           {nativeVisible && (
             <>
+              <Text testID="native-status-top" accessibilityLabel="native-status-top" style={styles.statusLine}>
+                NATIVE_STATUS:{adStatuses.native.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.native.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}
+              </Text>
+              <Text testID="native-message-top" accessibilityLabel="native-message-top" style={styles.statusLine}>
+                NATIVE_MSG:{adStatuses.native.lastMessage}
+              </Text>
               <NativeAd
                 key={nativeKey}
                 adUnitId={ids.native}
@@ -358,8 +423,11 @@ const App = () => {
                 onAdFailedToLoad={e => { addLog('NATIVE', `failed: ${e.message}`); updateAdStatus('native', { lastMessage: `failed:${e.message}` }); }}
                 onAdClicked={() => addLog('NATIVE', 'clicked')}
               />
-              <Text style={styles.statusLine}>
+              <Text testID="native-status-line" accessibilityLabel="native-status-line" style={styles.statusLine}>
                 NATIVE_STATUS:{adStatuses.native.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.native.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}
+              </Text>
+              <Text testID="native-message-line" accessibilityLabel="native-message-line" style={styles.statusLine}>
+                NATIVE_MSG:{adStatuses.native.lastMessage}
               </Text>
             </>
           )}
@@ -368,7 +436,12 @@ const App = () => {
         {/* ── 3. 인라인 동영상 ─────────────────────── */}
         <Section title="3. 인라인 동영상 광고">
           <View style={styles.adButtonRow}>
-            <TouchableOpacity disabled={!initialized} style={[styles.adButton, { backgroundColor: '#1565C0' }, !initialized && styles.buttonDisabled]} onPress={() => { setVideoVisible(true); setVideoKey(k => k + 1); }}>
+            <TouchableOpacity
+              testID="video-load-button"
+              accessibilityLabel="video-load-button"
+              disabled={!initialized}
+              style={[styles.adButton, { backgroundColor: '#1565C0' }, !initialized && styles.buttonDisabled]}
+              onPress={() => { setVideoVisible(true); setVideoKey(k => k + 1); }}>
               <Text style={styles.buttonText}>{videoVisible ? '재로드' : '로드'}</Text>
             </TouchableOpacity>
             <TouchableOpacity disabled={!initialized} style={[styles.adButton, { backgroundColor: '#546E7A' }, !initialized && styles.buttonDisabled]} onPress={() => setVideoVisible(false)}>
@@ -377,6 +450,9 @@ const App = () => {
           </View>
           {videoVisible && (
             <>
+              <Text testID="video-status-top" accessibilityLabel="video-status-top" style={styles.statusLine}>
+                VIDEO_STATUS:{adStatuses.video.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.video.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.video.completed ? 'COMPLETED' : 'NOT_COMPLETED'}
+              </Text>
               <VideoAd
                 key={videoKey}
                 adUnitId={ids.video}
@@ -388,7 +464,7 @@ const App = () => {
                 onAdSkipped={() => addLog('VIDEO', 'skipped')}
                 onAdClicked={() => addLog('VIDEO', 'clicked')}
               />
-              <Text style={styles.statusLine}>
+              <Text testID="video-status-line" accessibilityLabel="video-status-line" style={styles.statusLine}>
                 VIDEO_STATUS:{adStatuses.video.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.video.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.video.completed ? 'COMPLETED' : 'NOT_COMPLETED'}
               </Text>
             </>
@@ -397,6 +473,11 @@ const App = () => {
 
         {/* ── 4. Fullscreen 버튼 ─────────────────── */}
         <Section title="4. 전면/리워드/전면동영상 광고">
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: isSoakTesting ? '#D32F2F' : '#00796B', marginBottom: 20 }]}
+            onPress={() => setIsSoakTesting(!isSoakTesting)}>
+            <Text style={styles.buttonText}>{isSoakTesting ? '■ 30분 자동 테스트 중지' : '▶ 30분 자동 통합 부하 테스트 시작'}</Text>
+          </TouchableOpacity>
           <TouchableOpacity disabled={!initialized} style={[styles.button, { backgroundColor: '#1565C0' }, !initialized && styles.buttonDisabled]} onPress={showInterstitial}>
             <Text style={styles.buttonText}>전면 광고 (popup)</Text>
           </TouchableOpacity>
@@ -421,18 +502,18 @@ const App = () => {
         </Section>
 
         <Section title="광고 응답 상태">
-          <Text style={styles.statusLine}>BANNER loaded={String(adStatuses.banner.loaded)} impression={String(adStatuses.banner.impression)} msg={adStatuses.banner.lastMessage}</Text>
-          <Text style={styles.statusLine}>BANNER_STATUS:{adStatuses.banner.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.banner.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
-          <Text style={styles.statusLine}>NATIVE loaded={String(adStatuses.native.loaded)} impression={String(adStatuses.native.impression)} msg={adStatuses.native.lastMessage}</Text>
-          <Text style={styles.statusLine}>NATIVE_STATUS:{adStatuses.native.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.native.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
-          <Text style={styles.statusLine}>VIDEO loaded={String(adStatuses.video.loaded)} impression={String(adStatuses.video.impression)} completed={String(adStatuses.video.completed)} msg={adStatuses.video.lastMessage}</Text>
-          <Text style={styles.statusLine}>VIDEO_STATUS:{adStatuses.video.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.video.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.video.completed ? 'COMPLETED' : 'NOT_COMPLETED'}</Text>
-          <Text style={styles.statusLine}>INTER loaded={String(adStatuses.interstitial.loaded)} opened={String(adStatuses.interstitial.opened)} impression={String(adStatuses.interstitial.impression)} msg={adStatuses.interstitial.lastMessage}</Text>
-          <Text style={styles.statusLine}>INTER_STATUS:{adStatuses.interstitial.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.interstitial.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.interstitial.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
-          <Text style={styles.statusLine}>REWARD loaded={String(adStatuses.rewarded.loaded)} opened={String(adStatuses.rewarded.opened)} impression={String(adStatuses.rewarded.impression)} rewarded={String(adStatuses.rewarded.rewarded)} msg={adStatuses.rewarded.lastMessage}</Text>
-          <Text style={styles.statusLine}>REWARD_STATUS:{adStatuses.rewarded.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.rewarded.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.rewarded.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.rewarded.rewarded ? 'REWARDED' : 'NOT_REWARDED'}</Text>
-          <Text style={styles.statusLine}>IV loaded={String(adStatuses.interstitialVideo.loaded)} opened={String(adStatuses.interstitialVideo.opened)} completed={String(adStatuses.interstitialVideo.completed)} msg={adStatuses.interstitialVideo.lastMessage}</Text>
-          <Text style={styles.statusLine}>IV_STATUS:{adStatuses.interstitialVideo.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.interstitialVideo.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.interstitialVideo.completed ? 'COMPLETED' : 'NOT_COMPLETED'}</Text>
+          <Text testID="summary-banner-detail" accessibilityLabel="summary-banner-detail" style={styles.statusLine}>BANNER loaded={String(adStatuses.banner.loaded)} impression={String(adStatuses.banner.impression)} msg={adStatuses.banner.lastMessage}</Text>
+          <Text testID="summary-banner-status" accessibilityLabel="summary-banner-status" style={styles.statusLine}>BANNER_STATUS:{adStatuses.banner.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.banner.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
+          <Text testID="summary-native-detail" accessibilityLabel="summary-native-detail" style={styles.statusLine}>NATIVE loaded={String(adStatuses.native.loaded)} impression={String(adStatuses.native.impression)} msg={adStatuses.native.lastMessage}</Text>
+          <Text testID="summary-native-status" accessibilityLabel="summary-native-status" style={styles.statusLine}>NATIVE_STATUS:{adStatuses.native.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.native.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
+          <Text testID="summary-video-detail" accessibilityLabel="summary-video-detail" style={styles.statusLine}>VIDEO loaded={String(adStatuses.video.loaded)} impression={String(adStatuses.video.impression)} completed={String(adStatuses.video.completed)} msg={adStatuses.video.lastMessage}</Text>
+          <Text testID="summary-video-status" accessibilityLabel="summary-video-status" style={styles.statusLine}>VIDEO_STATUS:{adStatuses.video.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.video.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.video.completed ? 'COMPLETED' : 'NOT_COMPLETED'}</Text>
+          <Text testID="summary-inter-detail" accessibilityLabel="summary-inter-detail" style={styles.statusLine}>INTER loaded={String(adStatuses.interstitial.loaded)} opened={String(adStatuses.interstitial.opened)} impression={String(adStatuses.interstitial.impression)} msg={adStatuses.interstitial.lastMessage}</Text>
+          <Text testID="summary-inter-status" accessibilityLabel="summary-inter-status" style={styles.statusLine}>INTER_STATUS:{adStatuses.interstitial.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.interstitial.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.interstitial.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
+          <Text testID="summary-reward-detail" accessibilityLabel="summary-reward-detail" style={styles.statusLine}>REWARD loaded={String(adStatuses.rewarded.loaded)} opened={String(adStatuses.rewarded.opened)} impression={String(adStatuses.rewarded.impression)} rewarded={String(adStatuses.rewarded.rewarded)} msg={adStatuses.rewarded.lastMessage}</Text>
+          <Text testID="summary-reward-status" accessibilityLabel="summary-reward-status" style={styles.statusLine}>REWARD_STATUS:{adStatuses.rewarded.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.rewarded.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.rewarded.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.rewarded.rewarded ? 'REWARDED' : 'NOT_REWARDED'}</Text>
+          <Text testID="summary-iv-detail" accessibilityLabel="summary-iv-detail" style={styles.statusLine}>IV loaded={String(adStatuses.interstitialVideo.loaded)} opened={String(adStatuses.interstitialVideo.opened)} completed={String(adStatuses.interstitialVideo.completed)} msg={adStatuses.interstitialVideo.lastMessage}</Text>
+          <Text testID="summary-iv-status" accessibilityLabel="summary-iv-status" style={styles.statusLine}>IV_STATUS:{adStatuses.interstitialVideo.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.interstitialVideo.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.interstitialVideo.completed ? 'COMPLETED' : 'NOT_COMPLETED'}</Text>
         </Section>
 
         {/* ── 이벤트 로그 ────────────────────────── */}

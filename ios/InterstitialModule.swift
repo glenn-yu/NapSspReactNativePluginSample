@@ -103,7 +103,7 @@ class InterstitialModule: NSObject {
       }
 
       #if canImport(AdMixerMediation)
-      guard let interstitial = NapSspRuntime.shared.consumeStoredInterstitial(adUnitId: adUnitId) else {
+      guard let interstitial = NapSspRuntime.shared.peekStoredInterstitial(adUnitId: adUnitId) else {
         NSLog("[NapSspInterstitial] show missing stored interstitial adUnitId=%@", adUnitId)
         reject(NapSspError.adNotLoaded("No interstitial has been loaded yet.").errorCode, "No interstitial has been loaded yet.", nil)
         return
@@ -165,6 +165,7 @@ private final class NapSspInterstitialDelegate: NSObject, AMMInterstitialDelegat
       "code": "napssp_interstitial_show_failed",
       "message": error?.localizedDescription ?? "unknown"
     ])
+    NapSspRuntime.shared.removeStoredInterstitial(adUnitId: adUnitId)
     NapSspInterstitialDelegate.instances.removeValue(forKey: adUnitId)
   }
 
@@ -176,6 +177,7 @@ private final class NapSspInterstitialDelegate: NSObject, AMMInterstitialDelegat
   func onCloseInterstitial() {
     NSLog("[NapSspInterstitial] delegate close adUnitId=%@", adUnitId)
     NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: ["adUnitId": adUnitId, "format": "interstitial"])
+    NapSspRuntime.shared.removeStoredInterstitial(adUnitId: adUnitId)
     NapSspInterstitialDelegate.instances.removeValue(forKey: adUnitId)
   }
 }

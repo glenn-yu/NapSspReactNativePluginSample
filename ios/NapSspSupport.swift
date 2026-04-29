@@ -471,6 +471,12 @@ final class NapSspRuntime {
     }
   }
 
+  func peekStoredInterstitial(adUnitId: String) -> AMMInterstitial? {
+    stateQueue.sync {
+      storedInterstitials[adUnitId]
+    }
+  }
+
   func consumeStoredInterstitial(adUnitId: String) -> AMMInterstitial? {
     stateQueue.sync {
       let instance = storedInterstitials[adUnitId]

@@ -13,6 +13,10 @@ export JAVA_HOME="/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
 export PATH="$JAVA_HOME/bin:$HOME/.maestro/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 echo "[$(date)] Starting Android validation..."
+/opt/homebrew/bin/adb -s emulator-5554 reverse tcp:8081 tcp:8081 >/dev/null 2>&1 || true
+/opt/homebrew/bin/adb -s emulator-5554 shell am force-stop com.integrationtestapp >/dev/null 2>&1 || true
+/opt/homebrew/bin/adb -s emulator-5554 shell am start -n com.integrationtestapp/com.integrationtestapp.MainActivity >/dev/null 2>&1 || true
+sleep 3
 set +e
 maestro test "$MAESTRO_DIR/android-ad-validation.yaml" > "$LOG" 2>&1
 EXIT_CODE=$?

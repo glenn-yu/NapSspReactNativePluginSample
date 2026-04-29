@@ -212,11 +212,11 @@ final class BannerView: UIView {
     sdkDelegate = delegate
 
     let sizeInfo = NapSspRuntime.shared.bannerSize(for: size as String)
-    let config = AMMBannerConfig()
-    config.viewSize = CGSize(width: sizeInfo.width, height: sizeInfo.height)
 
-    let view = AMMBannerView(rootViewController: rootVC, adUnitID: numericAdUnitId, config: config)
+    let view = AMMBannerView(rootViewController: rootVC)
+    view.adUnitID = numericAdUnitId
     view.delegate = delegate
+    view.frame = CGRect(x: 0, y: 0, width: sizeInfo.width, height: sizeInfo.height)
     
     bannerView = view
     addSubview(view)
@@ -311,7 +311,7 @@ final class BannerView: UIView {
 }
 
 #if canImport(AdMixerMediation)
-private final class NapSspBannerDelegate: NSObject, AMMBannerDelegate {
+private final class NapSspBannerDelegate: NSObject, AMMBannerViewDelegate {
   private weak var bannerView: BannerView?
   private let adUnitId: String
 
@@ -320,16 +320,16 @@ private final class NapSspBannerDelegate: NSObject, AMMBannerDelegate {
     self.adUnitId = adUnitId
   }
 
-  func onSuccessShowBanner() {
+  func onSuccessBanner() {
     guard let view = bannerView else { return }
     view.attachSdkView()
     view.onAdLoaded?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Banner loaded"))
     view.onAdImpression?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Banner impression"))
   }
 
-  func onFailShowBanner(error: Error?) {
+  func onFailBanner() {
     guard let view = bannerView else { return }
-    view.emitSdkFailure(adUnitId: adUnitId, code: "napssp_banner_load_failed", message: error?.localizedDescription ?? "unknown")
+    view.emitSdkFailure(adUnitId: adUnitId, code: "napssp_banner_load_failed", message: "unknown")
   }
 
   func onTapBanner() {

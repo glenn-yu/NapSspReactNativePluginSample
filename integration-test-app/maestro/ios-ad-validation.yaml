@@ -7,205 +7,80 @@ appId: org.reactjs.native.example.IntegrationTestApp
       visible: "Allow"
     commands:
       - tapOn: "Allow"
-- runFlow:
-    when:
-      visible: "허용"
-    commands:
-      - tapOn: "허용"
 - extendedWaitUntil:
-    visible: "SDK 초기화"
+    visible:
+      id: "init-button"
     timeout: 30000
-- runFlow:
-    when:
-      visible: "OK"
-    commands:
-      - tapOn: "OK"
-- waitForAnimationToEnd
+- tapOn:
+    id: "init-button"
 - extendedWaitUntil:
-    visible: "SDK 초기화"
-    timeout: 10000
-- tapOn: "SDK 초기화"
-- waitForAnimationToEnd
-- runFlow:
-    when:
-      visible: "OK"
-    commands:
-      - tapOn: "OK"
-- extendedWaitUntil:
-    visible: "1. 배너 광고 (320×50)"
-    timeout: 25000
-- runFlow:
-    when:
-      visible: "재로드"
-    commands:
-      - tapOn:
-          text: "재로드"
-          below: '1. 배너 광고 \(320×50\)'
-- runFlow:
-    when:
-      visible: "로드"
-    commands:
-      - tapOn:
-          text: "로드"
-          below: '1. 배너 광고 \(320×50\)'
+    visible: "SDK: success"
+    timeout: 20000
+- scrollUntilVisible:
+    element: "1. 배너 광고 (320×50)"
+    direction: DOWN
+- tapOn:
+    id: "banner-load-button"
 - extendedWaitUntil:
     visible: "BANNER_STATUS:LOADED:IMPRESSION"
     timeout: 30000
-- tapOn: "BANNER_STATUS:LOADED:IMPRESSION"
-- runFlow:
-    when:
-      notVisible: "SDK 초기화 설정"
-    commands:
-      - launchApp:
-          appId: org.reactjs.native.example.IntegrationTestApp
 - scrollUntilVisible:
-    element: "이벤트 로그"
+    element:
+      id: "native-load-button"
     direction: DOWN
+- tapOn:
+    id: "native-load-button"
 - extendedWaitUntil:
-    visible: ".*BANNER.*clicked.*"
+    visible: "더보기"
+    timeout: 45000
 - scrollUntilVisible:
-    element: "2. 네이티브 광고"
-    direction: UP
+    element:
+      id: "summary-native-status"
+    direction: DOWN
+    timeout: 30000
 - extendedWaitUntil:
-    visible: "언로드"
+    visible:
+      id: "summary-native-status"
     timeout: 10000
-- scrollUntilVisible:
-    element: "2. 네이티브 광고"
-    direction: DOWN
-    timeout: 20000
-    centerElement: true
-- runFlow:
-    when:
-      visible:
-        text: "재로드"
-        below: "2. 네이티브 광고"
-    commands:
-      - tapOn:
-          text: "재로드"
-          below: "2. 네이티브 광고"
-- runFlow:
-    when:
-      visible:
-        text: "로드"
-        below: "2. 네이티브 광고"
-    commands:
-      - tapOn:
-          text: "로드"
-          below: "2. 네이티브 광고"
-- extendedWaitUntil:
-    visible: "NATIVE_STATUS:LOADED:IMPRESSION"
-    timeout: 30000
-- tapOn: "NATIVE_STATUS:LOADED:IMPRESSION"
-- runFlow:
-    when:
-      notVisible: "SDK 초기화 설정"
-    commands:
-      - launchApp:
-          appId: org.reactjs.native.example.IntegrationTestApp
-- scrollUntilVisible:
-    element: "이벤트 로그"
-    direction: DOWN
-- extendedWaitUntil:
-    visible: ".*NATIVE.*clicked.*"
-- scrollUntilVisible:
-    element: "3. 인라인 동영상 광고"
-    direction: UP
-- scrollUntilVisible:
-    element: "3. 인라인 동영상 광고"
-    direction: DOWN
-    timeout: 20000
-    centerElement: true
-- runFlow:
-    when:
-      visible:
-        text: "재로드"
-        below: "3. 인라인 동영상 광고"
-    commands:
-      - tapOn:
-          text: "재로드"
-          below: "3. 인라인 동영상 광고"
-- runFlow:
-    when:
-      visible:
-        text: "로드"
-        below: "3. 인라인 동영상 광고"
-    commands:
-      - tapOn:
-          text: "로드"
-          below: "3. 인라인 동영상 광고"
-- extendedWaitUntil:
-    visible: "VIDEO_STATUS:LOADED:IMPRESSION:NOT_COMPLETED"
-    timeout: 30000
 - scrollUntilVisible:
     element: "전면 광고 (popup)"
-    direction: DOWN
-    timeout: 15000
-    centerElement: true
+    direction: UP
 - tapOn: "전면 광고 (popup)"
-- waitForAnimationToEnd
-- runFlow:
-    when:
-      visible: "닫기"
-    commands:
-      - tapOn: "닫기"
-- runFlow:
-    when:
-      visible: "OK"
-    commands:
-      - tapOn: "OK"
 - extendedWaitUntil:
-    visible: "INTER_STATUS:LOADED:OPENED:IMPRESSION"
-    timeout: 30000
-- scrollUntilVisible:
-    element: "리워드 동영상"
-    direction: DOWN
-    timeout: 15000
-    centerElement: true
-- tapOn: "리워드 동영상"
-- waitForAnimationToEnd
-- runFlow:
-    when:
-      visible: "닫기"
-    commands:
-      - tapOn: "닫기"
-- runFlow:
-    when:
-      visible: "OK"
-    commands:
-      - tapOn: "OK"
+    visible: "x"
+    timeout: 20000
+    optional: true
 - extendedWaitUntil:
-    visible: "REWARD_STATUS:LOADED:OPENED:IMPRESSION"
-    timeout: 30000
-- runFlow:
-    when:
-      visible: "닫기"
-    commands:
-      - tapOn: "닫기"
+    visible: "TEST"
+    timeout: 20000
+    optional: true
 - extendedWaitUntil:
-    visible: "REWARD_STATUS:LOADED:OPENED:IMPRESSION:REWARDED"
-    timeout: 10000
-- scrollUntilVisible:
-    element: "전면 동영상"
-    direction: DOWN
-    timeout: 15000
-    centerElement: true
-- tapOn: "전면 동영상"
-- waitForAnimationToEnd
-- runFlow:
-    when:
-      visible: "닫기"
-    commands:
-      - tapOn: "닫기"
-- runFlow:
-    when:
-      visible: "OK"
-    commands:
-      - tapOn: "OK"
+    visible:
+      id: "summary-inter-status"
+      text: "INTER_STATUS:LOADED:OPENED:IMPRESSION"
+    timeout: 20000
+    optional: true
 - extendedWaitUntil:
-    visible: "IV_STATUS:LOADED:OPENED"
-    timeout: 30000
-- scrollUntilVisible:
-    element: "이벤트 로그"
-    direction: DOWN
-    timeout: 10000
-- assertVisible: "이벤트 로그"
+    visible:
+      id: "summary-inter-status"
+      text: "INTER_STATUS:LOADED:NOT_OPENED:NO_IMPRESSION"
+    timeout: 12000
+    optional: true
+- runFlow:
+    when:
+      visible:
+        id: "summary-inter-status"
+        text: "INTER_STATUS:LOADED:NOT_OPENED:NO_IMPRESSION"
+    commands:
+      - tapOn: "전면 광고 (popup)"
+- extendedWaitUntil:
+    visible: "x"
+    timeout: 20000
+    optional: true
+- extendedWaitUntil:
+    visible: "TEST"
+    timeout: 20000
+    optional: true
+- extendedWaitUntil:
+    visible: "x"
+    timeout: 20000

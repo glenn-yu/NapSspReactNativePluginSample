@@ -131,10 +131,8 @@ final class VideoAdView: UIView {
     let delegate = NapSspVideoDelegate(view: self, adUnitId: adUnitId)
     sdkDelegate = delegate
 
-    let config = AMMVideoConfig()
-    config.isRetry = isRetry
-
-    let view = AMMVideoView(rootViewController: rootVC, adUnitID: numericAdUnitId, config: config)
+    let view = AMMVideoView(rootViewController: rootVC)
+    view.adUnitID = numericAdUnitId
     view.delegate = delegate
     
     videoAdView = view
@@ -192,7 +190,7 @@ final class VideoAdView: UIView {
 }
 
 #if canImport(AdMixerMediation)
-private final class NapSspVideoDelegate: NSObject, AMMVideoDelegate {
+private final class NapSspVideoDelegate: NSObject, AMMVideoViewDelegate {
   private weak var videoView: VideoAdView?
   private let adUnitId: String
 
@@ -201,19 +199,19 @@ private final class NapSspVideoDelegate: NSObject, AMMVideoDelegate {
     self.adUnitId = adUnitId
   }
 
-  func onSuccessShowVideo() {
+  func onSuccessVideo() {
     guard let view = videoView else { return }
     view.attachSdkView()
     view.onAdLoaded?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Video loaded"))
     view.onAdImpression?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Video impression"))
   }
 
-  func onFailShowVideo(error: Error?) {
+  func onFailVideo() {
     guard let view = videoView else { return }
-    view.emitSdkFailure(adUnitId: adUnitId, code: "napssp_video_load_failed", message: error?.localizedDescription ?? "unknown")
+    view.emitSdkFailure(adUnitId: adUnitId, code: "napssp_video_load_failed", message: "unknown")
   }
 
-  func onTapVideo() {
+  func onTapVideoViewMore() {
     guard let view = videoView else { return }
     view.onAdClicked?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Video tapped"))
     view.onAdOpened?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Video opened"))

@@ -110,7 +110,7 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
             startPromises[normalizedAdUnitId]?.reject("NAP_SSP_INTERSTITIAL_START_CANCELLED", "Superseded by start")
             startPromises[normalizedAdUnitId] = promise
             Log.d(tag, "startInterstitial request adUnitId=$normalizedAdUnitId")
-            interstitial.javaClass.getMethod("loadInterstitial").invoke(interstitial)
+            interstitial.javaClass.getMethod("startInterstitial").invoke(interstitial)
         } catch (error: Throwable) {
             loadPromises.remove(normalizedAdUnitId)
             promise.reject("NAP_SSP_INTERSTITIAL_START_FAILED", error)
@@ -273,16 +273,7 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
                     val startPromise = startPromises.remove(adUnitId)
                     if (startPromise != null) {
                         Log.d(tag, "onReceivedAd startPromise=true adUnitId=$adUnitId")
-                        runCatching {
-                            Log.d(tag, "auto-show interstitial after load adUnitId=$adUnitId")
-                            NapSspSdkBridge.markInterstitialState(adUnitId, NapSspLoadState.SHOWN)
-                            interstitial.javaClass.getMethod("showInterstitial").invoke(interstitial)
-                            Log.d(tag, "showInterstitial invoked from onReceivedAd adUnitId=$adUnitId")
-                            startPromise.resolve(null)
-                        }.onFailure {
-                            Log.e(tag, "auto-show interstitial failed adUnitId=$adUnitId: ${it.message}", it)
-                            startPromise.reject("NAP_SSP_INTERSTITIAL_SHOW_FAILED", it)
-                        }
+                        startPromise.resolve(null)
                     } else {
                         val loadPromise = loadPromises.remove(adUnitId)
                         Log.d(tag, "onReceivedAd loadPromise=${loadPromise != null} adUnitId=$adUnitId")
@@ -364,6 +355,4 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
         interstitialAds.clear()
         super.invalidate()
     }
-}
- }
 }
