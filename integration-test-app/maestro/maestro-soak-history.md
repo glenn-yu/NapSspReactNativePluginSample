@@ -146,3 +146,123 @@ This file accumulates Maestro soak-test results across runs.
 - Output directory: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260429-183734`
 - Summary: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260429-183734/summary.txt`
 - Failure artifacts present: no
+
+## 2026-04-29 18:46:34 iOS soak run
+- Started: 2026-04-29 18:46:34
+- Ended: 2026-04-29 19:16:34
+- Total iterations: 29
+- Pass: 29
+- Fail: 0
+- Flow: `integration-test-app/maestro/ios-ad-validation.yaml`
+
+## 2026-04-29 18:46:33 Android soak run
+- Started: 2026-04-29 18:46:33 (Asia/Seoul)
+- Ended: 2026-04-29 19:17:36 (Asia/Seoul)
+- Total iterations: 12
+- Pass: 9
+- Fail: 3
+- Flow: `integration-test-app/maestro/android-ad-validation.yaml`
+- Output directory: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260429-184633`
+- Summary: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260429-184633/summary.txt`
+- Failure artifacts present: yes
+
+## 2026-04-29 21:04:32 Android soak run
+- Started: 2026-04-29 21:04:32 (Asia/Seoul)
+- Ended: 2026-04-29 21:09:58 (Asia/Seoul)
+- Total iterations: 2
+- Pass: 2
+- Fail: 0
+- Flow: `integration-test-app/maestro/android-ad-validation.yaml`
+- Output directory: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260429-210432`
+- Summary: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260429-210432/summary.txt`
+- Failure artifacts present: no
+
+## 2026-04-29 21:10:07 Android soak run
+- Started: 2026-04-29 21:10:07 (Asia/Seoul)
+- Ended: 2026-04-29 21:41:22 (Asia/Seoul)
+- Total iterations: 12
+- Pass: 11
+- Fail: 1
+- Flow: `integration-test-app/maestro/android-ad-validation.yaml`
+- Output directory: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260429-211007`
+- Summary: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260429-211007/summary.txt`
+- Failure artifacts present: yes
+
+## 2026-04-29 23:19:41 Android soak run
+- Started: 2026-04-29 23:19:41 (Asia/Seoul)
+- Ended: 2026-04-29 23:25:04 (Asia/Seoul)
+- Total iterations: 2
+- Pass: 2
+- Fail: 0
+- Flow: `integration-test-app/maestro/android-ad-validation.yaml`
+- Output directory: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260429-231941`
+- Summary: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260429-231941/summary.txt`
+- Failure artifacts present: no
+
+## 2026-04-29 23:25:55 iOS soak run
+- Started: 2026-04-29 23:25:55
+- Ended: 2026-04-29 23:56:04
+- Total iterations: 32
+- Pass: 20
+- Fail: 12
+- Flow: `integration-test-app/maestro/ios-ad-validation.yaml`
+
+## 2026-04-29 23:25:12 Android soak run
+- Started: 2026-04-29 23:25:12 (Asia/Seoul)
+- Ended: 2026-04-29 23:57:16 (Asia/Seoul)
+- Total iterations: 13
+- Pass: 9
+- Fail: 4
+- Flow: `integration-test-app/maestro/android-ad-validation.yaml`
+- Output directory: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260429-232512`
+- Summary: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260429-232512/summary.txt`
+- Failure artifacts present: yes
+
+## 2026-04-30 07:35:36 iOS soak run
+- Started: 2026-04-30 07:35:36
+- Ended: 2026-04-30 07:40:45
+- Total iterations: 5
+- Pass: 5
+- Fail: 0
+- Flow: `integration-test-app/maestro/ios-ad-validation.yaml`
+
+## 2026-04-30 07:35:33 Android soak run
+- Started: 2026-04-30 07:35:33 (Asia/Seoul)
+- Ended: 2026-04-30 07:41:01 (Asia/Seoul)
+- Total iterations: 2
+- Pass: 2
+- Fail: 0
+- Flow: `integration-test-app/maestro/android-ad-validation.yaml`
+- Output directory: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260430-073533`
+- Summary: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260430-073533/summary.txt`
+- Failure artifacts present: no
+
+## 2026-04-30 08:20:47 iOS soak run
+- Started: 2026-04-30 08:20:47
+- Ended: 2026-04-30 08:51:27
+- Total iterations: 30
+- Pass: 30
+- Fail: 0
+- Flow: `integration-test-app/maestro/ios-ad-validation.yaml`
+
+## 2026-04-30 09:48:14 Android soak run
+- Started: 2026-04-30 09:48:14 (Asia/Seoul)
+- Ended: 2026-04-30 09:56:13 (Asia/Seoul)
+- Total iterations: 3
+- Pass: 3
+- Fail: 0
+- Flow: `integration-test-app/maestro/android-ad-validation.yaml`
+- Output directory: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260430-094814`
+- Summary: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260430-094814/summary.txt`
+- Failure artifacts present: no
+
+## 2026-04-30 09:56:32 Android soak run
+- Started: 2026-04-30 09:56:32 (Asia/Seoul)
+- Ended: 2026-04-30 10:27:28 (Asia/Seoul)
+- Total iterations: 12
+- Pass: 11
+- Fail: 1
+- Flow: `integration-test-app/maestro/android-ad-validation.yaml`
+- Output directory: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260430-095632`
+- Summary: `/Users/gwangy.claw/.openclaw/workspace/NapSspReactNativePluginSample/integration-test-app/maestro/results/soak-30m-20260430-095632/summary.txt`
+- Failure artifacts present: yes

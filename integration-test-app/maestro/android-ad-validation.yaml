@@ -39,42 +39,55 @@ appId: com.integrationtestapp
     optional: true
 - scrollUntilVisible:
     element:
-      id: "summary-native-status"
+      id: "native-status-top"
     direction: DOWN
     timeout: 30000
+    visibilityPercentage: 20
+    centerElement: true
 - extendedWaitUntil:
     visible:
-      id: "summary-native-status"
+      id: "native-status-top"
       text: "NATIVE_STATUS:LOADED:IMPRESSION"
     timeout: 45000
 - scrollUntilVisible:
-    element:
-      id: "video-load-button"
-    direction: UP
+    element: "3. 인라인 동영상 광고"
+    direction: DOWN
     timeout: 30000
+    visibilityPercentage: 20
+    centerElement: true
 - tapOn:
     id: "video-load-button"
 - scrollUntilVisible:
     element:
-      id: "summary-video-status"
+      id: "video-status-top"
     direction: DOWN
     timeout: 30000
+    visibilityPercentage: 20
+    centerElement: true
 - extendedWaitUntil:
     visible:
-      id: "summary-video-status"
+      id: "video-status-top"
       text: "VIDEO_STATUS:LOADED:IMPRESSION:NOT_COMPLETED"
     timeout: 45000
     optional: true
 - extendedWaitUntil:
     visible:
-      id: "summary-video-status"
+      id: "video-status-top"
       text: "VIDEO_STATUS:LOADED:IMPRESSION:COMPLETED"
     timeout: 45000
     optional: true
+- extendedWaitUntil:
+    visible: "VIDEO_STATUS:LOADED:IMPRESSION"
+    timeout: 45000
+    optional: true
 - scrollUntilVisible:
-    element: "전면 광고 (popup)"
-    direction: UP
-- tapOn: "전면 광고 (popup)"
+    element: "4. 전면/리워드/전면동영상 광고"
+    direction: DOWN
+    timeout: 30000
+    visibilityPercentage: 20
+    centerElement: true
+- tapOn:
+    id: "interstitial-show-button"
 - extendedWaitUntil:
     visible: "Test Ad"
     timeout: 20000

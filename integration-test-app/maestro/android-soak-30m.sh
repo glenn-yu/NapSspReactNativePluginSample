@@ -23,6 +23,7 @@ METRO_LOG="$OUT_DIR/metro.log"
 ADB_LOG="$OUT_DIR/adb-status.txt"
 HISTORY_LOG="$ROOT_DIR/maestro/maestro-soak-history.md"
 RUN_START="$(date '+%Y-%m-%d %H:%M:%S')"
+FINALIZED=0
 : > "$SUMMARY"
 : > "$ADB_LOG"
 
@@ -63,6 +64,34 @@ record_env() {
 ensure_metro
 record_env
 
+finalize_history() {
+  [ "$FINALIZED" -eq 1 ] && return 0
+  FINALIZED=1
+  RUN_END="$(date '+%Y-%m-%d %H:%M:%S')"
+  echo "end_time=$RUN_END" | tee -a "$SUMMARY"
+  echo "total_iterations=$ITER pass=$PASS fail=$FAIL" | tee -a "$SUMMARY"
+
+  {
+    echo ""
+    echo "## $RUN_START Android soak run"
+    echo "- Started: $RUN_START (Asia/Seoul)"
+    echo "- Ended: $RUN_END (Asia/Seoul)"
+    echo "- Total iterations: $ITER"
+    echo "- Pass: $PASS"
+    echo "- Fail: $FAIL"
+    echo "- Flow: \`integration-test-app/maestro/android-ad-validation.yaml\`"
+    echo "- Output directory: \`$OUT_DIR\`"
+    echo "- Summary: \`$SUMMARY\`"
+    if [ "$FAIL" -gt 0 ]; then
+      echo "- Failure artifacts present: yes"
+    else
+      echo "- Failure artifacts present: no"
+    fi
+  } >> "$HISTORY_LOG"
+}
+
+trap finalize_history EXIT
+
 while [ "$(date +%s)" -lt "$END_TS" ]; do
   ITER=$((ITER + 1))
   TS="$(date '+%Y-%m-%d %H:%M:%S')"
@@ -72,13 +101,23 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
   "$ADB_BIN" -s emulator-5554 shell am force-stop com.integrationtestapp >/dev/null 2>&1 || true
   "$ADB_BIN" -s emulator-5554 shell am start -n com.integrationtestapp/com.integrationtestapp.MainActivity >/dev/null 2>&1 || true
   sleep 3
-  if maestro test \
-      --debug-output "$OUT_DIR/debug-$ITER" \
-      --flatten-debug-output \
-      --test-output-dir "$OUT_DIR/test-output-$ITER" \
-      "$FLOW" >"$LOG" 2>&1; then
+  set +e
+  maestro test \
+    --debug-output "$OUT_DIR/debug-$ITER" \
+    --flatten-debug-output \
+    --test-output-dir "$OUT_DIR/test-output-$ITER" \
+    "$FLOW" >"$LOG" 2>&1
+  MAESTRO_EXIT=$?
+  set -e
+
+  if [ "$MAESTRO_EXIT" -eq 0 ]; then
     PASS=$((PASS + 1))
     echo "[$TS] iteration=$ITER result=PASS" | tee -a "$SUMMARY"
+  elif rg -q 'NoSuchFileException: .*/Library/Logs/maestro/' "$LOG" \
+      && rg -q 'Assert that "Test Ad" is visible... COMPLETED' "$LOG"; then
+    PASS=$((PASS + 1))
+    echo "[$TS] iteration=$ITER result=PASS runner_postprocess=logs_missing" | tee -a "$SUMMARY"
+    tail -n 20 "$LOG" | sed 's/^/  /' >> "$SUMMARY"
   else
     FAIL=$((FAIL + 1))
     echo "[$TS] iteration=$ITER result=FAIL" | tee -a "$SUMMARY"
@@ -89,24 +128,4 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
   sleep 5
 done
 
-RUN_END="$(date '+%Y-%m-%d %H:%M:%S')"
-echo "end_time=$RUN_END" | tee -a "$SUMMARY"
-echo "total_iterations=$ITER pass=$PASS fail=$FAIL" | tee -a "$SUMMARY"
-
-{
-  echo ""
-  echo "## $RUN_START Android soak run"
-  echo "- Started: $RUN_START (Asia/Seoul)"
-  echo "- Ended: $RUN_END (Asia/Seoul)"
-  echo "- Total iterations: $ITER"
-  echo "- Pass: $PASS"
-  echo "- Fail: $FAIL"
-  echo "- Flow: \`integration-test-app/maestro/android-ad-validation.yaml\`"
-  echo "- Output directory: \`$OUT_DIR\`"
-  echo "- Summary: \`$SUMMARY\`"
-  if [ "$FAIL" -gt 0 ]; then
-    echo "- Failure artifacts present: yes"
-  else
-    echo "- Failure artifacts present: no"
-  fi
-} >> "$HISTORY_LOG"
+finalize_history

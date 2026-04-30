@@ -478,7 +478,12 @@ const App = () => {
             onPress={() => setIsSoakTesting(!isSoakTesting)}>
             <Text style={styles.buttonText}>{isSoakTesting ? '■ 30분 자동 테스트 중지' : '▶ 30분 자동 통합 부하 테스트 시작'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity disabled={!initialized} style={[styles.button, { backgroundColor: '#1565C0' }, !initialized && styles.buttonDisabled]} onPress={showInterstitial}>
+          <TouchableOpacity
+            testID="interstitial-show-button"
+            accessibilityLabel="interstitial-show-button"
+            disabled={!initialized}
+            style={[styles.button, { backgroundColor: '#1565C0' }, !initialized && styles.buttonDisabled]}
+            onPress={showInterstitial}>
             <Text style={styles.buttonText}>전면 광고 (popup)</Text>
           </TouchableOpacity>
           <Text style={styles.statusLine}>
