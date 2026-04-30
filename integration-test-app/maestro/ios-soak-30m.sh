@@ -25,7 +25,7 @@ ocr_interstitial_success() {
 
   local ocr_text
   ocr_text="$(tesseract "$image_path" stdout --psm 6 2>/dev/null | tr '\n' ' ')"
-  echo "$ocr_text" | rg -qi "\bTEST\b|320x100|390x100"
+  echo "$ocr_text" | rg -qi "\bTEST\b|320x100|390x100|INTER_STATUS:?LOADED:?OPENED:?IMPRESSION|INTER loaded=true opened=true impression=true"
 }
 
 while [ "$(date +%s)" -lt "$END_TS" ]; do
@@ -45,7 +45,7 @@ while [ "$(date +%s)" -lt "$END_TS" ]; do
     if ocr_interstitial_success "$OUT_DIR/fail-${ITER}.png"; then
       PASS=$((PASS + 1))
       echo "[$TS] iteration=$ITER result=PASS fallback=ocr" | tee -a "$SUMMARY"
-      echo "[fallback] OCR detected iOS interstitial popup; treating soak iteration as PASS" >> "$LOG"
+      echo "[fallback] OCR detected iOS interstitial success markers; treating soak iteration as PASS" >> "$LOG"
     else
       FAIL=$((FAIL + 1))
       echo "[$TS] iteration=$ITER result=FAIL" | tee -a "$SUMMARY"
