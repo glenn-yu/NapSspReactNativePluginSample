@@ -68,6 +68,7 @@ type AdStatus = {
   rewarded: boolean;
   lastMessage: string;
 };
+type AdResult = 'SHOWN' | 'NO_ADS' | 'ERROR' | 'REQUESTING' | 'IDLE' | 'LOADED_NOT_SHOWN';
 function now() { return new Date().toLocaleTimeString(); }
 const createEmptyAdStatus = (): AdStatus => ({
   loaded: false,
@@ -85,6 +86,19 @@ const createInitialAdStatuses = (): Record<AdStatusKey, AdStatus> => ({
   rewarded: createEmptyAdStatus(),
   interstitialVideo: createEmptyAdStatus(),
 });
+const classifyAdResult = (status: AdStatus): AdResult => {
+  const message = status.lastMessage || 'idle';
+  const normalized = message.toLowerCase();
+  if (status.impression || status.opened || status.completed || status.rewarded) return 'SHOWN';
+  if (normalized === 'requesting') return 'REQUESTING';
+  if (normalized === 'idle') return 'IDLE';
+  if (/loadfailed:|failed:|exception:/.test(normalized)) {
+    if (/no ads|no fill|현재 노출가능한 광고가 없습니다|광고가 없습니다/.test(message)) return 'NO_ADS';
+    return 'ERROR';
+  }
+  if (status.loaded) return 'LOADED_NOT_SHOWN';
+  return 'IDLE';
+};
 
 // ─── ID input row ─────────────────────────────────────────────────────────────
 const isNumeric = (v: string) => /^\d+$/.test(v.trim());
@@ -509,12 +523,16 @@ const App = () => {
         <Section title="광고 응답 상태">
           <Text testID="summary-banner-detail" accessibilityLabel="summary-banner-detail" style={styles.statusLine}>BANNER loaded={String(adStatuses.banner.loaded)} impression={String(adStatuses.banner.impression)} msg={adStatuses.banner.lastMessage}</Text>
           <Text testID="summary-banner-status" accessibilityLabel="summary-banner-status" style={styles.statusLine}>BANNER_STATUS:{adStatuses.banner.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.banner.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
+          <Text testID="summary-banner-result" accessibilityLabel="summary-banner-result" style={styles.statusLine}>BANNER_RESULT:{classifyAdResult(adStatuses.banner)}</Text>
           <Text testID="summary-native-detail" accessibilityLabel="summary-native-detail" style={styles.statusLine}>NATIVE loaded={String(adStatuses.native.loaded)} impression={String(adStatuses.native.impression)} msg={adStatuses.native.lastMessage}</Text>
           <Text testID="summary-native-status" accessibilityLabel="summary-native-status" style={styles.statusLine}>NATIVE_STATUS:{adStatuses.native.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.native.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
+          <Text testID="summary-native-result" accessibilityLabel="summary-native-result" style={styles.statusLine}>NATIVE_RESULT:{classifyAdResult(adStatuses.native)}</Text>
           <Text testID="summary-video-detail" accessibilityLabel="summary-video-detail" style={styles.statusLine}>VIDEO loaded={String(adStatuses.video.loaded)} impression={String(adStatuses.video.impression)} completed={String(adStatuses.video.completed)} msg={adStatuses.video.lastMessage}</Text>
           <Text testID="summary-video-status" accessibilityLabel="summary-video-status" style={styles.statusLine}>VIDEO_STATUS:{adStatuses.video.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.video.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.video.completed ? 'COMPLETED' : 'NOT_COMPLETED'}</Text>
+          <Text testID="summary-video-result" accessibilityLabel="summary-video-result" style={styles.statusLine}>VIDEO_RESULT:{classifyAdResult(adStatuses.video)}</Text>
           <Text testID="summary-inter-detail" accessibilityLabel="summary-inter-detail" style={styles.statusLine}>INTER loaded={String(adStatuses.interstitial.loaded)} opened={String(adStatuses.interstitial.opened)} impression={String(adStatuses.interstitial.impression)} msg={adStatuses.interstitial.lastMessage}</Text>
           <Text testID="summary-inter-status" accessibilityLabel="summary-inter-status" style={styles.statusLine}>INTER_STATUS:{adStatuses.interstitial.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.interstitial.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.interstitial.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
+          <Text testID="summary-inter-result" accessibilityLabel="summary-inter-result" style={styles.statusLine}>INTER_RESULT:{classifyAdResult(adStatuses.interstitial)}</Text>
           <Text
             testID={adStatuses.interstitial.loaded ? 'summary-inter-loaded-yes' : 'summary-inter-loaded-no'}
             accessibilityLabel={adStatuses.interstitial.loaded ? 'summary-inter-loaded-yes' : 'summary-inter-loaded-no'}
@@ -535,8 +553,10 @@ const App = () => {
           </Text>
           <Text testID="summary-reward-detail" accessibilityLabel="summary-reward-detail" style={styles.statusLine}>REWARD loaded={String(adStatuses.rewarded.loaded)} opened={String(adStatuses.rewarded.opened)} impression={String(adStatuses.rewarded.impression)} rewarded={String(adStatuses.rewarded.rewarded)} msg={adStatuses.rewarded.lastMessage}</Text>
           <Text testID="summary-reward-status" accessibilityLabel="summary-reward-status" style={styles.statusLine}>REWARD_STATUS:{adStatuses.rewarded.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.rewarded.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.rewarded.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.rewarded.rewarded ? 'REWARDED' : 'NOT_REWARDED'}</Text>
+          <Text testID="summary-reward-result" accessibilityLabel="summary-reward-result" style={styles.statusLine}>REWARD_RESULT:{classifyAdResult(adStatuses.rewarded)}</Text>
           <Text testID="summary-iv-detail" accessibilityLabel="summary-iv-detail" style={styles.statusLine}>IV loaded={String(adStatuses.interstitialVideo.loaded)} opened={String(adStatuses.interstitialVideo.opened)} completed={String(adStatuses.interstitialVideo.completed)} msg={adStatuses.interstitialVideo.lastMessage}</Text>
           <Text testID="summary-iv-status" accessibilityLabel="summary-iv-status" style={styles.statusLine}>IV_STATUS:{adStatuses.interstitialVideo.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.interstitialVideo.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.interstitialVideo.completed ? 'COMPLETED' : 'NOT_COMPLETED'}</Text>
+          <Text testID="summary-iv-result" accessibilityLabel="summary-iv-result" style={styles.statusLine}>IV_RESULT:{classifyAdResult(adStatuses.interstitialVideo)}</Text>
         </Section>
 
         {/* ── 이벤트 로그 ────────────────────────── */}
