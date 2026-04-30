@@ -49,14 +49,30 @@ appId: com.integrationtestapp
       id: "native-status-top"
       text: "NATIVE_STATUS:LOADED:IMPRESSION"
     timeout: 45000
+- runFlow:
+    when:
+      visible: "Dismiss"
+    commands:
+      - tapOn: "Dismiss"
+- runFlow:
+    when:
+      visible: "See issues"
+    commands:
+      - tapOn: "Dismiss"
 - scrollUntilVisible:
-    element: "3. 인라인 동영상 광고"
+    element:
+      id: "video-load-button"
     direction: DOWN
     timeout: 30000
     visibilityPercentage: 20
     centerElement: true
 - tapOn:
     id: "video-load-button"
+- runFlow:
+    when:
+      visible: "Dismiss"
+    commands:
+      - tapOn: "Dismiss"
 - scrollUntilVisible:
     element:
       id: "video-status-top"

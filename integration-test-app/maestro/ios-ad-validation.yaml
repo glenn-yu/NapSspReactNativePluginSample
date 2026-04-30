@@ -53,22 +53,33 @@ appId: org.reactjs.native.example.IntegrationTestApp
     id: "interstitial-show-button"
 - extendedWaitUntil:
     visible: "x"
-    timeout: 20000
+    timeout: 8000
     optional: true
 - extendedWaitUntil:
     visible: "TEST"
-    timeout: 20000
+    timeout: 8000
     optional: true
+- tapOn:
+    point: "94%,9%"
+- tapOn:
+    point: "94%,9%"
+- scrollUntilVisible:
+    element:
+      id: "summary-inter-status"
+    direction: DOWN
+    timeout: 30000
+    visibilityPercentage: 20
+    centerElement: true
 - extendedWaitUntil:
     visible:
       id: "summary-inter-status"
       text: "INTER_STATUS:LOADED:OPENED:IMPRESSION"
-    timeout: 20000
+    timeout: 12000
     optional: true
 - extendedWaitUntil:
     visible:
-      id: "summary-inter-status"
-      text: "INTER_STATUS:LOADED:NOT_OPENED:NO_IMPRESSION"
+      id: "summary-inter-detail"
+      text: "INTER loaded=true opened=true impression=true"
     timeout: 12000
     optional: true
 - runFlow:
@@ -77,16 +88,29 @@ appId: org.reactjs.native.example.IntegrationTestApp
         id: "summary-inter-status"
         text: "INTER_STATUS:LOADED:NOT_OPENED:NO_IMPRESSION"
     commands:
+      - scrollUntilVisible:
+          element:
+            id: "interstitial-show-button"
+          direction: UP
+          timeout: 30000
+          visibilityPercentage: 20
+          centerElement: true
       - tapOn:
           id: "interstitial-show-button"
+      - scrollUntilVisible:
+          element:
+            id: "summary-inter-status"
+          direction: DOWN
+          timeout: 30000
+          visibilityPercentage: 20
+          centerElement: true
 - extendedWaitUntil:
-    visible: "x"
-    timeout: 20000
-    optional: true
+    visible:
+      id: "summary-inter-status"
+      text: "INTER_STATUS:LOADED:OPENED:IMPRESSION"
+    timeout: 15000
 - extendedWaitUntil:
-    visible: "TEST"
-    timeout: 20000
-    optional: true
-- extendedWaitUntil:
-    visible: "x"
-    timeout: 20000
+    visible:
+      id: "summary-inter-detail"
+      text: "INTER loaded=true opened=true impression=true"
+    timeout: 15000
