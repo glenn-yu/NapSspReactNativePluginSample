@@ -27,12 +27,12 @@ allprojects {
 ### 2.1 의존성 추가
 ```gradle
 dependencies {
-    implementation 'io.github.nasmedia-tech:admixer-ssp:1.0.21'
+    implementation 'io.github.nasmedia-tech:admixer-ssp:1.0.23'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
     
     // 미디에이션 사용 시 해당 어댑터 추가
-    implementation 'io.github.nasmedia-tech:admixer-adfit:1.0.10'
-    implementation 'io.github.nasmedia-tech:admixer-pangle:1.0.10'
+    implementation 'io.github.nasmedia-tech:admixer-adfit:1.0.12_beta'
+    implementation 'io.github.nasmedia-tech:admixer-pangle:1.0.12_beta'
 }
 ```
 

@@ -22,12 +22,12 @@ def enabledMediations = ((project.findProperty('napSsp.mediations') ?: '') as St
 def mediationEnabled = { String name -> enabledMediations.isEmpty() || enabledMediations.contains(name) }
 
 def napSspSdkCoordinates = [
-    core: 'io.github.nasmedia-tech:admixer-ssp:1.0.21',
-    adManager: 'io.github.nasmedia-tech:admixer-admanager:1.0.14',
-    adFit: 'io.github.nasmedia-tech:admixer-adfit:1.0.10',
-    pangle: 'io.github.nasmedia-tech:admixer-pangle:1.0.10',
-    appLovin: 'io.github.nasmedia-tech:admixer-applovin:1.0.8',
-    unity: 'io.github.nasmedia-tech:admixer-unity:1.0.6',
+    core: 'io.github.nasmedia-tech:admixer-ssp:1.0.23',
+    adManager: 'io.github.nasmedia-tech:admixer-admanager:1.0.15_delta',
+    adFit: 'io.github.nasmedia-tech:admixer-adfit:1.0.12_beta',
+    pangle: 'io.github.nasmedia-tech:admixer-pangle:1.0.12_beta',
+    appLovin: 'io.github.nasmedia-tech:admixer-applovin:1.0.10_beta',
+    unity: 'io.github.nasmedia-tech:admixer-unity:1.0.7_beta',
     adsIdentifier: 'com.google.android.gms:play-services-ads-identifier:18.0.1',
 ]
 

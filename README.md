@@ -101,13 +101,13 @@ await interstitial.show();
 ```gradle
 dependencies {
     // (필수) Nap SSP SDK 본체
-    implementation 'io.github.nasmedia-tech:admixer-ssp:1.0.21'
+    implementation 'io.github.nasmedia-tech:admixer-ssp:1.0.23'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.9.0'
     
     // (선택) 미디에이션 어댑터 (원하는 네트워크만 추가)
-    implementation 'io.github.nasmedia-tech:admixer-admanager:1.0.14'
-    implementation 'io.github.nasmedia-tech:admixer-adfit:1.0.10'
-    implementation 'io.github.nasmedia-tech:admixer-applovin:1.0.8'
+    implementation 'io.github.nasmedia-tech:admixer-admanager:1.0.15_delta'
+    implementation 'io.github.nasmedia-tech:admixer-adfit:1.0.12_beta'
+    implementation 'io.github.nasmedia-tech:admixer-applovin:1.0.10_beta'
     // ... 기타 네트워크 어댑터
 }
 ```

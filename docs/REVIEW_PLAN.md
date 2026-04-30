@@ -1,6 +1,6 @@
 # Nap SSP React Native Plugin Review & Verification Plan
 
-이 문서는 개발된 `react-native-nap-ssp` 플러그인과 테스트 앱이 초기 설계 및 최신 네이티브 SDK 가이드(Android v1.0.21 / iOS v2.2.1)를 준수하고 있는지 전수 조사하고, 실제 광고 노출까지 검증하기 위한 가이드라인입니다.
+이 문서는 개발된 `react-native-nap-ssp` 플러그인과 테스트 앱이 초기 설계 및 최신 네이티브 SDK 가이드(Android v1.0.23 / iOS v2.3.2)를 준수하고 있는지 전수 조사하고, 실제 광고 노출까지 검증하기 위한 가이드라인입니다.
 
 ---
 
@@ -35,7 +35,7 @@
 
 #### 네이티브 광고 (NativeAd)
 - [ ] **Asset Mapping**: icon, headline, advertiser, description, media, cta 6종 에셋이 렌더링되는가?
-- [ ] **iOS v2.2.1 대응**: `loadAD()` 시 기존 뷰를 제거하는 `removeView` 로직이 반영되었는가?
+- [ ] **iOS v2.3.2 대응**: `loadAD()` 시 기존 뷰를 제거하는 `removeView` 로직이 반영되었는가?
 - [ ] **Layout**: Android에서 `RelativeLayout` 기반의 컨테이너 구조를 유지하는가?
 
 #### 리워드 동영상 (RewardedAd)

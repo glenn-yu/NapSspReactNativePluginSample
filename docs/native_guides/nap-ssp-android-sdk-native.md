@@ -103,21 +103,21 @@ allprojects {
 ```gradle
 dependencies {
     // (필수)
-    implementation 'io.github.nasmedia-tech:admixer-ssp:1.0.21'
+    implementation 'io.github.nasmedia-tech:admixer-ssp:1.0.23'
     // (필수)
     implementation 'com.google.android.gms:play-services-ads-identifier:18.9.0'
     // (선택) Google AdManager
-    implementation 'io.github.nasmedia-tech:admixer-admanager:1.0.14'  // play-services-ads:24.8.0 포함
+    implementation 'io.github.nasmedia-tech:admixer-admanager:1.0.15_delta'  // play-services-ads:24.8.0 포함
     // (선택) Kakao Adfit
-    implementation 'io.github.nasmedia-tech:admixer-adfit:1.0.10'      // ads-base:3.21.17 포함
+    implementation 'io.github.nasmedia-tech:admixer-adfit:1.0.12_beta'      // ads-base:3.21.17 포함
     // (선택) Pangle
-    implementation 'io.github.nasmedia-tech:admixer-pangle:1.0.10'     // pag-sdk:7.7.0.2 포함
+    implementation 'io.github.nasmedia-tech:admixer-pangle:1.0.12_beta'     // pag-sdk:7.7.0.2 포함
     // (팽글 사용 시 필수)
     implementation "com.pangle.global:pag-sdk:7.1.0.4"
     // (선택) Applovin
-    implementation 'io.github.nasmedia-tech:admixer-applovin:1.0.8'    // applovin-sdk:13.5.0 포함
+    implementation 'io.github.nasmedia-tech:admixer-applovin:1.0.10_beta'    // applovin-sdk:13.5.0 포함
     // (선택) Unity Ads
-    implementation 'io.github.nasmedia-tech:admixer-unity:1.0.6'       // unity-ads:4.15.0 포함
+    implementation 'io.github.nasmedia-tech:admixer-unity:1.0.7_beta'       // unity-ads:4.15.0 포함
 }
 ```
 
@@ -175,13 +175,13 @@ Google 네트워크 사용 시, 아래 광고 소스 라이브러리를 모두 �
 
 ```gradle
 dependencies {
-    implementation("io.github.nasmedia-tech:admixer-admanager:1.0.14") {
+    implementation("io.github.nasmedia-tech:admixer-admanager:1.0.15_delta") {
         exclude group: "com.google.android.gms", module: "play-services-ads"
     }
-    implementation("io.github.nasmedia-tech:admixer-adfit:1.0.10") {
+    implementation("io.github.nasmedia-tech:admixer-adfit:1.0.12_beta") {
         exclude group: "com.kakao.adfit", module: "ads-base"
     }
-    implementation("io.github.nasmedia-tech:admixer-pangle:1.0.10")
+    implementation("io.github.nasmedia-tech:admixer-pangle:1.0.12_beta")
 }
 ```
 

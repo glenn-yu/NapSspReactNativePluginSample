@@ -2,10 +2,9 @@
 import PackageDescription
 
 // AdMixerMediation XCFramework coordinates.
-// Replace url and checksum with the official release when available.
-// Current version: 2.2.1
-let adMixerMediationURL = "https://github.com/nasmedia-tech/admixer-ios-sdk/releases/download/2.2.1/AdMixerMediation.xcframework.zip"
-let adMixerMediationChecksum = "REPLACE_WITH_OFFICIAL_CHECKSUM"
+// Latest verified SPM/CocoaPods core release: 2.3.2
+let adMixerMediationURL = "https://github.com/Nasmedia-Tech/iOS-AdMixerDownload/raw/main/AdMixerMediation2.3.2.xcframework.zip"
+let adMixerMediationChecksum = "78c7edb00263cade63925a2e91eddfa9cc84b4a2b73c2036b87b45e97cf43ca7"
 
 let package = Package(
     name: "NapSspPluginSPM",
