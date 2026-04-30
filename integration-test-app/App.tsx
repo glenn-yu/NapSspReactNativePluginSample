@@ -515,6 +515,24 @@ const App = () => {
           <Text testID="summary-video-status" accessibilityLabel="summary-video-status" style={styles.statusLine}>VIDEO_STATUS:{adStatuses.video.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.video.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.video.completed ? 'COMPLETED' : 'NOT_COMPLETED'}</Text>
           <Text testID="summary-inter-detail" accessibilityLabel="summary-inter-detail" style={styles.statusLine}>INTER loaded={String(adStatuses.interstitial.loaded)} opened={String(adStatuses.interstitial.opened)} impression={String(adStatuses.interstitial.impression)} msg={adStatuses.interstitial.lastMessage}</Text>
           <Text testID="summary-inter-status" accessibilityLabel="summary-inter-status" style={styles.statusLine}>INTER_STATUS:{adStatuses.interstitial.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.interstitial.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.interstitial.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}</Text>
+          <Text
+            testID={adStatuses.interstitial.loaded ? 'summary-inter-loaded-yes' : 'summary-inter-loaded-no'}
+            accessibilityLabel={adStatuses.interstitial.loaded ? 'summary-inter-loaded-yes' : 'summary-inter-loaded-no'}
+            style={styles.statusLine}>
+            INTER_LOADED:{String(adStatuses.interstitial.loaded)}
+          </Text>
+          <Text
+            testID={adStatuses.interstitial.opened ? 'summary-inter-opened-yes' : 'summary-inter-opened-no'}
+            accessibilityLabel={adStatuses.interstitial.opened ? 'summary-inter-opened-yes' : 'summary-inter-opened-no'}
+            style={styles.statusLine}>
+            INTER_OPENED:{String(adStatuses.interstitial.opened)}
+          </Text>
+          <Text
+            testID={adStatuses.interstitial.impression ? 'summary-inter-impression-yes' : 'summary-inter-impression-no'}
+            accessibilityLabel={adStatuses.interstitial.impression ? 'summary-inter-impression-yes' : 'summary-inter-impression-no'}
+            style={styles.statusLine}>
+            INTER_IMPRESSION:{String(adStatuses.interstitial.impression)}
+          </Text>
           <Text testID="summary-reward-detail" accessibilityLabel="summary-reward-detail" style={styles.statusLine}>REWARD loaded={String(adStatuses.rewarded.loaded)} opened={String(adStatuses.rewarded.opened)} impression={String(adStatuses.rewarded.impression)} rewarded={String(adStatuses.rewarded.rewarded)} msg={adStatuses.rewarded.lastMessage}</Text>
           <Text testID="summary-reward-status" accessibilityLabel="summary-reward-status" style={styles.statusLine}>REWARD_STATUS:{adStatuses.rewarded.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.rewarded.opened ? 'OPENED' : 'NOT_OPENED'}:{adStatuses.rewarded.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}:{adStatuses.rewarded.rewarded ? 'REWARDED' : 'NOT_REWARDED'}</Text>
           <Text testID="summary-iv-detail" accessibilityLabel="summary-iv-detail" style={styles.statusLine}>IV loaded={String(adStatuses.interstitialVideo.loaded)} opened={String(adStatuses.interstitialVideo.opened)} completed={String(adStatuses.interstitialVideo.completed)} msg={adStatuses.interstitialVideo.lastMessage}</Text>

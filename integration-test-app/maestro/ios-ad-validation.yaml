@@ -72,14 +72,12 @@ appId: org.reactjs.native.example.IntegrationTestApp
     centerElement: true
 - extendedWaitUntil:
     visible:
-      id: "summary-inter-status"
-      text: "INTER_STATUS:LOADED:OPENED:IMPRESSION"
+      id: "summary-inter-opened-yes"
     timeout: 12000
     optional: true
 - extendedWaitUntil:
     visible:
-      id: "summary-inter-detail"
-      text: "INTER loaded=true opened=true impression=true"
+      id: "summary-inter-impression-yes"
     timeout: 12000
     optional: true
 - runFlow:
@@ -106,11 +104,9 @@ appId: org.reactjs.native.example.IntegrationTestApp
           centerElement: true
 - extendedWaitUntil:
     visible:
-      id: "summary-inter-status"
-      text: "INTER_STATUS:LOADED:OPENED:IMPRESSION"
+      id: "summary-inter-opened-yes"
     timeout: 15000
 - extendedWaitUntil:
     visible:
-      id: "summary-inter-detail"
-      text: "INTER loaded=true opened=true impression=true"
+      id: "summary-inter-impression-yes"
     timeout: 15000
