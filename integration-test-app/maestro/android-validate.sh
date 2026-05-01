@@ -9,7 +9,7 @@ OUT_DIR="$MAESTRO_DIR/results/android-validate-$(date +%Y%m%d-%H%M%S)"
 mkdir -p "$OUT_DIR"
 LOG="$OUT_DIR/validate.log"
 
-export JAVA_HOME="/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home"
+export JAVA_HOME="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
 export PATH="$JAVA_HOME/bin:$HOME/.maestro/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 echo "[$(date)] Starting Android validation..."
