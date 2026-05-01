@@ -71,4 +71,45 @@
 
 - Android Maestro 환경은 구성 완료.
 - Native 광고 상태 불일치는 테스트 환경 문제가 아니라 앱/SDK/시나리오 검증 이슈로 분리해 확인 필요.
-- iOS 검증은 전체 Xcode가 활성화되어 있지 않아 아직 구성 완료가 아니다.
+- iOS 검증은 아래 `iOS 구성 추가 - 2026-05-01` 단계에서 구성 및 PASS 확인 완료.
+
+## iOS 구성 추가 - 2026-05-01
+
+### 설치/구성 완료
+
+- Xcode 활성화 확인
+  - 경로: `/Applications/Xcode.app/Contents/Developer`
+  - 버전: Xcode 26.4.1
+- iOS Simulator Runtime 설치
+  - iOS 26.4.1 / Runtime 표기 iOS 26.4
+- CocoaPods 설치
+  - `cocoapods` 1.16.2_2
+- CocoaPods UTF-8 실행 환경 보정
+  - `LANG=en_US.UTF-8`
+  - `LC_ALL=en_US.UTF-8`
+- iOS Pods 설치
+  - 위치: `integration-test-app/ios`
+  - 명령: `pod install --repo-update`
+- iOS Debug Simulator 빌드 성공
+  - destination: `iPhone 17 Pro` / `F5390915-AD8B-47EC-9C54-4B892FFDF011`
+- iOS Maestro 검증 실행 성공
+  - 로그: `integration-test-app/maestro/results/ios-validate-20260501-124535/validate.log`
+
+### 스크립트 조정
+
+- `integration-test-app/maestro/ios-validate.sh`
+  - 고정 UDID 대신 `IOS_SIM_UDID` 환경변수를 우선 사용
+  - 값이 없으면 현재 사용 가능한 `iPhone 17 Pro` UDID를 자동 선택
+
+### iOS Maestro 결과
+
+- SDK 초기화: PASS
+- Banner 검증: PASS
+- Native 검증: PASS
+- Interstitial opened/impression proof marker 검증: PASS
+
+### 참고
+
+- `x`, `TEST` optional assertion은 보이지 않아 WARN 처리됐지만 플로우 전체 결과는 PASS다.
+- CocoaPods 실행 시 일부 외부 Pod license 파일 읽기 경고가 있었지만 설치는 완료됐다.
+

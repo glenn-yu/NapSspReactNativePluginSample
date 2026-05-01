@@ -5,7 +5,14 @@ set -uo pipefail
 MAESTRO_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$MAESTRO_DIR/common.sh"
 
-SIM_UDID="8D90B616-14A9-4A49-A1A7-0470FF80A9F9"
+SIM_UDID="${IOS_SIM_UDID:-}"
+if [ -z "$SIM_UDID" ]; then
+  SIM_UDID="$(xcrun simctl list devices available | sed -n 's/^[[:space:]]*iPhone 17 Pro (\([A-F0-9-]*\)).*/\1/p' | head -1)"
+fi
+if [ -z "$SIM_UDID" ]; then
+  echo "No available iPhone 17 Pro simulator found. Set IOS_SIM_UDID explicitly."
+  exit 1
+fi
 OUT_DIR="$MAESTRO_DIR/results/ios-validate-$(date +%Y%m%d-%H%M%S)"
 mkdir -p "$OUT_DIR"
 LOG="$OUT_DIR/validate.log"
