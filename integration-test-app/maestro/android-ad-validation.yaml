@@ -49,16 +49,6 @@ appId: com.integrationtestapp
       id: "native-status-top"
       text: "NATIVE_STATUS:LOADED:IMPRESSION"
     timeout: 45000
-- runFlow:
-    when:
-      visible: "Dismiss"
-    commands:
-      - tapOn: "Dismiss"
-- runFlow:
-    when:
-      visible: "See issues"
-    commands:
-      - tapOn: "Dismiss"
 - scrollUntilVisible:
     element:
       id: "video-load-button"
@@ -68,11 +58,6 @@ appId: com.integrationtestapp
     centerElement: true
 - tapOn:
     id: "video-load-button"
-- runFlow:
-    when:
-      visible: "Dismiss"
-    commands:
-      - tapOn: "Dismiss"
 - scrollUntilVisible:
     element:
       id: "video-status-top"
@@ -81,21 +66,8 @@ appId: com.integrationtestapp
     visibilityPercentage: 20
     centerElement: true
 - extendedWaitUntil:
-    visible:
-      id: "video-status-top"
-      text: "VIDEO_STATUS:LOADED:IMPRESSION:NOT_COMPLETED"
+    visible: "VIDEO_STATUS:LOADED:IMPRESSION:.*"
     timeout: 45000
-    optional: true
-- extendedWaitUntil:
-    visible:
-      id: "video-status-top"
-      text: "VIDEO_STATUS:LOADED:IMPRESSION:COMPLETED"
-    timeout: 45000
-    optional: true
-- extendedWaitUntil:
-    visible: "VIDEO_STATUS:LOADED:IMPRESSION"
-    timeout: 45000
-    optional: true
 - scrollUntilVisible:
     element: "4. 전면/리워드/전면동영상 광고"
     direction: DOWN
@@ -104,12 +76,3 @@ appId: com.integrationtestapp
     centerElement: true
 - tapOn:
     id: "interstitial-show-button"
-- runFlow:
-    when:
-      visible: "Got it"
-    commands:
-      - tapOn: "Got it"
-- extendedWaitUntil:
-    visible: "test ad"
-    timeout: 20000
-    optional: true

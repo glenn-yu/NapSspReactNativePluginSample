@@ -21,8 +21,13 @@ def enabledMediations = ((project.findProperty('napSsp.mediations') ?: '') as St
 
 def mediationEnabled = { String name -> enabledMediations.isEmpty() || enabledMediations.contains(name) }
 
+// Keep the core SDK aligned with the latest published mediation adapters.
+// As of 2026-05-02, the latest admanager/adfit/pangle/applovin/unity adapters
+// all declare admixer-ssp:1.0.21_alpha, while admixer-ssp:1.0.23 is published
+// ahead of matching mediation artifacts. Forcing 1.0.23 caused fullscreen
+// mediation runtime errors in the integration app.
 def napSspSdkCoordinates = [
-    core: 'io.github.nasmedia-tech:admixer-ssp:1.0.23',
+    core: 'io.github.nasmedia-tech:admixer-ssp:1.0.21_alpha',
     adManager: 'io.github.nasmedia-tech:admixer-admanager:1.0.15_delta',
     adFit: 'io.github.nasmedia-tech:admixer-adfit:1.0.12_beta',
     pangle: 'io.github.nasmedia-tech:admixer-pangle:1.0.12_beta',
