@@ -9,10 +9,19 @@ source "$MAESTRO_DIR/common.sh"
 
 echo "[$(date)] Starting integrated validation for all platforms..."
 
+EXIT_CODE=0
+
 # 1. Android Validation
-"$MAESTRO_DIR/android-validate.sh" || echo "Android validation failed"
+if ! "$MAESTRO_DIR/android-validate.sh"; then
+  echo "Android validation failed"
+  EXIT_CODE=1
+fi
 
 # 2. iOS Validation
-"$MAESTRO_DIR/ios-validate.sh" || echo "iOS validation failed"
+if ! "$MAESTRO_DIR/ios-validate.sh"; then
+  echo "iOS validation failed"
+  EXIT_CODE=1
+fi
 
 echo "[$(date)] Integrated validation completed."
+exit $EXIT_CODE

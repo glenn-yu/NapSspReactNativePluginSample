@@ -65,6 +65,8 @@ xcodebuild -workspace IntegrationTestApp.xcworkspace -scheme IntegrationTestApp 
 플랫폼별 또는 전체 플랫폼의 건강 상태를 즉시 확인합니다.
 - **전체 플랫폼**: `integration-test-app/maestro/validate-all.sh`
 - **Android 전용**: `integration-test-app/maestro/android-validate.sh`
+  - 기본 Android 대상은 `emulator-5554`입니다.
+  - 다른 디바이스를 사용할 때는 `ANDROID_DEVICE_ID=<adb device id>`를 지정합니다.
 - **iOS 전용**: `integration-test-app/maestro/ios-validate.sh`
 
 ### 4.2 부하 테스트 (Soak Tests)
