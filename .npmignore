@@ -1,0 +1,36 @@
+# Android build artifacts
+android/build/
+android/.gradle/
+android/.kotlin/
+android/app/build/
+
+# iOS build artifacts
+ios/build/
+ios/Pods/
+ios/*.xcresult
+ios/DerivedData/
+ios/.build/
+
+# Security
+.npmrc
+.env
+.env.*
+
+# Dev tooling
+.idea/
+.vscode/
+.claude/
+.gemini/
+scripts/
+integration-test-app/
+example/
+docs/
+jest.setup.js
+tsconfig.json
+tsconfig.tsbuildinfo
+*.tgz
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
