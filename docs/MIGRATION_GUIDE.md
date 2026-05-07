@@ -4,6 +4,15 @@
 
 ---
 
+## v0.1.3 ➡️ v0.1.4
+
+### 변경 없음 (API 호환)
+
+네이티브 코드 및 JS API 변경 없음. npm 배포 패키지에 가이드 문서가 추가된 것이 전부입니다.  
+`npm install react-native-nap-ssp@0.1.4` 후 `node_modules/react-native-nap-ssp/docs/` 에서 가이드를 직접 확인할 수 있습니다.
+
+---
+
 ## v0.1.2 ➡️ v0.1.3
 
 ### 1. iOS SPM 체크섬 업데이트

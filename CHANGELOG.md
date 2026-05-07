@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.4 - 2026-05-07
+
+### Added
+- npm 배포 패키지에 가이드 문서 18개 포함 (`docs/` 중 사용자 대상 파일만 선별):
+  API_REFERENCE, ANDROID_SETUP, IOS_SETUP, MEDIATION_GUIDE, SPM_GUIDE, MIGRATION_GUIDE,
+  VERSION_MATRIX, TROUBLESHOOTING, FAQ, ADVANCED_USAGE, NATIVE_ASSETS_GUIDE, PRIVACY_GUIDE,
+  EXPO_GUIDE, GLOSSARY, ROADMAP, MAESTRO_GUIDE, DEVELOPMENT, PUBLISH_GUIDE.
+
+### Changed
+- `package.json` `files`: 개별 docs 파일 명시로 내부 개발 문서(MAESTRO 실행 로그, REVIEW 보고서, png 이미지, docx 등) 배포 제외.
+
+---
+
 ## 0.1.3 - 2026-05-07
 
 ### Changed
