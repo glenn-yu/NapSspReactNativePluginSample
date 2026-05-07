@@ -243,8 +243,8 @@ const showInterstitial = async () => {
     buttonLeftText: '닫기',
   });
 
-  inter.addAdEventListener('onAdClosed', () => console.log('전면 광고가 닫혔습니다.'));
-  inter.addAdEventListener('onAdClicked', () => console.log('전면 광고가 클릭되었습니다.'));
+  inter.addAdEventListener('closed', () => console.log('전면 광고가 닫혔습니다.'));
+  inter.addAdEventListener('clicked', () => console.log('전면 광고가 클릭되었습니다.'));
 
   try {
     await inter.load();
@@ -263,9 +263,9 @@ import { InterstitialVideoAd } from 'react-native-nap-ssp';
 const showInterstitialVideo = async () => {
   const interVideo = new InterstitialVideoAd('INTER_VIDEO_ID');
 
-  interVideo.addAdEventListener('onVideoCompleted', () => console.log('전면 동영상 끝까지 시청함!'));
-  interVideo.addAdEventListener('onVideoSkipped', () => console.log('전면 동영상 스킵됨.'));
-  interVideo.addAdEventListener('onAdClosed', () => console.log('전면 동영상 창 닫힘.'));
+  interVideo.addAdEventListener('completed', () => console.log('전면 동영상 끝까지 시청함!'));
+  interVideo.addAdEventListener('skipped', () => console.log('전면 동영상 스킵됨.'));
+  interVideo.addAdEventListener('closed', () => console.log('전면 동영상 창 닫힘.'));
 
   await interVideo.load();
   await interVideo.show();
@@ -283,12 +283,12 @@ const showRewardedAd = async () => {
     mute: true  // (안드로이드 전용) 시작 시 음소거
   });
 
-  reward.addAdEventListener('onRewarded', (item) => {
+  reward.addAdEventListener('rewarded', (item) => {
     console.log('보상 지급 이벤트 발생!', item);
     // 정확한 보상 처리는 S2S 콜백 사용을 강력 권장합니다.
   });
 
-  reward.addAdEventListener('onAdClosed', () => {
+  reward.addAdEventListener('closed', () => {
     console.log('리워드 광고 창이 닫혔습니다.');
   });
 
@@ -299,6 +299,12 @@ const showRewardedAd = async () => {
 
 ---
 
+
+## 🧪 DEBUG 빌드 플레이스홀더 동작
+
+v0.1.5부터 DEBUG 빌드에서는 시뮬레이터/에뮬레이터의 no-fill, SDK timeout, 일부 미디에이션 callback 누락 상황에서도 RN 이벤트 파이프라인을 검증할 수 있도록 플레이스홀더 성공 이벤트를 발행합니다. 실제 광고 노출 검증은 RELEASE 빌드 + 실기기에서 진행하세요. 자세한 기준은 [Troubleshooting](./docs/TROUBLESHOOTING.md)을 확인하세요.
+
+---
 ## ✅ 테스트와 검증
 
 ```bash
@@ -315,6 +321,7 @@ npm run verify
 
 프로젝트의 상세 가이드와 검증 리포트는 `docs/` 디렉토리에 정리되어 있습니다.
 
+- **[Getting Started](./docs/GETTING_STARTED.md)**: 처음 연동할 때 보는 빠른 시작 가이드
 - **[API Reference](./docs/API_REFERENCE.md)**: 컴포넌트 및 클래스 상세 명세
 - **[Troubleshooting](./docs/TROUBLESHOOTING.md)**: 설치 및 런타임 주요 에러 해결 방법
 - **[FAQ](./docs/FAQ.md)**: 자주 묻는 질문
@@ -351,7 +358,7 @@ npm run verify
   - A. 광고 SDK 중 일부는 실기기(Real Device) 환경에서만 정상적으로 로드됩니다. 가급적 실기기에서 테스트해 주세요.
 
 - **Q. 이벤트 리스너의 이름이 헷갈립니다.**
-  - A. 모든 이벤트는 `onAdLoaded`, `onAdClosed`, `onAdClicked`, `onRewarded`, `onVideoCompleted`, `onVideoSkipped` 등 `on` 접두사를 사용합니다. 상세 목록은 [API Reference](./docs/API_REFERENCE.md)를 참조하세요.
+  - A. JS 클래스의 `addAdEventListener()`는 `loaded`, `loadFailed`, `opened`, `closed`, `clicked`, `impression`, `rewarded`, `completed`, `skipped` 같은 정규화된 이벤트명을 사용합니다. 컴포넌트 props는 `onAdLoaded`처럼 `on` 접두사를 사용합니다. 상세 목록은 [API Reference](./docs/API_REFERENCE.md)를 참조하세요.
 
 ---
 

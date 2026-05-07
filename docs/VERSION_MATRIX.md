@@ -57,4 +57,4 @@
 
 ## 3. 업데이트 가이드
 
-플러그인 버전을 올릴 때에는 `build.gradle` 및 `Podfile`에서 해당 네이티브 SDK 버전도 함께 업데이트해야 할 수 있습니다. 상세 내역은 [CHANGELOG.md](../../CHANGELOG.md)를 참조하십시오.
+플러그인 버전을 올릴 때에는 `build.gradle` 및 `Podfile`에서 해당 네이티브 SDK 버전도 함께 업데이트해야 할 수 있습니다. 상세 내역은 [CHANGELOG.md](../CHANGELOG.md)를 참조하십시오.

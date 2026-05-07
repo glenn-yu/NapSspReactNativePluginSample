@@ -13,6 +13,6 @@
     "react-native-nap-ssp": "file:.."
   },
   "devDependencies": {
-    "@react-native/metro-config": "^0.85.1"
+    "@react-native/metro-config": "^0.85.3"
   }
 }

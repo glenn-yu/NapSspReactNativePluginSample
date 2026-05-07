@@ -34,7 +34,7 @@ SDK를 초기화합니다. 앱 시작 시 한 번만 호출하면 됩니다.
 ### Props
 - `adUnitId`: (string) 광고 단위 ID.
 - `size`: (BannerSize) 배너 크기.
-  - `BANNER_320x50`, `BANNER_320x100`, `BANNER_300x250`, `SMART_BANNER` 등.
+  - `BANNER_320x50`, `BANNER_320x100`, `BANNER_300x250`, `BANNER_320x480`, `LARGE_BANNER`, `MEDIUM_RECTANGLE`, `SMART_BANNER`.
 - `onAdLoaded`: () => void. 광고 로드 성공 시 호출.
 - `onAdFailedToLoad`: (error: AdError) => void. 광고 로드 실패 시 호출.
 - `onAdClicked`: () => void. 광고 클릭 시 호출.
@@ -70,8 +70,8 @@ SDK를 초기화합니다. 앱 시작 시 한 번만 호출하면 됩니다.
   - Events: `loaded`, `loadFailed`, `opened`, `closed`, `clicked`, `impression`.
 
 ### RewardedAd 전용
-- Event: `onRewarded`. 보상 지급 시점에 발생. (S2S 콜백 권장)
-- Option: `customParams`. 보상 데이터와 함께 매체사 서버로 전달할 파라미터.
+- Events: `rewarded` (보상 지급), `completed` (시청 완료), `skipped` (스킵). S2S 콜백 권장.
+- Option: `customParams`. 보상 데이터와 함께 매체사 서버로 전달할 파라미터 (`useid`, `name`, `phone` 등).
 
 ### InterstitialVideoAd 전용
 - Events: `completed`, `skipped`.

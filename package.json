@@ -17,6 +17,7 @@
     "android/build.gradle",
     "android/consumer-rules.pro",
     "ios",
+    "docs/GETTING_STARTED.md",
     "docs/API_REFERENCE.md",
     "docs/ANDROID_SETUP.md",
     "docs/IOS_SETUP.md",

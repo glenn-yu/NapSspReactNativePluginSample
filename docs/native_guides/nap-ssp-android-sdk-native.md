@@ -105,7 +105,7 @@ dependencies {
     // (필수)
     implementation 'io.github.nasmedia-tech:admixer-ssp:1.0.23'
     // (필수)
-    implementation 'com.google.android.gms:play-services-ads-identifier:18.9.0'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.3.0'
     // (선택) Google AdManager
     implementation 'io.github.nasmedia-tech:admixer-admanager:1.0.15_delta'  // play-services-ads:24.8.0 포함
     // (선택) Kakao Adfit

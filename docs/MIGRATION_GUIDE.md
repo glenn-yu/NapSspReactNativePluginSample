@@ -29,19 +29,7 @@ let adMixerMediationURL = "https://github.com/Nasmedia-Tech/iOS-AdMixerDownload/
 let adMixerMediationChecksum = "b40eb8ae2eff354e56de68ad11de0030002d17ba66a48b2df2bad461c1a6049f"
 ```
 
-### 2. 이벤트 이름 통일 (확인 필요)
-
-이벤트 리스너에서 이벤트 이름이 `on` 접두사 형식으로 통일되었습니다. 기존 코드에서 `'closed'`, `'clicked'` 등 단축 형태를 사용하고 있었다면 `'onAdClosed'`, `'onAdClicked'` 등으로 업데이트하세요.
-
-```tsx
-// 기존
-inter.addAdEventListener('closed', () => {});
-
-// 최신
-inter.addAdEventListener('onAdClosed', () => {});
-```
-
-### 3. 그 외 변경 없음
+### 2. 그 외 변경 없음
 
 Android Maven SDK 버전은 0.1.2와 동일합니다. CocoaPods 사용자는 별도 변경이 필요하지 않습니다.
 
