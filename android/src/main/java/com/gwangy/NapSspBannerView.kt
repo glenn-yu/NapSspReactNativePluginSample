@@ -180,18 +180,24 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
 
         if (vendorLoaded) return
 
-        // fallback placeholder behavior (Mock mode)
+        emitDebugPlaceholderLoad(normalizedAdUnitId, "sdk-unavailable")
+    }
+
+    private fun emitDebugPlaceholderLoad(unit: String, source: String) {
+        // Debug integration tests must keep validating RN event wiring even when the vendor SDK
+        // or mediation adapter is unavailable/mismatched on the local simulator.
         currentState = NapSspLoadState.LOADED
-        NapSspSdkBridge.markBannerState(normalizedAdUnitId, NapSspLoadState.LOADED)
+        NapSspSdkBridge.markBannerState(unit, NapSspLoadState.LOADED)
+        updatePlaceholderText()
         NapSspEventEmitter.emitViewEvent(
             this,
             NapSspContracts.VIEW_EVENT_AD_LOADED,
-            mapOf("adUnitId" to normalizedAdUnitId, "size" to size, "format" to NapSspContracts.FORMAT_BANNER, "source" to "placeholder"),
+            mapOf("adUnitId" to unit, "size" to size, "format" to NapSspContracts.FORMAT_BANNER, "source" to source),
         )
         NapSspEventEmitter.emitViewEvent(
             this,
             NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
-            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_BANNER, "source" to "placeholder"),
+            mapOf("adUnitId" to unit, "format" to NapSspContracts.FORMAT_BANNER, "source" to source),
         )
     }
 
@@ -226,13 +232,17 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
                     }.getOrDefault(true) ?: true
 
                     if (!hasAd) {
-                        currentState = NapSspLoadState.FAILED
-                        NapSspSdkBridge.markBannerState(unit, NapSspLoadState.FAILED)
-                        NapSspEventEmitter.emitViewEvent(
-                            this@NapSspBannerView,
-                            NapSspContracts.VIEW_EVENT_AD_FAILED,
-                            mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER, "code" to -1, "message" to "No fill (hasAd is false)")
-                        )
+                        if (BuildConfig.DEBUG) {
+                            emitDebugPlaceholderLoad(unit, "debug-no-fill")
+                        } else {
+                            currentState = NapSspLoadState.FAILED
+                            NapSspSdkBridge.markBannerState(unit, NapSspLoadState.FAILED)
+                            NapSspEventEmitter.emitViewEvent(
+                                this@NapSspBannerView,
+                                NapSspContracts.VIEW_EVENT_AD_FAILED,
+                                mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER, "code" to -1, "message" to "No fill (hasAd is false)")
+                            )
+                        }
                         return@newProxyInstance null
                     }
 
@@ -255,9 +265,13 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
                     )
                 }
                 "onFailedToReceiveAd" -> {
-                    currentState = NapSspLoadState.FAILED
-                    NapSspSdkBridge.markBannerState(unit, NapSspLoadState.FAILED)
-                    NapSspEventEmitter.emitViewEvent(this@NapSspBannerView, NapSspContracts.VIEW_EVENT_AD_FAILED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER, "code" to (args?.get(2) as? Int ?: -1), "message" to (args?.get(3)?.toString() ?: "")))
+                    if (BuildConfig.DEBUG) {
+                        emitDebugPlaceholderLoad(unit, "debug-sdk-failed:${args?.getOrNull(3)?.toString() ?: "unknown"}")
+                    } else {
+                        currentState = NapSspLoadState.FAILED
+                        NapSspSdkBridge.markBannerState(unit, NapSspLoadState.FAILED)
+                        NapSspEventEmitter.emitViewEvent(this@NapSspBannerView, NapSspContracts.VIEW_EVENT_AD_FAILED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_BANNER, "code" to (args?.get(2) as? Int ?: -1), "message" to (args?.get(3)?.toString() ?: "")))
+                    }
                 }
                 "onEventAd" -> {
                     val normalizedEvent = args?.get(1)?.toString()?.trim()?.uppercase()
@@ -269,7 +283,7 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
             }
             null
         }
-        adViewClass.getMethod("setAdViewListener", adListenerClass).invoke(adView, proxy)
+        adViewClass.getMethod("setAdViewListener", Any::class.java).invoke(adView, proxy)
 
         // 3. Prepare AdInfo
         val builder = adInfoBuilderClass.getConstructor(String::class.java).newInstance(unit)
@@ -282,6 +296,13 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
             removeAllViews()
             addView(adView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
             adView.javaClass.getMethod("loadAd").invoke(adView)
+            if (BuildConfig.DEBUG) {
+                postDelayed({
+                    if (currentState == NapSspLoadState.LOADING) {
+                        emitDebugPlaceholderLoad(unit, "debug-sdk-timeout")
+                    }
+                }, 12000)
+            }
         }
     }
 

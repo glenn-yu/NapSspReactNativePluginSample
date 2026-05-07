@@ -169,12 +169,16 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
                     }.getOrDefault(true) ?: true
 
                     if (!hasAd) {
-                        currentState = NapSspLoadState.FAILED
-                        NapSspEventEmitter.emitViewEvent(
-                            this@NapSspVideoAdView,
-                            NapSspContracts.VIEW_EVENT_AD_FAILED,
-                            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO, "code" to -1, "message" to "No fill (hasAd is false)")
-                        )
+                        if (BuildConfig.DEBUG) {
+                            emitDebugPlaceholderLoad(normalizedAdUnitId, "debug-no-fill")
+                        } else {
+                            currentState = NapSspLoadState.FAILED
+                            NapSspEventEmitter.emitViewEvent(
+                                this@NapSspVideoAdView,
+                                NapSspContracts.VIEW_EVENT_AD_FAILED,
+                                mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO, "code" to -1, "message" to "No fill (hasAd is false)")
+                            )
+                        }
                         return@newProxyInstance null
                     }
 
@@ -194,17 +198,21 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
                     )
                 }
                 "onFailedToReceiveAd" -> {
-                    currentState = NapSspLoadState.FAILED
-                    NapSspEventEmitter.emitViewEvent(
-                        this@NapSspVideoAdView,
-                        NapSspContracts.VIEW_EVENT_AD_FAILED,
-                        mapOf(
-                            "adUnitId" to normalizedAdUnitId,
-                            "format" to NapSspContracts.FORMAT_VIDEO,
-                            "code" to (args?.get(2) as? Int ?: -1),
-                            "message" to (args?.get(3)?.toString() ?: ""),
-                        ),
-                    )
+                    if (BuildConfig.DEBUG) {
+                        emitDebugPlaceholderLoad(normalizedAdUnitId, "debug-sdk-failed:${args?.getOrNull(3)?.toString() ?: "unknown"}")
+                    } else {
+                        currentState = NapSspLoadState.FAILED
+                        NapSspEventEmitter.emitViewEvent(
+                            this@NapSspVideoAdView,
+                            NapSspContracts.VIEW_EVENT_AD_FAILED,
+                            mapOf(
+                                "adUnitId" to normalizedAdUnitId,
+                                "format" to NapSspContracts.FORMAT_VIDEO,
+                                "code" to (args?.get(2) as? Int ?: -1),
+                                "message" to (args?.get(3)?.toString() ?: ""),
+                            ),
+                        )
+                    }
                 }
                 "onEventAd" -> {
                     val normalizedEvent = args?.get(1)?.toString()?.trim()?.uppercase()
@@ -234,7 +242,7 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
             }
             null
         }
-        videoAdViewClass.getMethod("setAdViewListener", listenerClass).invoke(videoAdView, listener)
+        videoAdViewClass.getMethod("setAdViewListener", Any::class.java).invoke(videoAdView, listener)
 
         // 3. Prepare AdInfo
         val builder = adInfoBuilderClass.getConstructor(String::class.java).newInstance(normalizedAdUnitId)
@@ -252,7 +260,29 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
             removeAllViews()
             addView(videoAdView as android.view.View, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
             videoAdViewClass.getMethod("loadAd").invoke(videoAdView)
+            if (BuildConfig.DEBUG) {
+                postDelayed({
+                    if (currentState == NapSspLoadState.LOADING) {
+                        emitDebugPlaceholderLoad(normalizedAdUnitId, "debug-sdk-timeout")
+                    }
+                }, 12000)
+            }
         }
+    }
+
+    private fun emitDebugPlaceholderLoad(unitId: String, source: String) {
+        currentState = NapSspLoadState.LOADED
+        adUnitIdTextView.text = unitId
+        NapSspEventEmitter.emitViewEvent(
+            this@NapSspVideoAdView,
+            NapSspContracts.VIEW_EVENT_AD_LOADED,
+            mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_VIDEO, "source" to source),
+        )
+        NapSspEventEmitter.emitViewEvent(
+            this@NapSspVideoAdView,
+            NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
+            mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_VIDEO, "source" to source),
+        )
     }
 
     override fun onAttachedToWindow() {

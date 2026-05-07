@@ -115,7 +115,7 @@ class RewardedModule: NSObject {
     DispatchQueue.main.async {
       #if canImport(AdMixerMediation)
       NapSspRuntime.shared.removeStoredRewardedAd(adUnitId: adUnitId)
-      NapSspRewardedDelegate.instances.removeValue(forKey: adUnitId)
+      NapSspRewardedDelegate.release(adUnitId: adUnitId)
       #endif
     }
   }
@@ -135,6 +135,10 @@ private final class NapSspRewardedDelegate: NSObject, AMMRewardVideoDelegate {
     return delegate
   }
 
+  static func release(adUnitId: String) {
+    instances.removeValue(forKey: adUnitId)
+  }
+
   func onSuccessShowReward() {
     NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: ["adUnitId": adUnitId, "format": "rewarded"])
     NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: ["adUnitId": adUnitId, "format": "rewarded"])
@@ -146,7 +150,7 @@ private final class NapSspRewardedDelegate: NSObject, AMMRewardVideoDelegate {
 
   func onCloseRewardVideo() {
     NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: ["adUnitId": adUnitId, "format": "rewarded"])
-    NapSspRewardedDelegate.instances.removeValue(forKey: adUnitId)
+    NapSspRewardedDelegate.release(adUnitId: adUnitId)
   }
 
   func onRewardVideoComplete() {
@@ -167,7 +171,7 @@ private final class NapSspRewardedDelegate: NSObject, AMMRewardVideoDelegate {
       "code": "napssp_rewarded_show_failed",
       "message": error?.localizedDescription ?? "unknown"
     ])
-    NapSspRewardedDelegate.instances.removeValue(forKey: adUnitId)
+    NapSspRewardedDelegate.release(adUnitId: adUnitId)
   }
 }
 #endif

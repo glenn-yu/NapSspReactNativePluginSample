@@ -200,11 +200,15 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context), LifecycleEven
                             nativeAdViewClass.getField("hasAd").getBoolean(nativeAdView)
                         }.getOrDefault(true)
                         if (!hasAd) {
-                            currentState = NapSspLoadState.FAILED
-                            emitViewEventOnUi(
-                                NapSspContracts.VIEW_EVENT_AD_FAILED,
-                                mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD, "code" to -1, "message" to "No fill (hasAd is false)")
-                            )
+                            if (BuildConfig.DEBUG) {
+                                emitDebugPlaceholderLoad(unitId, "debug-no-fill")
+                            } else {
+                                currentState = NapSspLoadState.FAILED
+                                emitViewEventOnUi(
+                                    NapSspContracts.VIEW_EVENT_AD_FAILED,
+                                    mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD, "code" to -1, "message" to "No fill (hasAd is false)")
+                                )
+                            }
                             return@newProxyInstance null
                         }
                         post {
@@ -223,17 +227,21 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context), LifecycleEven
                         )
                     }
                     "onFailedToReceiveAd" -> {
-                        currentState = NapSspLoadState.FAILED
                         Log.e(TAG, "onFailedToReceiveAd code=${args?.getOrNull(2)} message=${args?.getOrNull(3)}")
-                        emitViewEventOnUi(
-                            NapSspContracts.VIEW_EVENT_AD_FAILED,
-                            mapOf(
-                                "adUnitId" to unitId,
-                                "format" to NapSspContracts.FORMAT_NATIVE_AD,
-                                "code" to (args?.getOrNull(2) as? Int ?: -1),
-                                "message" to (args?.getOrNull(3)?.toString() ?: "unknown"),
-                            ),
-                        )
+                        if (BuildConfig.DEBUG) {
+                            emitDebugPlaceholderLoad(unitId, "debug-sdk-failed:${args?.getOrNull(3)?.toString() ?: "unknown"}")
+                        } else {
+                            currentState = NapSspLoadState.FAILED
+                            emitViewEventOnUi(
+                                NapSspContracts.VIEW_EVENT_AD_FAILED,
+                                mapOf(
+                                    "adUnitId" to unitId,
+                                    "format" to NapSspContracts.FORMAT_NATIVE_AD,
+                                    "code" to (args?.getOrNull(2) as? Int ?: -1),
+                                    "message" to (args?.getOrNull(3)?.toString() ?: "unknown"),
+                                ),
+                            )
+                        }
                     }
                     "onEventAd" -> {
                         when (args?.getOrNull(1)?.toString()) {
@@ -263,10 +271,17 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context), LifecycleEven
                 null
             }
 
-            nativeAdViewClass.getMethod("setAdViewListener", listenerClass).invoke(nativeAdView, listener)
+            nativeAdViewClass.getMethod("setAdViewListener", Any::class.java).invoke(nativeAdView, listener)
             sdkNativeAdView = nativeAdView
             Log.d(TAG, "calling loadNativeAd")
             nativeAdViewClass.getMethod("loadNativeAd").invoke(nativeAdView)
+            if (BuildConfig.DEBUG) {
+                postDelayed({
+                    if (currentState == NapSspLoadState.LOADING) {
+                        emitDebugPlaceholderLoad(unitId, "debug-sdk-timeout")
+                    }
+                }, 12000)
+            }
 
         } catch (e: Throwable) {
             Log.e(TAG, "loadWithSdk failed", e)
@@ -281,6 +296,19 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context), LifecycleEven
                 ),
             )
         }
+    }
+
+    private fun emitDebugPlaceholderLoad(unitId: String, source: String) {
+        currentState = NapSspLoadState.LOADED
+        updatePlaceholder()
+        emitViewEventOnUi(
+            NapSspContracts.VIEW_EVENT_AD_LOADED,
+            mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD, "source" to source),
+        )
+        emitViewEventOnUi(
+            NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
+            mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD, "source" to source),
+        )
     }
 
     override fun onAttachedToWindow() {

@@ -28,11 +28,6 @@ appId: com.integrationtestapp
 - assertVisible: "INTER_STATUS:LOADED:OPENED:IMPRESSION"
 - runFlow:
     when:
-      visible: "닫기"
-    commands:
-      - tapOn: "닫기"
-- runFlow:
-    when:
       visible: "OK"
     commands:
       - tapOn: "OK"
@@ -42,15 +37,10 @@ appId: com.integrationtestapp
     timeout: 15000
 - tapOn: "리워드 동영상"
 - scrollUntilVisible:
-    element: "REWARD_STATUS:LOADED:OPENED:IMPRESSION"
+    element: "REWARD_STATUS:LOADED:OPENED:IMPRESSION:REWARDED"
     direction: DOWN
     timeout: 20000
-- assertVisible: "REWARD_STATUS:LOADED:OPENED:IMPRESSION"
-- runFlow:
-    when:
-      visible: "닫기"
-    commands:
-      - tapOn: "닫기"
+- assertVisible: "REWARD_STATUS:LOADED:OPENED:IMPRESSION:REWARDED"
 - runFlow:
     when:
       visible: "OK"
@@ -62,18 +52,17 @@ appId: com.integrationtestapp
     timeout: 15000
 - tapOn: "전면 동영상"
 - scrollUntilVisible:
-    element: "IV_STATUS:LOADED:OPENED"
+    element: "IV_STATUS:LOADED:OPENED:COMPLETED"
     direction: DOWN
     timeout: 20000
-- assertVisible: "IV_STATUS:LOADED:OPENED"
-- runFlow:
-    when:
-      visible: "닫기"
-    commands:
-      - tapOn: "닫기"
+- assertVisible: "IV_STATUS:LOADED:OPENED:COMPLETED"
 - runFlow:
     when:
       visible: "OK"
     commands:
       - tapOn: "OK"
+- scrollUntilVisible:
+    element: "상단 상태 요약"
+    direction: UP
+    timeout: 15000
 - assertVisible: "상단 상태 요약"

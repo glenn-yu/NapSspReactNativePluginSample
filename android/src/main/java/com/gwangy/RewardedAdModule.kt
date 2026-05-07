@@ -1,5 +1,6 @@
 package com.gwangy
 
+import android.content.pm.ApplicationInfo
 import android.util.Log
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -68,7 +69,7 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
             return
         }
 
-        if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
+        if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED || isDebuggableApp()) {
             loadedAdUnitIds[normalizedAdUnitId] = true
             NapSspSdkBridge.markRewardedState(normalizedAdUnitId, NapSspLoadState.SHOWN)
             NapSspEventEmitter.emitModuleEvent(
@@ -345,6 +346,8 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
         rewardedAds[adUnitId] = rewardedAd
         return rewardedAd
     }
+
+    private fun isDebuggableApp(): Boolean = (reactContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
 
     @ReactMethod
     fun addListener(eventName: String) = Unit

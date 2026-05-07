@@ -49,31 +49,31 @@ PODS:
     - hermes-engine/Pre-built (= 0.72.10)
   - hermes-engine/Pre-built (0.72.10)
   - libevent (2.1.12)
-  - NapSspPlugin (0.1.2):
+  - NapSspPlugin (0.1.5):
     - AdMixerMediation
-    - NapSspPlugin/AdFit (= 0.1.2)
-    - NapSspPlugin/AppLovin (= 0.1.2)
-    - NapSspPlugin/GAM (= 0.1.2)
-    - NapSspPlugin/Pangle (= 0.1.2)
-    - NapSspPlugin/UnityAds (= 0.1.2)
+    - NapSspPlugin/AdFit (= 0.1.5)
+    - NapSspPlugin/AppLovin (= 0.1.5)
+    - NapSspPlugin/GAM (= 0.1.5)
+    - NapSspPlugin/Pangle (= 0.1.5)
+    - NapSspPlugin/UnityAds (= 0.1.5)
     - React-Core
-  - NapSspPlugin/AdFit (0.1.2):
+  - NapSspPlugin/AdFit (0.1.5):
     - AdMixerMediation
     - AdMixerMediationAdFit
     - React-Core
-  - NapSspPlugin/AppLovin (0.1.2):
+  - NapSspPlugin/AppLovin (0.1.5):
     - AdMixerMediation
     - AdMixerMediationAppLovin
     - React-Core
-  - NapSspPlugin/GAM (0.1.2):
+  - NapSspPlugin/GAM (0.1.5):
     - AdMixerMediation
     - AdMixerMediationGAM
     - React-Core
-  - NapSspPlugin/Pangle (0.1.2):
+  - NapSspPlugin/Pangle (0.1.5):
     - AdMixerMediation
     - AdMixerMediationPangle
     - React-Core
-  - NapSspPlugin/UnityAds (0.1.2):
+  - NapSspPlugin/UnityAds (0.1.5):
     - AdMixerMediation
     - AdMixerMediationUnityAds
     - React-Core
@@ -660,7 +660,7 @@ SPEC CHECKSUMS:
   GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
   hermes-engine: 90e4033deb00bee33330a9f15eff0f874bd82f6d
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
-  NapSspPlugin: 52cf9cbd598af395ee996e0853589eafa3dd3878
+  NapSspPlugin: bd9e4485f0ab43d992faec50a8404a5eb4c5f282
   RCT-Folly: 8dc08ca5a393b48b1c523ab6220dfdcc0fe000ad
   RCTRequired: b4d3068afa6f52ec5260a8417053b1f1b421483d
   RCTTypeSafety: a4551b3d338c96435f63bf06d564055c1d3cc0ac

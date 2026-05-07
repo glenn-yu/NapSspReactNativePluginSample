@@ -32,20 +32,24 @@ appId: org.reactjs.native.example.IntegrationTestApp
     id: "native-load-button"
 - extendedWaitUntil:
     visible: "더보기"
+    timeout: 30000
+    optional: true
+- scrollUntilVisible:
+    element:
+      id: "native-status-top"
+    direction: DOWN
+    timeout: 30000
+    visibilityPercentage: 20
+    centerElement: true
+- extendedWaitUntil:
+    visible:
+      id: "native-status-top"
+      text: "NATIVE_STATUS:LOADED:IMPRESSION"
     timeout: 45000
 - scrollUntilVisible:
     element:
-      id: "summary-native-status"
-    direction: DOWN
-    timeout: 30000
-- extendedWaitUntil:
-    visible:
-      id: "summary-native-status"
-    timeout: 10000
-- scrollUntilVisible:
-    element:
       id: "interstitial-show-button"
-    direction: UP
+    direction: DOWN
     timeout: 30000
     visibilityPercentage: 20
     centerElement: true
@@ -89,7 +93,7 @@ appId: org.reactjs.native.example.IntegrationTestApp
       - scrollUntilVisible:
           element:
             id: "interstitial-show-button"
-          direction: UP
+          direction: DOWN
           timeout: 30000
           visibilityPercentage: 20
           centerElement: true

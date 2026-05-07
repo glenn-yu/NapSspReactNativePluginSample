@@ -422,10 +422,10 @@ const App = () => {
           </View>
           {nativeVisible && (
             <>
-              <Text testID="native-status-top" accessibilityLabel="native-status-top" style={styles.statusLine}>
+              <Text testID="native-status-top" style={styles.statusLine}>
                 NATIVE_STATUS:{adStatuses.native.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.native.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}
               </Text>
-              <Text testID="native-message-top" accessibilityLabel="native-message-top" style={styles.statusLine}>
+              <Text testID="native-message-top" style={styles.statusLine}>
                 NATIVE_MSG:{adStatuses.native.lastMessage}
               </Text>
               <NativeAd
@@ -437,10 +437,10 @@ const App = () => {
                 onAdFailedToLoad={e => { addLog('NATIVE', `failed: ${e.message}`); updateAdStatus('native', { lastMessage: `failed:${e.message}` }); }}
                 onAdClicked={() => addLog('NATIVE', 'clicked')}
               />
-              <Text testID="native-status-line" accessibilityLabel="native-status-line" style={styles.statusLine}>
+              <Text testID="native-status-line" style={styles.statusLine}>
                 NATIVE_STATUS:{adStatuses.native.loaded ? 'LOADED' : 'NOT_LOADED'}:{adStatuses.native.impression ? 'IMPRESSION' : 'NO_IMPRESSION'}
               </Text>
-              <Text testID="native-message-line" accessibilityLabel="native-message-line" style={styles.statusLine}>
+              <Text testID="native-message-line" style={styles.statusLine}>
                 NATIVE_MSG:{adStatuses.native.lastMessage}
               </Text>
             </>

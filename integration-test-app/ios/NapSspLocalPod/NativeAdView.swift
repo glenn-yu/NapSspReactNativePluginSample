@@ -91,16 +91,25 @@ final class NativeAdView: UIView {
     detailLabel.text = "adUnitId: \(currentAdUnitId)"
     if isLoaded { return }
 
-    #if canImport(AdMixerMediation)
+    #if DEBUG
+    loadPlaceholder(adUnitId: currentAdUnitId)
+    #elseif canImport(AdMixerMediation)
     loadWithSdk(adUnitId: currentAdUnitId)
     #else
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-      guard let self = self else { return }
-      self.isLoaded = true
-      self.onAdLoaded?(self.eventPayload(adUnitId: currentAdUnitId, message: "Native ad loaded (placeholder)"))
-      self.onAdImpression?(self.eventPayload(adUnitId: currentAdUnitId, message: "Native ad impression"))
-    }
+    loadPlaceholder(adUnitId: currentAdUnitId)
     #endif
+  }
+
+
+  private func loadPlaceholder(adUnitId: String) {
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+      guard let self = self, !self.isLoaded else { return }
+      self.isLoaded = true
+      self.titleLabel.text = "Native Ad loaded"
+      self.detailLabel.text = "adUnitId: \(adUnitId) • source: placeholder"
+      self.onAdLoaded?(self.eventPayload(adUnitId: adUnitId, message: "Native ad loaded (placeholder)"))
+      self.onAdImpression?(self.eventPayload(adUnitId: adUnitId, message: "Native ad impression"))
+    }
   }
 
   #if canImport(AdMixerMediation)

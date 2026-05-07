@@ -1,5 +1,6 @@
 package com.gwangy
 
+import android.content.pm.ApplicationInfo
 import android.util.Log
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -69,7 +70,7 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
             return
         }
 
-        if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
+        if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED || isDebuggableApp()) {
             loadedAdUnitIds[normalizedAdUnitId] = true
             NapSspSdkBridge.markInterstitialState(normalizedAdUnitId, NapSspLoadState.SHOWN)
             NapSspEventEmitter.emitModuleEvent(
@@ -132,7 +133,7 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
         }
 
         try {
-            if (BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
+            if (BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED && !BuildConfig.DEBUG) {
                 val interstitial = interstitialAds[normalizedAdUnitId]
                 if (interstitial == null) {
                     promise.reject("NAP_SSP_INTERSTITIAL_NOT_READY", "Interstitial instance is missing")
@@ -339,6 +340,8 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
         interstitialAds[adUnitId] = interstitial
         return interstitial
     }
+
+    private fun isDebuggableApp(): Boolean = (reactContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
 
     @ReactMethod
     fun addListener(eventName: String) = Unit

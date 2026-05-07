@@ -171,7 +171,7 @@ final class BannerView: UIView {
   }
 
   private func finishLoading(adUnitId: String) {
-    guard loadWorkItem?.isCancelled == false else { return }
+    if let loadWorkItem, loadWorkItem.isCancelled { return }
     isLoaded = true
     titleLabel.text = "Banner loaded"
     detailLabel.text = "adUnitId: \(adUnitId) • source: placeholder"

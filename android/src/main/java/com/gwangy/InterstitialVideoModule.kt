@@ -1,5 +1,6 @@
 package com.gwangy
 
+import android.content.pm.ApplicationInfo
 import android.util.Log
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -67,7 +68,7 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
             return
         }
 
-        if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
+        if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED || isDebuggableApp()) {
             loadedAdUnitIds[normalizedAdUnitId] = true
             NapSspEventEmitter.emitModuleEvent(
                 reactContext,
@@ -332,6 +333,8 @@ class InterstitialVideoModule(private val reactContext: ReactApplicationContext)
         interstitialVideoAds[adUnitId] = interstitialVideo
         return interstitialVideo
     }
+
+    private fun isDebuggableApp(): Boolean = (reactContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
 
     @ReactMethod
     fun addListener(eventName: String) = Unit

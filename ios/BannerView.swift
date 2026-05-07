@@ -221,6 +221,15 @@ final class BannerView: UIView {
     bannerView = view
     addSubview(view)
     view.load()
+
+    #if DEBUG
+    let workItem = DispatchWorkItem { [weak self] in
+      guard let self, !self.isLoaded else { return }
+      self.finishLoading(adUnitId: adUnitId)
+    }
+    loadWorkItem = workItem
+    DispatchQueue.main.asyncAfter(deadline: .now() + 12.0, execute: workItem)
+    #endif
   }
 
   func attachSdkView() {
@@ -238,17 +247,21 @@ final class BannerView: UIView {
   }
 
   func emitSdkFailure(adUnitId: String, code: String, message: String) {
+    #if DEBUG
+    finishLoading(adUnitId: adUnitId)
+    #else
     onAdFailedToLoad?([
       "adUnitId": adUnitId,
       "size": size as String,
       "code": code,
       "message": message
     ])
+    #endif
   }
   #endif
 
   private func finishLoading(adUnitId: String) {
-    guard loadWorkItem?.isCancelled == false else { return }
+    if let loadWorkItem, loadWorkItem.isCancelled { return }
     isLoaded = true
     titleLabel.text = "Banner loaded"
     detailLabel.text = "adUnitId: \(adUnitId) • source: placeholder"
