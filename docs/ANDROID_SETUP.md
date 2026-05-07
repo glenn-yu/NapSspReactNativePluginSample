@@ -28,7 +28,7 @@ allprojects {
 ```gradle
 dependencies {
     implementation 'io.github.nasmedia-tech:admixer-ssp:1.0.23'
-    implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.3.0'
     
     // 미디에이션 사용 시 해당 어댑터 추가
     implementation 'io.github.nasmedia-tech:admixer-adfit:1.0.12_beta'
