@@ -83,9 +83,17 @@ class InterstitialVideoModule: NSObject {
 
   @objc
   func destroy(_ adUnitId: String) {
-    #if canImport(AdMixerMediation)
-    NapSspRuntime.shared.removeStoredInterstitialVideo(adUnitId: adUnitId)
-    #endif
+    DispatchQueue.main.async {
+      #if canImport(AdMixerMediation)
+      if let delegate = NapSspRuntime.shared.peekStoredInterstitialVideoDelegate(adUnitId: adUnitId) as? NapSspInterstitialVideoDelegate,
+         let pendingReject = delegate.reject {
+        pendingReject("napssp_destroyed", "InterstitialVideo was destroyed before completing.", nil)
+        delegate.resolve = nil
+        delegate.reject = nil
+      }
+      NapSspRuntime.shared.removeStoredInterstitialVideo(adUnitId: adUnitId)
+      #endif
+    }
   }
 }
 

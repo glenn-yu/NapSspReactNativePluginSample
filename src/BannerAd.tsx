@@ -14,6 +14,8 @@ import type { AdError, BannerSize } from './types';
 export interface BannerAdProps {
   adUnitId: string;
   size?: BannerSize;
+  /** Android only: set to false to suppress automatic ad loading on mount. Defaults to true. */
+  autoLoad?: boolean;
   onAdLoaded?: () => void;
   onAdFailedToLoad?: (error: AdError) => void;
   onAdClicked?: () => void;
@@ -26,8 +28,9 @@ export interface BannerAdProps {
 
 type NativeBannerProps = Omit<
   BannerAdProps,
-  'onAdLoaded' | 'onAdFailedToLoad' | 'onAdClicked' | 'onAdOpened' | 'onAdClosed' | 'onAdImpression'
+  'onAdLoaded' | 'onAdFailedToLoad' | 'onAdClicked' | 'onAdOpened' | 'onAdClosed' | 'onAdImpression' | 'autoLoad'
 > & {
+  autoLoad?: boolean;
   onAdLoaded?: () => void;
   onAdFailedToLoad?: (event: { nativeEvent: AdError }) => void;
   onAdClicked?: () => void;
@@ -77,6 +80,7 @@ export default function BannerAd(props: BannerAdProps) {
         <NativeBannerComponent
           adUnitId={props.adUnitId}
           size={size}
+          autoLoad={props.autoLoad ?? true}
           style={{ width: '100%', height: '100%' }}
           testID={props.testID}
           onAdLoaded={props.onAdLoaded}

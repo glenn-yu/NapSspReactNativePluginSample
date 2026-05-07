@@ -50,6 +50,8 @@ class GlobalEventEmitter extends TypedEventEmitter<any> {
   private nativeEmitters = new Map<string, NativeEventEmitter>();
   // One nativeEmitter subscription per module+event pair
   private nativeSubscriptions = new Map<string, ReturnType<NativeEventEmitter['addListener']>>();
+  // Tracks event names registered before setup() was called, for retroactive subscription
+  private readonly registeredEventNames = new Set<string>();
 
   setup(nativeModuleName: string): void {
     if (this.nativeEmitters.has(nativeModuleName)) {
@@ -57,15 +59,27 @@ class GlobalEventEmitter extends TypedEventEmitter<any> {
     }
 
     const nativeModule = NativeModules[nativeModuleName];
-    if (!nativeModule) {
+    if (!nativeModule || typeof nativeModule.addListener !== 'function') {
       return;
     }
 
     const emitter = new NativeEventEmitter(nativeModule);
     this.nativeEmitters.set(nativeModuleName, emitter);
+
+    // Retroactively subscribe for events registered before this setup() call
+    for (const eventName of this.registeredEventNames) {
+      const key = `${nativeModuleName}:${eventName}`;
+      if (!this.nativeSubscriptions.has(key)) {
+        const sub = emitter.addListener(eventName, (payload: any) => {
+          this.emit(eventName, payload);
+        });
+        this.nativeSubscriptions.set(key, sub);
+      }
+    }
   }
 
   addListener(eventName: string, handler: EventHandler<any>): () => void {
+    this.registeredEventNames.add(eventName);
     const cleanup = this.on(eventName, handler);
 
     for (const [moduleName, emitter] of this.nativeEmitters.entries()) {

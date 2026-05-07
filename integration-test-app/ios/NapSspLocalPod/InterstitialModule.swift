@@ -134,9 +134,12 @@ class InterstitialModule: NSObject {
 
   @objc
   func destroy(_ adUnitId: String) {
-    #if canImport(AdMixerMediation)
-    NapSspRuntime.shared.removeStoredInterstitial(adUnitId: adUnitId)
-    #endif
+    DispatchQueue.main.async {
+      #if canImport(AdMixerMediation)
+      NapSspRuntime.shared.removeStoredInterstitial(adUnitId: adUnitId)
+      NapSspInterstitialDelegate.instances.removeValue(forKey: adUnitId)
+      #endif
+    }
   }
 }
 

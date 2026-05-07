@@ -46,6 +46,10 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
         layout(left, top, right, bottom)
     }
 
+    private val layoutChangeListener = OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+        post(measureAndLayout)
+    }
+
     var adUnitId: String? = null
         set(value) {
             field = value?.trim()?.takeIf { it.isNotEmpty() }
@@ -73,10 +77,7 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
             }
         }
 
-        // RN 레이아웃 엔진과 네이티브 뷰 동기화
-        addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            post(measureAndLayout)
-        }
+        addOnLayoutChangeListener(layoutChangeListener)
     }
 
     fun destroyVideoAd() {
@@ -120,7 +121,8 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
         val vendorLoaded = try {
             tryAttachVendorVideoViewAndLoad(normalizedAdUnitId)
             true
-        } catch (_: Throwable) {
+        } catch (e: Throwable) {
+            android.util.Log.w("NapSspVideoAd", "vendor SDK unavailable, using placeholder for $normalizedAdUnitId: ${e.message}")
             false
         }
 
@@ -205,8 +207,9 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
                     )
                 }
                 "onEventAd" -> {
-                    when (args?.get(1)?.toString()) {
-                        "COMPLETION" -> NapSspEventEmitter.emitViewEvent(
+                    val normalizedEvent = args?.get(1)?.toString()?.trim()?.uppercase()
+                    when (normalizedEvent) {
+                        "COMPLETION", "COMPLETE", "COMPLETED" -> NapSspEventEmitter.emitViewEvent(
                             this@NapSspVideoAdView,
                             NapSspContracts.VIEW_EVENT_AD_COMPLETED,
                             mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
@@ -216,7 +219,7 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
                             NapSspContracts.VIEW_EVENT_AD_SKIPPED,
                             mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
                         )
-                        "CLICK" -> NapSspEventEmitter.emitViewEvent(
+                        "CLICK", "CLICKED" -> NapSspEventEmitter.emitViewEvent(
                             this@NapSspVideoAdView,
                             NapSspContracts.VIEW_EVENT_AD_CLICKED,
                             mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
@@ -239,7 +242,7 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
             adInfoBuilderClass.getMethod("isRetry", Boolean::class.javaPrimitiveType).invoke(builder, isRetry)
         } catch (_: Throwable) {}
         try {
-            adInfoBuilderClass.getMethod("setIsUseMediation", Boolean::class.java).invoke(builder, true)
+            adInfoBuilderClass.getMethod("setIsUseMediation", Boolean::class.javaPrimitiveType).invoke(builder, true)
         } catch (_: Throwable) {}
         val adInfo = adInfoBuilderClass.getMethod("build").invoke(builder)
         videoAdViewClass.getMethod("setAdInfo", adInfoClass).invoke(videoAdView, adInfo)
@@ -259,6 +262,7 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        removeOnLayoutChangeListener(layoutChangeListener)
         (context as? ThemedReactContext)?.removeLifecycleEventListener(this)
         adViewInstance?.let {
             runCatching { it.javaClass.getMethod("onPause").invoke(it) }

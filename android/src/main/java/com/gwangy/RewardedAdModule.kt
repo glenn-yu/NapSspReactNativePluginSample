@@ -190,6 +190,8 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
     fun destroy(adUnitId: String, promise: Promise) {
         val normalizedAdUnitId = adUnitId.trim()
         loadedAdUnitIds.remove(normalizedAdUnitId)
+        loadPromises.remove(normalizedAdUnitId)?.reject("NAP_SSP_REWARDED_DESTROYED", "Destroyed before load completed")
+        startPromises.remove(normalizedAdUnitId)?.reject("NAP_SSP_REWARDED_DESTROYED", "Destroyed before start completed")
         rewardedAds.remove(normalizedAdUnitId)?.let { rewardedAd ->
             runCatching { rewardedAd.javaClass.getMethod("stopRewardVideoAd").invoke(rewardedAd) }
         }
@@ -234,7 +236,7 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
 
         val builder = builderClass.getConstructor(String::class.java).newInstance(adUnitId)
         applyRewardedOptions(builder!!, builderClass, options)
-        try { builderClass.getMethod("setIsUseMediation", Boolean::class.java).invoke(builder, true) } catch (_: Throwable) {}
+        try { builderClass.getMethod("setIsUseMediation", Boolean::class.javaPrimitiveType).invoke(builder, true) } catch (_: Throwable) {}
         val adInfo = builderClass.getMethod("build").invoke(builder)
         val rewardedAd = rewardedClass.getConstructor(android.content.Context::class.java).newInstance(activity)
         rewardedClass.getMethod("setAdInfo", adInfoClass).invoke(rewardedAd, adInfo)
@@ -321,8 +323,8 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
                             NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_IMPRESSION, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
                         }
                         "CLICK", "CLICKED", "LEFT_CLICK", "RIGHT_CLICK" -> NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_CLICKED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
-                        "COMPLETION", "COMPLETE", "COMPLETED" -> NapSspEventEmitter.emitModuleEvent(reactContext, "onVideoCompleted", mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
-                        "SKIPPED" -> NapSspEventEmitter.emitModuleEvent(reactContext, "onVideoSkipped", mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
+                        "COMPLETION", "COMPLETE", "COMPLETED" -> NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_VIDEO_COMPLETED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
+                        "SKIPPED" -> NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_VIDEO_SKIPPED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_REWARDED))
                         "EARNEDREWARD", "REWARDED", "REWARD" -> NapSspEventEmitter.emitModuleEvent(
                             reactContext,
                             NapSspContracts.EVENT_REWARDED,
@@ -351,9 +353,9 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
     fun removeListeners(count: Int) = Unit
 
     override fun invalidate() {
-        loadPromises.values.forEach { it.reject("NAP_SSP_REWARDED_LOAD_CANCELLED", "Module invalidated") }
+        loadPromises.values.toList().forEach { it.reject("NAP_SSP_REWARDED_LOAD_CANCELLED", "Module invalidated") }
         loadPromises.clear()
-        startPromises.values.forEach { it.reject("NAP_SSP_REWARDED_START_CANCELLED", "Module invalidated") }
+        startPromises.values.toList().forEach { it.reject("NAP_SSP_REWARDED_START_CANCELLED", "Module invalidated") }
         startPromises.clear()
         loadedAdUnitIds.clear()
         rewardedAds.values.forEach { rewardedAd ->

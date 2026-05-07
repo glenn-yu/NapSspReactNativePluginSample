@@ -5,7 +5,7 @@ import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
 
 class NativeAdViewManager : SimpleViewManager<NapSspNativeAdView>() {
-    override fun getName(): String = "NapSspNativeAdView"
+    override fun getName(): String = NapSspContracts.NATIVE_AD_VIEW_NAME
 
     override fun createViewInstance(reactContext: ThemedReactContext): NapSspNativeAdView = NapSspNativeAdView(reactContext)
 

@@ -163,6 +163,7 @@ const App = () => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [bannerKey, setBannerKey] = useState(0);
   const [isSoakTesting, setIsSoakTesting] = useState(false);
+  const initialized = initStatus === 'success';
 
   // 30분 자동화 Soak Test 로직 (15초마다 모든 광고 로드 및 노출)
   React.useEffect(() => {
@@ -321,7 +322,6 @@ const App = () => {
   };
 
   const statusColor = initStatus === 'success' ? '#4CAF50' : initStatus === 'failed' ? '#F44336' : '#FF9800';
-  const initialized = initStatus === 'success';
 
   return (
     <SafeAreaView style={styles.container}>

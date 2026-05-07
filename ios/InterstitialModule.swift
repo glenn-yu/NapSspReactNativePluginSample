@@ -47,7 +47,10 @@ class InterstitialModule: NSObject {
         config.closeButtonTouchAreaRatio = Float(max(0.2, min(1.0, ratio)))
       }
       AMMInterstitial.load(adUnitID: adUnit, config: config) { [weak self] interstitial, error in
-        guard let _ = self else { return }
+        guard let _ = self else {
+          reject("napssp_module_released", "Module was released during load.", nil)
+          return
+        }
         if let error = error {
           NSLog("[NapSspInterstitial] load failed adUnitId=%@ error=%@", adUnitId, error.localizedDescription)
           let errPayload = napSspErrorPayload(adUnitId: adUnitId, format: "interstitial", error: error)
@@ -103,7 +106,7 @@ class InterstitialModule: NSObject {
       }
 
       #if canImport(AdMixerMediation)
-      guard let interstitial = NapSspRuntime.shared.peekStoredInterstitial(adUnitId: adUnitId) else {
+      guard let interstitial = NapSspRuntime.shared.consumeStoredInterstitial(adUnitId: adUnitId) else {
         NSLog("[NapSspInterstitial] show missing stored interstitial adUnitId=%@", adUnitId)
         reject(NapSspError.adNotLoaded("No interstitial has been loaded yet.").errorCode, "No interstitial has been loaded yet.", nil)
         return
@@ -132,9 +135,12 @@ class InterstitialModule: NSObject {
 
   @objc
   func destroy(_ adUnitId: String) {
-    #if canImport(AdMixerMediation)
-    NapSspRuntime.shared.removeStoredInterstitial(adUnitId: adUnitId)
-    #endif
+    DispatchQueue.main.async {
+      #if canImport(AdMixerMediation)
+      NapSspRuntime.shared.removeStoredInterstitial(adUnitId: adUnitId)
+      NapSspInterstitialDelegate.instances.removeValue(forKey: adUnitId)
+      #endif
+    }
   }
 }
 

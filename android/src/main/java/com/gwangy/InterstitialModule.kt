@@ -112,7 +112,8 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
             Log.d(tag, "startInterstitial request adUnitId=$normalizedAdUnitId")
             interstitial.javaClass.getMethod("startInterstitial").invoke(interstitial)
         } catch (error: Throwable) {
-            loadPromises.remove(normalizedAdUnitId)
+            loadPromises.remove(normalizedAdUnitId)?.reject("NAP_SSP_INTERSTITIAL_START_FAILED", error)
+            startPromises.remove(normalizedAdUnitId)
             promise.reject("NAP_SSP_INTERSTITIAL_START_FAILED", error)
         }
     }
@@ -176,9 +177,11 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
     fun destroy(adUnitId: String, promise: Promise) {
         val normalizedAdUnitId = adUnitId.trim()
         loadedAdUnitIds.remove(normalizedAdUnitId)
+        loadPromises.remove(normalizedAdUnitId)?.reject("NAP_SSP_INTERSTITIAL_DESTROYED", "Destroyed before load completed")
+        startPromises.remove(normalizedAdUnitId)?.reject("NAP_SSP_INTERSTITIAL_DESTROYED", "Destroyed before start completed")
         interstitialAds.remove(normalizedAdUnitId)?.let { interstitial ->
             val listenerClass = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
-            runCatching { interstitial.javaClass.getMethod("setListener", listenerClass).invoke(interstitial, null) }
+            runCatching { interstitial.javaClass.getMethod("setAdListener", listenerClass).invoke(interstitial, null) }
             runCatching { interstitial.javaClass.getMethod("stopInterstitial").invoke(interstitial) }
         }
         NapSspSdkBridge.clearInterstitial(normalizedAdUnitId)
@@ -233,7 +236,7 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
 
         val builder = builderClass.getConstructor(String::class.java).newInstance(adUnitId)
         applyInterstitialOptions(builder!!, builderClass, options)
-        try { builderClass.getMethod("setIsUseMediation", Boolean::class.java).invoke(builder, true) } catch (_: Throwable) {}
+        try { builderClass.getMethod("setIsUseMediation", Boolean::class.javaPrimitiveType).invoke(builder, true) } catch (_: Throwable) {}
         val adInfo = builderClass.getMethod("build").invoke(builder)
         val interstitial = interstitialClass.getConstructor(android.content.Context::class.java).newInstance(activity)
         interstitialClass.getMethod("setAdInfo", adInfoClass).invoke(interstitial, adInfo)
@@ -344,12 +347,16 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
     fun removeListeners(count: Int) = Unit
 
     override fun invalidate() {
-        loadPromises.values.forEach { it.reject("NAP_SSP_INTERSTITIAL_LOAD_CANCELLED", "Module invalidated") }
-        startPromises.values.forEach { it.reject("NAP_SSP_INTERSTITIAL_START_CANCELLED", "Module invalidated") }
+        loadPromises.values.toList().forEach { it.reject("NAP_SSP_INTERSTITIAL_LOAD_CANCELLED", "Module invalidated") }
+        startPromises.values.toList().forEach { it.reject("NAP_SSP_INTERSTITIAL_START_CANCELLED", "Module invalidated") }
         loadPromises.clear()
         startPromises.clear()
         loadedAdUnitIds.clear()
         interstitialAds.values.forEach { interstitial ->
+            runCatching {
+                val listenerClass = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
+                interstitial.javaClass.getMethod("setAdListener", listenerClass).invoke(interstitial, null)
+            }
             runCatching { interstitial.javaClass.getMethod("stopInterstitial").invoke(interstitial) }
         }
         interstitialAds.clear()

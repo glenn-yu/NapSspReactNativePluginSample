@@ -9,6 +9,7 @@ import { TurboModuleRegistry } from 'react-native';
 
 export interface FullscreenAdSpec extends TurboModule {
   load(adUnitId: string, options: Object | null): Promise<void>;
+  start(adUnitId: string, options: Object | null): Promise<void>;
   show(adUnitId: string): Promise<void>;
   isLoaded(adUnitId: string): Promise<boolean>;
   destroy(adUnitId: string): void;

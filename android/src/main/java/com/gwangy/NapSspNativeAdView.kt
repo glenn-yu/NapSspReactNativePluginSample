@@ -36,6 +36,10 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context), LifecycleEven
         layout(left, top, right, bottom)
     }
 
+    private val layoutChangeListener = OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+        post(measureAndLayout)
+    }
+
     private fun emitViewEventOnUi(eventName: String, data: Map<String, Any?> = emptyMap()) {
         post {
             NapSspEventEmitter.emitViewEvent(this, eventName, data)
@@ -62,12 +66,9 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context), LifecycleEven
         if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
             addView(placeholder, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         }
-        
-        // RN 레이아웃 변화 감지
-        addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            post(measureAndLayout)
-        }
-        
+
+        addOnLayoutChangeListener(layoutChangeListener)
+
         updatePlaceholder()
     }
 
@@ -236,10 +237,22 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context), LifecycleEven
                     }
                     "onEventAd" -> {
                         when (args?.getOrNull(1)?.toString()) {
-                            "CLICK" -> emitViewEventOnUi(
-                                NapSspContracts.VIEW_EVENT_AD_CLICKED,
-                                mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
-                            )
+                            "CLICK" -> {
+                                emitViewEventOnUi(
+                                    NapSspContracts.VIEW_EVENT_AD_CLICKED,
+                                    mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
+                                )
+                                emitViewEventOnUi(
+                                    NapSspContracts.VIEW_EVENT_AD_OPENED,
+                                    mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
+                                )
+                                postDelayed({
+                                    emitViewEventOnUi(
+                                        NapSspContracts.VIEW_EVENT_AD_CLOSED,
+                                        mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
+                                    )
+                                }, 200)
+                            }
                             "DISPLAYED" -> emitViewEventOnUi(
                                 NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
                                 mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
@@ -250,7 +263,7 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context), LifecycleEven
                 null
             }
 
-            nativeAdViewClass.getMethod("setAdViewListener", Any::class.java).invoke(nativeAdView, listener)
+            nativeAdViewClass.getMethod("setAdViewListener", listenerClass).invoke(nativeAdView, listener)
             sdkNativeAdView = nativeAdView
             Log.d(TAG, "calling loadNativeAd")
             nativeAdViewClass.getMethod("loadNativeAd").invoke(nativeAdView)
@@ -278,6 +291,7 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context), LifecycleEven
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        removeOnLayoutChangeListener(layoutChangeListener)
         (context as? ThemedReactContext)?.removeLifecycleEventListener(this)
         sdkNativeAdView?.let {
             runCatching { it.javaClass.getMethod("onPause").invoke(it) }

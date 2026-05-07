@@ -336,6 +336,10 @@ private final class NapSspBannerDelegate: NSObject, AMMBannerViewDelegate {
     guard let view = bannerView else { return }
     view.onAdClicked?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Banner tapped"))
     view.onAdOpened?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Banner opened"))
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+      guard let self, let view = self.bannerView else { return }
+      view.onAdClosed?(view.eventPayload(adUnitId: self.adUnitId, source: "sdk", message: "Banner dismissed"))
+    }
   }
 }
 #endif

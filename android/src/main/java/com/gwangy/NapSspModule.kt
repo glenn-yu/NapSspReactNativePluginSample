@@ -103,6 +103,23 @@ private fun itemToReadableMap(value: Map<*, *>): com.facebook.react.bridge.Writa
                 is Double -> putDouble(key, nestedValue)
                 is Float -> putDouble(key, nestedValue.toDouble())
                 is Long -> putDouble(key, nestedValue.toDouble())
+                is Map<*, *> -> putMap(key, itemToReadableMap(nestedValue))
+                is List<*> -> {
+                    val array = com.facebook.react.bridge.Arguments.createArray()
+                    nestedValue.forEach { item ->
+                        when (item) {
+                            null -> array.pushNull()
+                            is String -> array.pushString(item)
+                            is Boolean -> array.pushBoolean(item)
+                            is Int -> array.pushInt(item)
+                            is Double -> array.pushDouble(item)
+                            is Float -> array.pushDouble(item.toDouble())
+                            is Long -> array.pushDouble(item.toDouble())
+                            else -> array.pushString(item.toString())
+                        }
+                    }
+                    putArray(key, array)
+                }
                 else -> putString(key, nestedValue.toString())
             }
         }

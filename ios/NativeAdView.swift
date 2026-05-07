@@ -291,7 +291,13 @@ private final class NapSspNativeDelegate: NSObject, AMMNativeDelegate {
   }
 
   func onTapNative() {
-    nativeAdView?.onAdClicked?(["adUnitId": adUnitId, "format": "native", "message": "Native ad tapped"])
+    guard let view = nativeAdView else { return }
+    view.onAdClicked?(["adUnitId": adUnitId, "format": "native", "message": "Native ad tapped"])
+    view.onAdOpened?(["adUnitId": adUnitId, "format": "native", "message": "Native ad opened"])
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+      guard let self, let view = self.nativeAdView else { return }
+      view.onAdClosed?(["adUnitId": self.adUnitId, "format": "native", "message": "Native ad dismissed"])
+    }
   }
 }
 #endif

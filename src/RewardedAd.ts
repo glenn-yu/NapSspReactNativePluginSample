@@ -1,7 +1,7 @@
 import { TypedEventEmitter, globalEvents } from './events';
 import { createNativeModuleMissingError, getNativeModuleFromNames, NativeModuleNames } from './nativeBridge';
 import { normalizeAdError } from './errors';
-import type { RewardedAdEventMap, RewardedAdOptions } from './types';
+import type { RewardedAdEventMap, RewardedAdOptions, RewardPayload } from './types';
 
 interface NativeRewardedModule {
   load?: (adUnitId: string, options?: RewardedAdOptions) => Promise<void>;
@@ -39,6 +39,8 @@ export class RewardedAd {
       'onAdClicked',
       'onAdImpression',
       'onRewarded',
+      'onVideoCompleted',
+      'onVideoSkipped',
     ];
 
     events.forEach((eventName) => {
@@ -70,7 +72,16 @@ export class RewardedAd {
             this.emitter.emit('impression', undefined);
             break;
           case 'onRewarded':
-            this.emitter.emit('rewarded', undefined);
+            this.emitter.emit('rewarded', {
+              type: payload?.type ?? 'reward',
+              amount: payload?.amount ?? 1,
+            });
+            break;
+          case 'onVideoCompleted':
+            this.emitter.emit('completed', undefined);
+            break;
+          case 'onVideoSkipped':
+            this.emitter.emit('skipped', undefined);
             break;
         }
       });
@@ -126,7 +137,7 @@ export class RewardedAd {
     this._loaded = false;
   }
 
-  addAdEventListener(event: 'onRewarded', handler: () => void): () => void;
+  addAdEventListener(event: 'onRewarded', handler: (payload: RewardPayload) => void): () => void;
   addAdEventListener<K extends keyof RewardedAdEventMap>(
     event: K,
     handler: (payload: RewardedAdEventMap[K]) => void,

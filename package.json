@@ -15,6 +15,7 @@
     "lib",
     "android",
     "ios",
+    "NapSspPlugin.podspec",
     "README.md",
     "CHANGELOG.md",
     "RELEASE_NOTES.md"

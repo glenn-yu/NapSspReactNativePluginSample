@@ -49,14 +49,15 @@ export interface NapSspConfig {
 export interface NapSspStatus {
   initialized: boolean;
   placeholderMode?: boolean;
-  vendorMode?: boolean;
-  mediationFlags?: Record<string, boolean>;
-  loadedAds?: {
-    banners?: readonly string[];
-    interstitials?: readonly string[];
-    rewarded?: readonly string[];
-  };
-  attStatus?: string;
+  vendorSdkEnabled?: boolean;
+  logLevel?: string;
+  coppa?: boolean;
+  sdkCoordinates?: Record<string, string>;
+  configuredAdUnitIds?: readonly string[];
+  loadedInterstitialAdUnitIds?: readonly string[];
+  loadedRewardedAdUnitIds?: readonly string[];
+  trackingAuthorizationStatus?: string;
+  runtime?: Record<string, unknown>;
   details?: Record<string, unknown>;
 }
 
@@ -90,8 +91,15 @@ export interface InterstitialAdEventMap {
   impression: void;
 }
 
+export interface RewardPayload {
+  type: string;
+  amount: number;
+}
+
 export interface RewardedAdEventMap extends InterstitialAdEventMap {
-  rewarded: void;
+  rewarded: RewardPayload;
+  completed: void;
+  skipped: void;
 }
 
 export interface VideoAdProps {

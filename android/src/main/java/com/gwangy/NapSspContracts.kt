@@ -16,6 +16,8 @@ internal object NapSspContracts {
     const val EVENT_AD_CLOSED = "onAdClosed"
     const val EVENT_AD_IMPRESSION = "onAdImpression"
     const val EVENT_REWARDED = "onRewarded"
+    const val EVENT_VIDEO_COMPLETED = "onVideoCompleted"
+    const val EVENT_VIDEO_SKIPPED = "onVideoSkipped"
     const val EVENT_STATUS = "napSsp_status"
 
     const val VIEW_EVENT_AD_LOADED = "topAdLoaded"
@@ -43,8 +45,8 @@ internal object NapSspContracts {
         EVENT_AD_CLOSED,
         EVENT_AD_IMPRESSION,
         EVENT_REWARDED,
-        "onVideoCompleted",
-        "onVideoSkipped"
+        EVENT_VIDEO_COMPLETED,
+        EVENT_VIDEO_SKIPPED
     )
 
     fun moduleConstants(moduleName: String): Map<String, Any?> = linkedMapOf(

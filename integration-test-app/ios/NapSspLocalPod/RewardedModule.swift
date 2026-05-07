@@ -109,9 +109,12 @@ class RewardedModule: NSObject {
 
   @objc
   func destroy(_ adUnitId: String) {
-    #if canImport(AdMixerMediation)
-    NapSspRuntime.shared.removeStoredRewardedAd(adUnitId: adUnitId)
-    #endif
+    DispatchQueue.main.async {
+      #if canImport(AdMixerMediation)
+      NapSspRuntime.shared.removeStoredRewardedAd(adUnitId: adUnitId)
+      NapSspRewardedDelegate.instances.removeValue(forKey: adUnitId)
+      #endif
+    }
   }
 }
 

@@ -536,6 +536,10 @@ final class NapSspRuntime {
   func removeStoredInterstitialVideoDelegate(adUnitId: String) {
     stateQueue.sync { storedInterstitialVideoDelegates.removeValue(forKey: adUnitId) }
   }
+
+  func peekStoredInterstitialVideoDelegate(adUnitId: String) -> NSObject? {
+    stateQueue.sync { storedInterstitialVideoDelegates[adUnitId] }
+  }
   #endif
 
   func requestTrackingAuthorization(completion: @escaping (String) -> Void) {

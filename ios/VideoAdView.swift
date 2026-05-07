@@ -215,6 +215,10 @@ private final class NapSspVideoDelegate: NSObject, AMMVideoViewDelegate {
     guard let view = videoView else { return }
     view.onAdClicked?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Video tapped"))
     view.onAdOpened?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Video opened"))
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+      guard let self, let view = self.videoView else { return }
+      view.onAdClosed?(view.eventPayload(adUnitId: self.adUnitId, source: "sdk", message: "Video dismissed"))
+    }
   }
   
   func onCompleteVideo() {

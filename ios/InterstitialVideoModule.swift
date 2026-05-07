@@ -14,13 +14,20 @@ class InterstitialVideoModule: NSObject {
     DispatchQueue.main.async {
       NSLog("[NapSspInterstitialVideo] load requested adUnitId=%@ options=%@", adUnitId, options ?? [:])
       #if canImport(AdMixerMediation)
+      guard NapSspRuntime.shared.isInitialized else {
+        reject(NapSspError.notInitialized.errorCode, NapSspError.notInitialized.errorDescription, nil)
+        return
+      }
       guard let adUnit = Int(adUnitId) else {
         reject("napssp_invalid_ad_unit", "Interstitial video adUnitId must be numeric on iOS.", nil)
         return
       }
 
       AMMVideoInterstitial.load(adUnitID: adUnit) { [weak self] ad, error in
-        guard let _ = self else { return }
+        guard let _ = self else {
+          reject("napssp_module_released", "Module was released during load.", nil)
+          return
+        }
         if let error = error {
           NSLog("[NapSspInterstitialVideo] load failed adUnitId=%@ error=%@", adUnitId, error.localizedDescription)
           let payload = napSspErrorPayload(adUnitId: adUnitId, format: "interstitial_video", error: error)
@@ -73,6 +80,7 @@ class InterstitialVideoModule: NSObject {
 
       let delegate = NapSspInterstitialVideoDelegate(adUnitId: adUnitId)
       delegate.resolve = resolve
+      delegate.reject = reject
       NapSspRuntime.shared.storeInterstitialVideoDelegate(adUnitId: adUnitId, delegate: delegate)
       ad.delegate = delegate
       NSLog("[NapSspInterstitialVideo] calling show on SDK adUnitId=%@ rootVC=%@", adUnitId, String(describing: type(of: rootVC)))
@@ -92,9 +100,17 @@ class InterstitialVideoModule: NSObject {
 
   @objc
   func destroy(_ adUnitId: String) {
-    #if canImport(AdMixerMediation)
-    NapSspRuntime.shared.removeStoredInterstitialVideo(adUnitId: adUnitId)
-    #endif
+    DispatchQueue.main.async {
+      #if canImport(AdMixerMediation)
+      if let delegate = NapSspRuntime.shared.peekStoredInterstitialVideoDelegate(adUnitId: adUnitId) as? NapSspInterstitialVideoDelegate,
+         let pendingReject = delegate.reject {
+        pendingReject("napssp_destroyed", "InterstitialVideo was destroyed before completing.", nil)
+        delegate.resolve = nil
+        delegate.reject = nil
+      }
+      NapSspRuntime.shared.removeStoredInterstitialVideo(adUnitId: adUnitId)
+      #endif
+    }
   }
 }
 
@@ -102,6 +118,7 @@ class InterstitialVideoModule: NSObject {
 private final class NapSspInterstitialVideoDelegate: NSObject, AMMVideoInterstitialDelegate {
   private let adUnitId: String
   var resolve: RCTPromiseResolveBlock?
+  var reject: RCTPromiseRejectBlock?
 
   init(adUnitId: String) { self.adUnitId = adUnitId }
 
@@ -109,12 +126,19 @@ private final class NapSspInterstitialVideoDelegate: NSObject, AMMVideoInterstit
     NSLog("[NapSspInterstitialVideo] delegate success show adUnitId=%@", adUnitId)
     resolve?(nil)
     resolve = nil
+    reject = nil
     NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
     NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
   }
 
   func onCloseVideoInterstitial() {
     NSLog("[NapSspInterstitialVideo] delegate close adUnitId=%@", adUnitId)
+    // resolve가 아직 호출 안 된 경우 (show 성공 콜백 없이 닫힌 경우) reject 처리
+    if let pendingReject = reject {
+      pendingReject("napssp_interstitial_video_show_failed", "InterstitialVideo closed before show succeeded.", nil)
+      reject = nil
+      resolve = nil
+    }
     NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
     NapSspRuntime.shared.removeStoredInterstitialVideoDelegate(adUnitId: adUnitId)
   }
@@ -122,6 +146,11 @@ private final class NapSspInterstitialVideoDelegate: NSObject, AMMVideoInterstit
   func onCompleteVideoInterstitial() {
     NSLog("[NapSspInterstitialVideo] delegate completed adUnitId=%@", adUnitId)
     NapSspModule.shared?.emitEvent(name: "onVideoCompleted", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
+  }
+
+  func onSkipVideoInterstitial() {
+    NSLog("[NapSspInterstitialVideo] delegate skipped adUnitId=%@", adUnitId)
+    NapSspModule.shared?.emitEvent(name: "onVideoSkipped", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
   }
 
   func onTapVideoInterstitialViewMore() {

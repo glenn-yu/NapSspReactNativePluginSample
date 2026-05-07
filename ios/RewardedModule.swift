@@ -26,7 +26,10 @@ class RewardedModule: NSObject {
         customParam = rawParams
       }
       AMMRewardVideo.load(adUnitID: adUnit, customParam: customParam) { [weak self] reward, error in
-        guard let _ = self else { return }
+        guard let _ = self else {
+          reject("napssp_module_released", "Module was released during load.", nil)
+          return
+        }
         if let error = error {
           let errPayload = napSspErrorPayload(adUnitId: adUnitId, format: "rewarded", error: error)
           reject(errPayload["code"] as? String ?? "napssp_rewarded_load_failed", error.localizedDescription, error)
@@ -100,7 +103,7 @@ class RewardedModule: NSObject {
       NapSspModule.shared?.emitEvent(name: "onRewarded", payload: [
         "adUnitId": adUnitId, "format": "rewarded",
         "type": rewardData?["type"] as? String ?? "reward",
-        "amount": rewardData?["amount"] as? Double ?? 1.0
+        "amount": (rewardData?["amount"] as? Int) ?? Int((rewardData?["amount"] as? Double) ?? 1.0)
       ])
       NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: ["adUnitId": adUnitId, "format": "rewarded"])
       #endif
@@ -109,9 +112,12 @@ class RewardedModule: NSObject {
 
   @objc
   func destroy(_ adUnitId: String) {
-    #if canImport(AdMixerMediation)
-    NapSspRuntime.shared.removeStoredRewardedAd(adUnitId: adUnitId)
-    #endif
+    DispatchQueue.main.async {
+      #if canImport(AdMixerMediation)
+      NapSspRuntime.shared.removeStoredRewardedAd(adUnitId: adUnitId)
+      NapSspRewardedDelegate.instances.removeValue(forKey: adUnitId)
+      #endif
+    }
   }
 }
 
@@ -145,6 +151,10 @@ private final class NapSspRewardedDelegate: NSObject, AMMRewardVideoDelegate {
 
   func onRewardVideoComplete() {
     NapSspModule.shared?.emitEvent(name: "onVideoCompleted", payload: ["adUnitId": adUnitId, "format": "rewarded"])
+  }
+
+  func onRewardVideoSkipped() {
+    NapSspModule.shared?.emitEvent(name: "onVideoSkipped", payload: ["adUnitId": adUnitId, "format": "rewarded"])
   }
 
   func onTapRewardVideo() {

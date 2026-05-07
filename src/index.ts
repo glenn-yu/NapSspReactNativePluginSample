@@ -26,4 +26,5 @@ export type {
   NapSspConfig,
   NapSspStatus,
   RewardedAdEventMap,
+  RewardPayload,
 } from './types';
