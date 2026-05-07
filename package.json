@@ -4,10 +4,10 @@
   "description": "React Native plugin for KT Nasmedia nap ssp SDK",
   "author": "gwangy",
   "license": "MIT",
-  "homepage": "https://github.com/glenn-yu/react-native-nap-ssp#readme",
+  "homepage": "https://gwangy.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/glenn-yu/react-native-nap-ssp.git"
+    "url": "git+https://github.com/glenn-yu/NapSspReactNativePluginSample.git"
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
