@@ -1,7 +1,7 @@
 # React Native Nap SSP — 시작 가이드
 
 ![npm](https://img.shields.io/badge/npm-react--native--nap--ssp-red)
-![version](https://img.shields.io/badge/version-0.1.7-blue)
+![version](https://img.shields.io/badge/version-0.1.8-blue)
 ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -223,7 +223,7 @@ function MyScreen() {
 | `BANNER_360x210` | 360 × 210 | AdFit(Kakao) 전용 |
 | `BANNER_WxH` | 임의 크기 | 서버 지정 사이즈 동적 지원 |
 
-> 💡 **`BANNER_WxH` 동적 사이즈 지원 (v0.1.7+)**  
+> 💡 **`BANNER_WxH` 동적 사이즈 지원 (v0.1.8+)**  
 > `size` prop에 `'BANNER_360x230'`처럼 `BANNER_너비x높이` 형식 문자열을 그대로 전달하면 됩니다.  
 > 서버에서 새로운 사이즈를 내려줘도 플러그인 업데이트 없이 자동으로 처리됩니다.
 >
@@ -353,7 +353,7 @@ async function showRewarded() {
 
 ## 7. 디버그 vs 릴리즈 빌드 동작 차이
 
-v0.1.7부터 DEBUG / RELEASE 빌드에 따라 광고 실패 처리 방식이 다릅니다.
+v0.1.8부터 DEBUG / RELEASE 빌드에 따라 광고 실패 처리 방식이 다릅니다.
 
 | 상황 | DEBUG 빌드 | RELEASE 빌드 |
 | :--- | :--- | :--- |
@@ -400,7 +400,7 @@ ProGuard 설정을 확인하세요. → [Step 5](#step-5--proguard-설정-릴리
 | :--- | :--- |
 | **기술 문의** | nap_adx@nasmedia.co.kr |
 | **미디어 키 / 광고 ID 발급** | 나스미디어 파트너 운영팀 |
-| **플러그인 버전** | 0.1.7 |
+| **플러그인 버전** | 0.1.8 |
 | **npm 패키지** | `react-native-nap-ssp` |
 
 ---

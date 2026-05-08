@@ -36,7 +36,7 @@ SDK를 초기화합니다. 앱 시작 시 한 번만 호출하면 됩니다.
 - `size`: (BannerSize) 배너 크기.
   - 사전 정의: `BANNER_320x50`, `BANNER_320x100`, `BANNER_300x250`, `BANNER_320x480`, `LARGE_BANNER`, `MEDIUM_RECTANGLE`, `SMART_BANNER`
   - 어댑터 전용: `BANNER_360x230` (NaverAdManager), `BANNER_360x210` (AdFit/Kakao)
-  - **동적 사이즈 (v0.1.7+)**: `'BANNER_WxH'` 형식 문자열을 그대로 전달 가능. 서버에서 내려온 사이즈를 코드 수정 없이 사용할 수 있습니다.
+  - **동적 사이즈 (v0.1.8+)**: `'BANNER_WxH'` 형식 문자열을 그대로 전달 가능. 서버에서 내려온 사이즈를 코드 수정 없이 사용할 수 있습니다.
 - `onAdLoaded`: () => void. 광고 로드 성공 시 호출.
 - `onAdFailedToLoad`: (error: AdError) => void. 광고 로드 실패 시 호출.
 - `onAdClicked`: () => void. 광고 클릭 시 호출.

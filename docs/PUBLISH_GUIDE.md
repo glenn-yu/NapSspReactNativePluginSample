@@ -54,8 +54,8 @@ npm publish --access public
 ### 3.1 Git 태그 생성
 배포된 버전과 코드 시점을 일치시키기 위해 Git 태그를 생성하고 푸시합니다.
 ```bash
-git tag v0.1.7
-git push origin v0.1.7
+git tag v0.1.8
+git push origin v0.1.8
 ```
 
 ### 3.2 샘플 앱 확인
