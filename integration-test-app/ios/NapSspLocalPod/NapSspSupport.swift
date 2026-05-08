@@ -215,7 +215,8 @@ struct NapSspBannerSize {
       // BANNER_WxH 패턴 동적 파싱 — 새 사이즈 추가 시 코드 수정 불필요
       let parts = normalized.components(separatedBy: "_")
       if parts.count == 2, let dims = parts.last?.components(separatedBy: "X"),
-         dims.count == 2, let w = CGFloat(dims[0]), let h = CGFloat(dims[1]) {
+         dims.count == 2, let w = CGFloat(dims[0]), let h = CGFloat(dims[1]),
+         w > 0, h > 0 {
         return NapSspBannerSize(width: w, height: h)
       }
       return .banner

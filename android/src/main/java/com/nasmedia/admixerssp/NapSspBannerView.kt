@@ -42,9 +42,15 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
 
     var size: String = "BANNER_320x50"
         set(value) {
-            field = value?.trim()?.takeIf { it.isNotEmpty() } ?: "BANNER_320x50"
+            val newSize = value?.trim()?.takeIf { it.isNotEmpty() } ?: "BANNER_320x50"
+            val sizeChanged = newSize != field
+            field = newSize
             updatePlaceholderText()
-            if (adUnitId != null) maybeAutoLoad()
+            if (sizeChanged && currentState == NapSspLoadState.LOADED) {
+                reload()
+            } else if (adUnitId != null) {
+                maybeAutoLoad()
+            }
         }
 
     var autoLoad: Boolean = true
@@ -204,8 +210,8 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
     private fun isSupportedSize(value: String): Boolean {
         return when (value) {
             "LARGE_BANNER", "MEDIUM_RECTANGLE", "SMART_BANNER" -> true
-            // BANNER_WxH 패턴 동적 허용 — 새 사이즈 추가 시 코드 수정 불필요
-            else -> value.matches(Regex("BANNER_\\d+[xX]\\d+"))
+            // BANNER_WxH 패턴 동적 허용 — 0은 유효하지 않은 크기이므로 [1-9]로 시작해야 함
+            else -> value.matches(Regex("BANNER_[1-9]\\d*[xX][1-9]\\d*"))
         }
     }
 

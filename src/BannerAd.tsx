@@ -55,7 +55,11 @@ const KNOWN_DIMENSIONS: Record<string, { width: number; height: number }> = {
 function resolveBannerDimensions(size: string): { width: number; height: number } {
   if (KNOWN_DIMENSIONS[size]) return KNOWN_DIMENSIONS[size]!;
   const match = size.match(/(\d+)[xX](\d+)/);
-  if (match) return { width: Number(match[1]), height: Number(match[2]) };
+  if (match) {
+    const w = Number(match[1]);
+    const h = Number(match[2]);
+    if (w > 0 && h > 0) return { width: w, height: h };
+  }
   return { width: 320, height: 50 };
 }
 
