@@ -34,7 +34,7 @@ React Native 프로젝트에 `react-native-nap-ssp`를 npm으로 설치한 후:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/glenn-yu/react-native-nap-ssp", from: "0.1.6"),
+    .package(url: "https://github.com/glenn-yu/react-native-nap-ssp", from: "0.1.7"),
 ],
 ```
 

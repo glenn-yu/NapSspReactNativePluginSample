@@ -33,7 +33,7 @@
 **A.** 해당 미디에이션 네트워크(예: Pangle)의 별도 설정(Key 입력, SDK 링킹)이 누락되지 않았는지 [Mediation Guide](./MEDIATION_GUIDE.md)를 통해 확인하십시오.
 
 ### Q. 시뮬레이터/디버그 빌드에서 `onAdLoaded`는 오는데 실제 광고 소재가 안 보입니다.
-**A.** 정상 동작입니다. v0.1.6부터 **DEBUG 빌드**에서는 SDK 광고 로드 실패 시 `onAdFailedToLoad` 대신 플레이스홀더 `onAdLoaded` 이벤트를 발행합니다. 이는 시뮬레이터 환경에서도 RN 이벤트 파이프라인을 테스트할 수 있게 하기 위한 것입니다.  
+**A.** 정상 동작입니다. v0.1.7부터 **DEBUG 빌드**에서는 SDK 광고 로드 실패 시 `onAdFailedToLoad` 대신 플레이스홀더 `onAdLoaded` 이벤트를 발행합니다. 이는 시뮬레이터 환경에서도 RN 이벤트 파이프라인을 테스트할 수 있게 하기 위한 것입니다.  
 이벤트 payload의 `source` 필드로 구분할 수 있습니다.
 - `source: "placeholder"`, `"debug-no-fill"`, `"debug-sdk-timeout"` 등 → 플레이스홀더 (디버그 전용)
 - `source` 없음 → 실제 광고

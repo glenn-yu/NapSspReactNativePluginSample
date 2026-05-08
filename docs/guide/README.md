@@ -3,7 +3,7 @@
 > **KT 나스미디어 Nap SSP SDK** × **React Native** 공식 플러그인 — Android / iOS 통합 광고 연동 가이드
 
 ![npm](https://img.shields.io/badge/npm-react--native--nap--ssp-red)
-![version](https://img.shields.io/badge/version-0.1.6-blue)
+![version](https://img.shields.io/badge/version-0.1.7-blue)
 ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey)
 ![RN](https://img.shields.io/badge/React%20Native-0.72%2B-61DAFB)
 ![License](https://img.shields.io/badge/license-MIT-green)

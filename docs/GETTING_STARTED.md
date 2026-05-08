@@ -1,7 +1,7 @@
 # React Native Nap SSP — 시작 가이드
 
 ![npm](https://img.shields.io/badge/npm-react--native--nap--ssp-red)
-![version](https://img.shields.io/badge/version-0.1.6-blue)
+![version](https://img.shields.io/badge/version-0.1.7-blue)
 ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -210,20 +210,25 @@ function MyScreen() {
 }
 ```
 
-| 사이즈 상수 | 크기 | 지원 어댑터 |
+| 사이즈 상수 | 크기 | 비고 |
 | :--- | :--- | :--- |
-| `BANNER_320x50` | 320 × 50 | 전체 |
-| `BANNER_320x100` | 320 × 100 | 전체 |
-| `BANNER_300x250` | 300 × 250 (중형 직사각형) | 전체 |
-| `BANNER_320x480` | 320 × 480 | 전체 |
-| `LARGE_BANNER` | 320 × 100 (대형 배너) | 전체 |
-| `MEDIUM_RECTANGLE` | 300 × 250 (미디엄 직사각형) | 전체 |
-| `SMART_BANNER` | 화면 너비에 맞게 자동 조절 | 전체 |
-| `BANNER_360x230` | 360 × 230 | NaverAdManager (AdManager) 전용 |
-| `BANNER_360x210` | 360 × 210 | AdFit (Kakao) 전용 |
+| `BANNER_320x50` | 320 × 50 | 기본 배너 |
+| `BANNER_320x100` | 320 × 100 | |
+| `BANNER_300x250` | 300 × 250 | 중형 직사각형 |
+| `BANNER_320x480` | 320 × 480 | |
+| `LARGE_BANNER` | 320 × 100 | 대형 배너 |
+| `MEDIUM_RECTANGLE` | 300 × 250 | 미디엄 직사각형 |
+| `SMART_BANNER` | 화면 너비 자동 조절 | |
+| `BANNER_360x230` | 360 × 230 | NaverAdManager(AdManager) 전용 |
+| `BANNER_360x210` | 360 × 210 | AdFit(Kakao) 전용 |
+| `BANNER_WxH` | 임의 크기 | 서버 지정 사이즈 동적 지원 |
 
-> ⚠️ `BANNER_360x230` / `BANNER_360x210` 은 해당 미디에이션 어댑터가 등록된 경우에만 광고가 정상 노출됩니다.  
-> Android는 `style` prop의 `width`/`height`를 사이즈에 맞게 직접 지정하세요. iOS는 SDK 프레임이 자동으로 설정됩니다.
+> 💡 **`BANNER_WxH` 동적 사이즈 지원 (v0.1.7+)**  
+> `size` prop에 `'BANNER_360x230'`처럼 `BANNER_너비x높이` 형식 문자열을 그대로 전달하면 됩니다.  
+> 서버에서 새로운 사이즈를 내려줘도 플러그인 업데이트 없이 자동으로 처리됩니다.
+>
+> ⚠️ 어댑터 전용 사이즈(`BANNER_360x230`, `BANNER_360x210`)는 해당 미디에이션 어댑터가 등록된 경우에만 광고가 노출됩니다.  
+> Android는 `style` prop의 `width`/`height`도 사이즈에 맞게 지정하세요. iOS는 SDK 프레임이 자동 설정됩니다.
 
 ---
 
@@ -348,7 +353,7 @@ async function showRewarded() {
 
 ## 7. 디버그 vs 릴리즈 빌드 동작 차이
 
-v0.1.6부터 DEBUG / RELEASE 빌드에 따라 광고 실패 처리 방식이 다릅니다.
+v0.1.7부터 DEBUG / RELEASE 빌드에 따라 광고 실패 처리 방식이 다릅니다.
 
 | 상황 | DEBUG 빌드 | RELEASE 빌드 |
 | :--- | :--- | :--- |
@@ -395,7 +400,7 @@ ProGuard 설정을 확인하세요. → [Step 5](#step-5--proguard-설정-릴리
 | :--- | :--- |
 | **기술 문의** | nap_adx@nasmedia.co.kr |
 | **미디어 키 / 광고 ID 발급** | 나스미디어 파트너 운영팀 |
-| **플러그인 버전** | 0.1.6 |
+| **플러그인 버전** | 0.1.7 |
 | **npm 패키지** | `react-native-nap-ssp` |
 
 ---

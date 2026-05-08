@@ -69,10 +69,10 @@ NapSspAd.initialize({
 
 일부 어댑터는 표준 사이즈 외에 전용 배너 사이즈를 지원합니다.
 
-| 어댑터 | 전용 배너 사이즈 | 상수 |
+| 어댑터 | 전용 배너 사이즈 | `size` prop 값 |
 | :--- | :--- | :--- |
-| NaverAdManager (AdManager) | 360 × 230 | `BANNER_360x230` |
-| AdFit (Kakao) | 360 × 210 | `BANNER_360x210` |
+| NaverAdManager (AdManager) | 360 × 230 | `'BANNER_360x230'` |
+| AdFit (Kakao) | 360 × 210 | `'BANNER_360x210'` |
 
 ```tsx
 // NaverAdManager 전용 배너
@@ -93,6 +93,23 @@ NapSspAd.initialize({
 > 💡 Android는 `style`의 `width`/`height`로 뷰 크기를 제어합니다.  
 > iOS는 `size` prop 값으로 SDK 프레임이 자동 설정됩니다.  
 > 해당 어댑터가 등록되지 않은 경우 광고가 노출되지 않습니다.
+
+### BANNER_WxH 동적 사이즈 (v0.1.7+)
+
+`size` prop은 `'BANNER_너비x높이'` 형식 문자열을 그대로 받아 동적으로 처리합니다.  
+서버에서 사이즈를 내려주는 구조라면 플러그인 업데이트 없이 바로 사용 가능합니다.
+
+```tsx
+// 서버에서 받은 사이즈를 그대로 전달
+const bannerSize = serverResponse.size; // e.g. "BANNER_360x230"
+const [width, height] = bannerSize.replace('BANNER_', '').split('x').map(Number);
+
+<BannerAd
+  adUnitId="YOUR_AD_UNIT_ID"
+  size={bannerSize}
+  style={{ width, height }}
+/>
+```
 
 ---
 
