@@ -1,5 +1,9 @@
 appId: com.integrationtestapp
 ---
+- launchApp:
+    appId: com.integrationtestapp
+    stopApp: true
+    clearState: true
 - runFlow:
     when:
       visible: "허용"
