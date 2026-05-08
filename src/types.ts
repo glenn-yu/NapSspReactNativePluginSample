@@ -7,7 +7,9 @@ export type BannerSize =
   | 'BANNER_320x480'
   | 'LARGE_BANNER'
   | 'MEDIUM_RECTANGLE'
-  | 'SMART_BANNER';
+  | 'SMART_BANNER'
+  | 'BANNER_360x230'   // NaverAdManager(AdManager) 전용
+  | 'BANNER_360x210';  // AdFit(Kakao) 전용
 
 export interface NativeAdProps {
   adUnitId: string;

@@ -210,15 +210,20 @@ function MyScreen() {
 }
 ```
 
-| 사이즈 상수 | 크기 |
-| :--- | :--- |
-| `BANNER_320x50` | 320 × 50 (기본 배너) |
-| `BANNER_320x100` | 320 × 100 |
-| `BANNER_300x250` | 300 × 250 (중형 직사각형) |
-| `BANNER_320x480` | 320 × 480 |
-| `LARGE_BANNER` | 320 × 100 (대형 배너) |
-| `MEDIUM_RECTANGLE` | 300 × 250 (미디엄 직사각형) |
-| `SMART_BANNER` | 화면 너비에 맞게 자동 조절 |
+| 사이즈 상수 | 크기 | 지원 어댑터 |
+| :--- | :--- | :--- |
+| `BANNER_320x50` | 320 × 50 | 전체 |
+| `BANNER_320x100` | 320 × 100 | 전체 |
+| `BANNER_300x250` | 300 × 250 (중형 직사각형) | 전체 |
+| `BANNER_320x480` | 320 × 480 | 전체 |
+| `LARGE_BANNER` | 320 × 100 (대형 배너) | 전체 |
+| `MEDIUM_RECTANGLE` | 300 × 250 (미디엄 직사각형) | 전체 |
+| `SMART_BANNER` | 화면 너비에 맞게 자동 조절 | 전체 |
+| `BANNER_360x230` | 360 × 230 | NaverAdManager (AdManager) 전용 |
+| `BANNER_360x210` | 360 × 210 | AdFit (Kakao) 전용 |
+
+> ⚠️ `BANNER_360x230` / `BANNER_360x210` 은 해당 미디에이션 어댑터가 등록된 경우에만 광고가 정상 노출됩니다.  
+> Android는 `style` prop의 `width`/`height`를 사이즈에 맞게 직접 지정하세요. iOS는 SDK 프레임이 자동으로 설정됩니다.
 
 ---
 

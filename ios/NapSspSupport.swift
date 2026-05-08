@@ -199,6 +199,8 @@ struct NapSspBannerSize {
   static let largeBanner = NapSspBannerSize(width: 320, height: 100)
   static let banner320x480 = NapSspBannerSize(width: 320, height: 480)
   static let smartBanner = NapSspBannerSize(width: 320, height: 50)
+  static let banner360x230 = NapSspBannerSize(width: 360, height: 230)  // NaverAdManager(AdManager) 전용
+  static let banner360x210 = NapSspBannerSize(width: 360, height: 210)  // AdFit(Kakao) 전용
 
   static func parse(_ rawValue: String?) -> NapSspBannerSize {
     switch rawValue?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() {
@@ -210,6 +212,10 @@ struct NapSspBannerSize {
       return .banner320x480
     case "SMART_BANNER":
       return .smartBanner
+    case "BANNER_360X230":
+      return .banner360x230
+    case "BANNER_360X210":
+      return .banner360x210
     default:
       return .banner
     }

@@ -48,6 +48,8 @@ const FALLBACK_DIMENSIONS: Record<BannerSize, { width: number; height: number }>
   LARGE_BANNER: { width: 320, height: 100 },
   MEDIUM_RECTANGLE: { width: 300, height: 250 },
   SMART_BANNER: { width: 320, height: 50 },
+  BANNER_360x230: { width: 360, height: 230 }, // NaverAdManager(AdManager) 전용
+  BANNER_360x210: { width: 360, height: 210 }, // AdFit(Kakao) 전용
 };
 
 function resolveNativeBannerComponent(): React.ComponentType<NativeBannerProps> | null {

@@ -34,7 +34,9 @@ SDK를 초기화합니다. 앱 시작 시 한 번만 호출하면 됩니다.
 ### Props
 - `adUnitId`: (string) 광고 단위 ID.
 - `size`: (BannerSize) 배너 크기.
-  - `BANNER_320x50`, `BANNER_320x100`, `BANNER_300x250`, `BANNER_320x480`, `LARGE_BANNER`, `MEDIUM_RECTANGLE`, `SMART_BANNER`.
+  - `BANNER_320x50`, `BANNER_320x100`, `BANNER_300x250`, `BANNER_320x480`, `LARGE_BANNER`, `MEDIUM_RECTANGLE`, `SMART_BANNER`
+  - `BANNER_360x230` — NaverAdManager(AdManager) 전용
+  - `BANNER_360x210` — AdFit(Kakao) 전용
 - `onAdLoaded`: () => void. 광고 로드 성공 시 호출.
 - `onAdFailedToLoad`: (error: AdError) => void. 광고 로드 실패 시 호출.
 - `onAdClicked`: () => void. 광고 클릭 시 호출.
