@@ -1,5 +1,6 @@
 export type LogLevel = 'verbose' | 'debug' | 'info' | 'warn' | 'error' | 'none';
 
+// 자주 쓰는 사이즈는 자동완성 제공, 그 외 'BANNER_WxH' 형식 문자열도 허용
 export type BannerSize =
   | 'BANNER_320x50'
   | 'BANNER_320x100'
@@ -8,8 +9,7 @@ export type BannerSize =
   | 'LARGE_BANNER'
   | 'MEDIUM_RECTANGLE'
   | 'SMART_BANNER'
-  | 'BANNER_360x230'   // NaverAdManager(AdManager) 전용
-  | 'BANNER_360x210';  // AdFit(Kakao) 전용
+  | (string & {});
 
 export interface NativeAdProps {
   adUnitId: string;

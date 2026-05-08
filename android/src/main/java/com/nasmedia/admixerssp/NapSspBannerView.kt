@@ -203,12 +203,9 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
 
     private fun isSupportedSize(value: String): Boolean {
         return when (value) {
-            "BANNER_320x50", "BANNER_320x100", "BANNER_300x250", "BANNER_320x480",
-            "LARGE_BANNER", "MEDIUM_RECTANGLE", "SMART_BANNER",
-            "BANNER_360x230",  // NaverAdManager(AdManager) 전용
-            "BANNER_360x210"   // AdFit(Kakao) 전용
-            -> true
-            else -> false
+            "LARGE_BANNER", "MEDIUM_RECTANGLE", "SMART_BANNER" -> true
+            // BANNER_WxH 패턴 동적 허용 — 새 사이즈 추가 시 코드 수정 불필요
+            else -> value.matches(Regex("BANNER_\\d+[xX]\\d+"))
         }
     }
 

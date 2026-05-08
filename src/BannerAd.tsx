@@ -40,17 +40,24 @@ type NativeBannerProps = Omit<
   style?: StyleProp<ViewStyle>;
 };
 
-const FALLBACK_DIMENSIONS: Record<BannerSize, { width: number; height: number }> = {
-  BANNER_320x50: { width: 320, height: 50 },
-  BANNER_320x100: { width: 320, height: 100 },
-  BANNER_300x250: { width: 300, height: 250 },
-  BANNER_320x480: { width: 320, height: 480 },
-  LARGE_BANNER: { width: 320, height: 100 },
-  MEDIUM_RECTANGLE: { width: 300, height: 250 },
-  SMART_BANNER: { width: 320, height: 50 },
-  BANNER_360x230: { width: 360, height: 230 }, // NaverAdManager(AdManager) 전용
-  BANNER_360x210: { width: 360, height: 210 }, // AdFit(Kakao) 전용
+const KNOWN_DIMENSIONS: Record<string, { width: number; height: number }> = {
+  BANNER_320x50:     { width: 320, height: 50 },
+  BANNER_320x100:    { width: 320, height: 100 },
+  BANNER_300x250:    { width: 300, height: 250 },
+  BANNER_320x480:    { width: 320, height: 480 },
+  LARGE_BANNER:      { width: 320, height: 100 },
+  MEDIUM_RECTANGLE:  { width: 300, height: 250 },
+  SMART_BANNER:      { width: 320, height: 50 },
 };
+
+// 'BANNER_WxH' 패턴을 동적으로 파싱해 치수를 반환한다.
+// 서버에서 새로운 사이즈를 내려줘도 코드 수정 없이 동작한다.
+function resolveBannerDimensions(size: string): { width: number; height: number } {
+  if (KNOWN_DIMENSIONS[size]) return KNOWN_DIMENSIONS[size]!;
+  const match = size.match(/(\d+)[xX](\d+)/);
+  if (match) return { width: Number(match[1]), height: Number(match[2]) };
+  return { width: 320, height: 50 };
+}
 
 function resolveNativeBannerComponent(): React.ComponentType<NativeBannerProps> | null {
   for (const componentName of NativeModuleNames.banner) {
@@ -68,7 +75,7 @@ const NativeBannerComponent = resolveNativeBannerComponent();
 
 export default function BannerAd(props: BannerAdProps) {
   const size = props.size ?? 'BANNER_320x50';
-  const dimensions = FALLBACK_DIMENSIONS[size];
+  const dimensions = resolveBannerDimensions(size);
 
   // Merge default dimensions with user-provided styles.
   const containerStyle = [

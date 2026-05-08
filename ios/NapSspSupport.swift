@@ -199,11 +199,10 @@ struct NapSspBannerSize {
   static let largeBanner = NapSspBannerSize(width: 320, height: 100)
   static let banner320x480 = NapSspBannerSize(width: 320, height: 480)
   static let smartBanner = NapSspBannerSize(width: 320, height: 50)
-  static let banner360x230 = NapSspBannerSize(width: 360, height: 230)  // NaverAdManager(AdManager) 전용
-  static let banner360x210 = NapSspBannerSize(width: 360, height: 210)  // AdFit(Kakao) 전용
 
   static func parse(_ rawValue: String?) -> NapSspBannerSize {
-    switch rawValue?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() {
+    let normalized = rawValue?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() ?? ""
+    switch normalized {
     case "MEDIUM_RECTANGLE", "MREC", "300X250", "BANNER_300X250":
       return .mediumRectangle
     case "LARGE_BANNER", "320X100", "BANNER_320X100":
@@ -212,11 +211,13 @@ struct NapSspBannerSize {
       return .banner320x480
     case "SMART_BANNER":
       return .smartBanner
-    case "BANNER_360X230":
-      return .banner360x230
-    case "BANNER_360X210":
-      return .banner360x210
     default:
+      // BANNER_WxH 패턴 동적 파싱 — 새 사이즈 추가 시 코드 수정 불필요
+      let parts = normalized.components(separatedBy: "_")
+      if parts.count == 2, let dims = parts.last?.components(separatedBy: "X"),
+         dims.count == 2, let w = CGFloat(dims[0]), let h = CGFloat(dims[1]) {
+        return NapSspBannerSize(width: w, height: h)
+      }
       return .banner
     }
   }
