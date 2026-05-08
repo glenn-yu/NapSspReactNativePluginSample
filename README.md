@@ -1,8 +1,8 @@
-# React Native Nap SSP 플러그인 (v0.1.5)
+# React Native Nap SSP 플러그인 (v0.1.6)
 
 KT Nasmedia Nap SSP SDK를 React Native에서 쓰기 위한 플러그인입니다.
 
-- 버전: `0.1.5`
+- 버전: `0.1.6`
 - 지원 목표: Android / iOS
 - 제공 형태: Native Module + Native View
 - 현재 중심 기능: 초기화, 배너, 전면, 전면 동영상, 리워드, 네이티브, 비디오
