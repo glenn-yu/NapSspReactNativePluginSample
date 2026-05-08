@@ -1,4 +1,4 @@
-package com.gwangy
+package com.nasmedia.admixerssp
 
 internal object NapSspContracts {
     const val MODULE_NAME = "NapSspModule"

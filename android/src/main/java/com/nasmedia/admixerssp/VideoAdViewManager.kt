@@ -1,4 +1,4 @@
-package com.gwangy
+package com.nasmedia.admixerssp
 
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext

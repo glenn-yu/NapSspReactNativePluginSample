@@ -1,4 +1,4 @@
-package com.gwangy
+package com.nasmedia.admixerssp
 
 import android.content.pm.ApplicationInfo
 import android.util.Log

@@ -33,7 +33,7 @@ def napSspSdkCoordinates = [
 ]
 
 android {
-    namespace 'com.gwangy'
+    namespace 'com.nasmedia.admixerssp'
     compileSdk 34
 
     defaultConfig {
