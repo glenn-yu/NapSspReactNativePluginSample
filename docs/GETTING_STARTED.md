@@ -37,7 +37,7 @@
 | Android minSdk | 21 이상 |
 | Android targetSdk | 34 이상 권장 |
 | Android JDK | 17 |
-| iOS | 13.0 이상 |
+| iOS | 14.0 이상 |
 | Xcode | 15.3 이상 |
 | **미디어 키 (Media Key)** | 나스미디어 파트너 운영팀 발급 |
 | **광고 단위 ID (Ad Unit ID)** | 나스미디어 파트너 운영팀 발급 |
@@ -136,7 +136,7 @@ class MainApplication : Application(), ReactApplication {
 `ios/Podfile`:
 
 ```ruby
-platform :ios, '13.0'
+platform :ios, '14.0'
 
 target 'YourAppName' do
   use_frameworks!
