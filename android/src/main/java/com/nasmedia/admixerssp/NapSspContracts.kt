@@ -62,6 +62,8 @@ internal object NapSspContracts {
             "pangle" to BuildConfig.NAP_SSP_PANGLE_COORDINATE,
             "appLovin" to BuildConfig.NAP_SSP_APP_LOVIN_COORDINATE,
             "unity" to BuildConfig.NAP_SSP_UNITY_COORDINATE,
+            "naverAdManager" to BuildConfig.NAP_SSP_NAVER_AD_MANAGER_COORDINATE,
+            "teads" to BuildConfig.NAP_SSP_TEADS_COORDINATE,
             "adsIdentifier" to BuildConfig.NAP_SSP_ADS_IDENTIFIER_COORDINATE,
         ),
     )
@@ -88,6 +90,8 @@ internal object NapSspContracts {
             "pangle" to BuildConfig.NAP_SSP_PANGLE_COORDINATE,
             "appLovin" to BuildConfig.NAP_SSP_APP_LOVIN_COORDINATE,
             "unity" to BuildConfig.NAP_SSP_UNITY_COORDINATE,
+            "naverAdManager" to BuildConfig.NAP_SSP_NAVER_AD_MANAGER_COORDINATE,
+            "teads" to BuildConfig.NAP_SSP_TEADS_COORDINATE,
             "adsIdentifier" to BuildConfig.NAP_SSP_ADS_IDENTIFIER_COORDINATE,
         ),
         "runtime" to runtimeState,

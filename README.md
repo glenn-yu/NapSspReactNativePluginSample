@@ -1,45 +1,53 @@
-# React Native Nap SSP 플러그인 (v0.1.8)
+# React Native Nap SSP Plugin (v0.2.0)
 
-KT Nasmedia Nap SSP SDK를 React Native에서 쓰기 위한 플러그인입니다.
+> 🇰🇷 한국어와 🇺🇸 English 를 한 문서에 함께 제공합니다. / This document is bilingual (Korean + English).
 
-- 버전: `0.1.8`
-- 지원 목표: Android / iOS
-- 제공 형태: Native Module + Native View
-- 현재 중심 기능: 초기화, 배너, 전면, 전면 동영상, 리워드, 네이티브, 비디오
-- 현재 미지원: Bizboard 전용 RN surface
-- 예제 앱은 위 주요 흐름을 모두 커버하면서, 네이티브 브릿지 없이도 화면이 렌더되는 플레이스홀더 모드도 보여줍니다.
+KT Nasmedia **nap mx (AdMixer SSP) SDK** 를 React Native 에서 사용하기 위한 플러그인입니다.
+A React Native plugin that wraps the KT Nasmedia **nap mx (AdMixer SSP) SDK**.
 
-## 📱 Compatibility (호환성)
+- 버전 / Version: `0.2.0`
+- 지원 플랫폼 / Platforms: Android · iOS
+- 제공 형태 / Surface: Native Module + Native View
+- 지원 포맷 / Formats: 초기화·배너·전면·전면 동영상·리워드·네이티브·인라인 비디오 / init, banner, interstitial, interstitial-video, rewarded, native, inline video
+- 미지원 / Not yet: Bizboard 전용 RN surface / dedicated Bizboard RN surface
 
-| 환경 | 지원 범위 |
-| :--- | :--- |
-| **React Native** | `>= 0.72.0` |
-| **Android** | `minSdkVersion 21`, `targetSdkVersion 34+` |
-| **iOS** | `iOS 14.0+` |
-| **Architecture** | Old Architecture 전용 (New Architecture 지원 예정) |
+> **v0.2.0 핵심 / Highlights**
+> - Android 벤더 SDK **v1.x → v2.0.0** 마이그레이션 / migrated the Android vendor SDK from v1.x to **v2.0.0**.
+> - iOS 벤더 SDK **2.3.3 → 2.3.7**.
+> - **NaverAdManager·Teads** 미디에이션 추가(Teads 는 Android 전용) / added **NaverAdManager & Teads** mediation (Teads = Android only).
+> - 전면 광고 **Basic 전용**(popup/countDown 제거), `registerAdapter()` 자동화 / interstitial is now **Basic-only** and adapters auto-register.
+> - ⚠️ 대부분의 네이티브 변경은 플러그인이 내부에서 흡수하므로 **앱 코드 변경은 거의 없습니다**. / Most native changes are absorbed internally, so **app code rarely needs changes** — see [Migration Guide](./docs/MIGRATION_GUIDE.md).
 
 ---
 
-## 가장 먼저 할 일
+## 📱 호환성 (Compatibility)
 
-1. 패키지 설치
-2. Android/iOS 네이티브 설정 추가
-3. `NapSspAd.initialize()` 호출
-4. `BannerAd` 또는 `InterstitialAd`부터 확인
+| 항목 / Item | 지원 범위 / Support |
+| :--- | :--- |
+| **React Native** | `>= 0.72.0` |
+| **Android** | `minSdkVersion 21`, `targetSdkVersion 34+` (어댑터에 따라 23/24 필요 / some adapters require 23/24) |
+| **iOS** | `iOS 14.0+`, Xcode 15.3+ |
+| **Architecture** | Old Architecture 전용 / Old Architecture only (New Architecture 예정 / planned) |
+
+---
+
+## 🚀 시작하기 (Getting Started)
+
+설치 / Install:
 
 ```bash
 npm install react-native-nap-ssp
-# 또는
+# 또는 / or
 yarn add react-native-nap-ssp
 ```
 
-> 권장: React Native 0.72 이상
+순서 / Steps:
+1. 패키지 설치 / install the package
+2. Android·iOS 네이티브 설정 추가 / add the native setup below
+3. `NapSspAd.initialize()` 호출 / call `NapSspAd.initialize()`
+4. `BannerAd` 또는 `InterstitialAd` 부터 확인 / try `BannerAd` or `InterstitialAd` first
 
----
-
-## 5분 안에 실행하기
-
-### 1) 앱 시작 시 초기화
+### 1) 초기화 / Initialize (앱 시작 시 1회 / once at app start)
 
 ```tsx
 import React, { useEffect } from 'react';
@@ -48,318 +56,232 @@ import { NapSspAd } from 'react-native-nap-ssp';
 export default function App() {
   useEffect(() => {
     NapSspAd.initialize({
-      mediaKey: '발급받은_MEDIA_KEY',
-      adUnitIds: [
-        'BANNER_ID',
-        'INTER_ID',
-        'REWARD_ID',
-        'NATIVE_ID',
-        'VIDEO_ID',
-        'INTER_VIDEO_ID',
-      ],
+      mediaKey: '발급받은_MEDIA_KEY',           // issued media key
+      adUnitIds: ['BANNER_ID', 'INTER_ID', 'REWARD_ID', 'NATIVE_ID', 'VIDEO_ID', 'INTER_VIDEO_ID'],
       logLevel: 'debug',
+      // 선택: 사용할 미디에이션만 / optional: enable only the mediations you use
+      mediations: {
+        adFit: true,
+        naverAdManager: true,  // v2.0.0+
+        teads: true,           // v2.0.0+ (Android only)
+      },
     });
   }, []);
-
   return null;
 }
 ```
 
-### 2) 배너 하나 띄우기
+### 2) 배너 / Banner
 
 ```tsx
-import React from 'react';
 import { BannerAd } from 'react-native-nap-ssp';
 
-export default function Screen() {
-  return <BannerAd adUnitId="BANNER_ID" size="BANNER_320x50" />;
-}
+<BannerAd adUnitId="BANNER_ID" size="BANNER_320x50" />;
 ```
 
-### 3) 전면 광고 띄우기
+### 3) 전면 / Interstitial
 
 ```tsx
 import { InterstitialAd } from 'react-native-nap-ssp';
 
-const interstitial = new InterstitialAd('INTER_ID');
+const interstitial = new InterstitialAd('INTER_ID'); // v2: Basic 전용 / Basic-only
 await interstitial.load();
 await interstitial.show();
 ```
 
 ---
 
-## ⚙️ 네이티브 필수 설정
+## ⚙️ 네이티브 필수 설정 (Native Setup)
 
-광고 SDK가 정상적으로 작동하려면 플랫폼별 필수 설정이 필요합니다.
+광고 SDK 동작을 위해 플랫폼별 설정이 필요합니다. / Platform-specific setup is required for the ad SDK to work.
 
-### 🤖 Android (안드로이드)
+### 🤖 Android
 
-`android/build.gradle` (프로젝트 루트 수준)에 아래 리포지토리를 추가하세요.
+프로젝트 루트 `android/build.gradle` 의 저장소 / Repositories in root `android/build.gradle`:
 
 ```gradle
 allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://devrepo.kakao.com/nexus/content/groups/public/" }
-        maven { url "https://artifact.bytedance.com/repository/pangle" }
+        maven { url "https://devrepo.kakao.com/nexus/content/groups/public/" } // AdFit
+        maven { url "https://artifact.bytedance.com/repository/pangle/" }       // Pangle
+        // Teads 사용 시 / when using Teads
+        maven { url "https://sdk.teads.tv/android/repo" }
+        maven { url "https://teads.jfrog.io/artifactory/SDKAndroid-maven-prod" }
     }
 }
 ```
 
-`android/app/build.gradle` 파일의 `dependencies`에 아래 내용을 추가하세요.
+`android/app/build.gradle` 의 `dependencies` / dependencies in `android/app/build.gradle`:
 
 ```gradle
 dependencies {
-    // (필수) Nap SSP SDK 본체
-    implementation 'io.github.nasmedia-tech:admixer-ssp:1.0.23'
-    implementation 'com.google.android.gms:play-services-ads-identifier:18.3.0'
+    // (필수 / required) nap mx Core
+    implementation 'io.github.nasmedia-tech:admixer-ssp:2.0.0'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.2.0'
 
-    // (선택) 미디에이션 어댑터 (원하는 네트워크만 추가)
-    implementation 'io.github.nasmedia-tech:admixer-admanager:1.0.15_delta'
-    implementation 'io.github.nasmedia-tech:admixer-adfit:1.0.12_beta'
-    implementation 'io.github.nasmedia-tech:admixer-pangle:1.0.12_beta'
-    implementation 'io.github.nasmedia-tech:admixer-applovin:1.0.10_beta'
-    implementation 'io.github.nasmedia-tech:admixer-unity:1.0.7_beta'
+    // (선택 / optional) 사용하는 미디에이션만 추가 / add only the mediations you use
+    implementation 'io.github.nasmedia-tech:admixer-admanager:2.0.0'      // Google AdManager
+    implementation 'io.github.nasmedia-tech:admixer-adfit:2.0.0'          // Kakao AdFit
+    implementation 'io.github.nasmedia-tech:admixer-pangle:2.0.0'         // Pangle
+    implementation 'io.github.nasmedia-tech:admixer-applovin:2.0.0'       // AppLovin
+    implementation 'io.github.nasmedia-tech:admixer-unity:2.0.0'          // Unity Ads
+    implementation 'io.github.nasmedia-tech:admixer-naveradmanager:2.0.0' // Naver Ad Manager (신규 / new)
+    implementation 'io.github.nasmedia-tech:admixer-teads:2.0.0'          // Teads (신규 / new)
 }
 ```
 
-### 🍎 iOS (아이폰)
+> ℹ️ **v2.0.0 변경 / changes**
+> - `registerAdapter()` 수동 호출 불필요 — `initialize()` 시 자동 등록. / No manual `registerAdapter()`; adapters auto-register on `initialize()`.
+> - Google AdManager 사용 시 `play-services-ads` 는 **25.2.0 상한** 권장(25.3.0+ 비호환). / Pin `play-services-ads` to **≤ 25.2.0** when using AdManager.
+> - 어댑터별 최소 Android API: Core/AdFit/Teads = 21, AdManager/Pangle/Unity/NaverAdManager = 23, AppLovin = 24. / Per-adapter minimum Android API.
+> 자세한 내용 / details: [Android Setup](./docs/ANDROID_SETUP.md) · [Mediation Guide](./docs/MEDIATION_GUIDE.md)
 
-iOS 환경에서는 **CocoaPods**와 **SPM(Swift Package Manager)** 두 가지 방식을 모두 지원합니다.
+### 🍎 iOS
 
-#### 옵션 A: CocoaPods 사용 (React Native 기본 권장)
+CocoaPods 와 SPM 둘 다 지원합니다. / Both CocoaPods and SPM are supported.
 
-`ios/Podfile` 파일에 아래 내용을 추가하고 `pod install`을 실행하세요.
+#### 옵션 A: CocoaPods
 
 ```ruby
-# (필수) Nap SSP SDK 본체
-pod 'AdMixerMediation'
+# (필수 / required)
+pod 'AdMixerMediation'             # 2.3.7 (버전 미고정 시 최신 / latest when unpinned)
 
-# (선택) 미디에이션 어댑터
-pod 'AdMixerMediationGAM'      # Google AdManager
-pod 'AdMixerMediationAdFit'    # Kakao AdFit
-pod 'AdMixerMediationPangle'   # Pangle
-pod 'AdMixerMediationAppLovin' # AppLovin
-pod 'AdMixerMediationUnityAds' # Unity Ads
+# (선택 / optional)
+pod 'AdMixerMediationGAM'          # Google AdManager
+pod 'AdMixerMediationAdFit'        # Kakao AdFit
+pod 'AdMixerMediationPangle'       # Pangle
+pod 'AdMixerMediationAppLovin'     # AppLovin
+pod 'AdMixerMediationUnityAds'     # Unity Ads
+pod 'AdMixerMediationNAM'          # Naver Ad Manager (신규 / new)
 ```
 
-#### 옵션 B: SPM (Swift Package Manager) 사용
+그 후 / then: `cd ios && pod install`
 
-Xcode를 열고 다음 단계를 진행합니다.
+#### 옵션 B: SPM (Swift Package Manager)
 
-1. `File` → `Add Packages...` 선택
-2. 로컬 패키지 추가: `node_modules/react-native-nap-ssp/ios` 폴더 선택
-3. AdMixerMediation XCFramework (v2.3.3)가 `ios/Package.swift`에 정의되어 있으며 자동으로 포함됩니다.
+1. Xcode → `File` → `Add Packages...`
+2. 로컬 패키지 추가 / add local package: `node_modules/react-native-nap-ssp/ios`
+3. AdMixerMediation XCFramework **2.3.7** 가 `ios/Package.swift` 에 정의되어 자동 포함됩니다. / The AdMixerMediation XCFramework **2.3.7** is declared in `ios/Package.swift` and included automatically.
+
+> ℹ️ iOS 에는 **Teads 어댑터가 없습니다.** / There is **no Teads adapter on iOS.** 자세히 / details: [iOS Setup](./docs/IOS_SETUP.md) · [SPM Guide](./docs/SPM_GUIDE.md)
 
 ---
 
-## 💻 사용 가이드
+## 💻 사용 가이드 (Usage)
 
-앱에서 광고를 띄우려면 **"1. 초기화 → 2. 화면에 표시"** 딱 2단계만 거치면 됩니다.
+광고는 **"1. 초기화 → 2. 표시"** 2단계입니다. / Ads are a two-step flow: **initialize → show**.
 
-### ✅ 1단계: SDK 초기화 (앱 시작 시 1번만)
-
-```tsx
-import React, { useEffect } from 'react';
-import { NapSspAd } from 'react-native-nap-ssp';
-
-export default function App() {
-  useEffect(() => {
-    NapSspAd.initialize({
-      mediaKey: '발급받은_MEDIA_KEY',
-      adUnitIds: [
-        'BANNER_ID', 'INTER_ID', 'REWARD_ID',
-        'NATIVE_ID', 'VIDEO_ID', 'INTER_VIDEO_ID'
-      ],
-      logLevel: 'debug',
-    }).then(() => console.log('SDK 초기화 성공!'));
-  }, []);
-
-  return <Home />;
-}
-```
-
----
-
-### 🖼️ 2단계: 화면에 그리는 광고 (배너, 네이티브, 비디오)
-
-#### 1) 배너 광고 (Banner)
+### 🖼️ 뷰형 광고 / View-based ads (배너·네이티브·비디오)
 
 ```tsx
-import { BannerAd } from 'react-native-nap-ssp';
+import { BannerAd, NativeAd, VideoAd } from 'react-native-nap-ssp';
 
+// 배너 / Banner
 <BannerAd
   adUnitId="BANNER_ID"
-  size="BANNER_320x50"   // BANNER_300x250, SMART_BANNER 등 지원
-  style={{ marginTop: 20 }}
-  onAdLoaded={() => console.log('배너 로드 성공!')}
-  onAdFailedToLoad={(error) => console.log('배너 로드 실패:', error.message)}
-  onAdClicked={() => console.log('배너 클릭됨!')}
+  size="BANNER_320x50"            // BANNER_300x250, SMART_BANNER 등 / etc.
+  onAdLoaded={() => console.log('banner loaded')}
+  onAdFailedToLoad={(e) => console.log('banner failed:', e.message)}
+  onAdClicked={() => console.log('banner clicked')}
 />
-```
 
-#### 2) 네이티브 광고 (Native Ad)
+// 네이티브 / Native
+<NativeAd adUnitId="NATIVE_ID" style={{ width: '100%', height: 250 }} />
 
-```tsx
-import { NativeAd } from 'react-native-nap-ssp';
-
-<NativeAd
-  adUnitId="NATIVE_ID"
-  style={{ width: '100%', height: 250 }}
-  onAdLoaded={() => console.log('네이티브 광고 로드됨')}
-  onAdClicked={() => console.log('네이티브 광고 클릭됨!')}
-/>
-```
-
-#### 3) 인라인 동영상 광고 (Video Ad)
-
-```tsx
-import { VideoAd } from 'react-native-nap-ssp';
-
+// 인라인 비디오 / Inline video
 <VideoAd
   adUnitId="VIDEO_ID"
   style={{ width: '100%', height: 200 }}
-  onAdLoaded={() => console.log('동영상 광고 준비 완료')}
-  onAdCompleted={() => console.log('동영상 끝까지 시청 완료!')}
-  onAdSkipped={() => console.log('사용자가 동영상을 스킵함')}
-  onAdClicked={() => console.log('동영상 더보기 버튼 눌림')}
+  onAdCompleted={() => console.log('video completed')}
+  onAdSkipped={() => console.log('video skipped')}
 />
 ```
 
----
-
-### 🎬 3단계: 화면 전체를 덮는 광고 (전면, 리워드)
-
-#### 1) 전면 광고 (Interstitial)
+### 🎬 풀스크린 광고 / Full-screen ads (전면·전면 동영상·리워드)
 
 ```tsx
-import { InterstitialAd } from 'react-native-nap-ssp';
+import { InterstitialAd, InterstitialVideoAd, RewardedAd } from 'react-native-nap-ssp';
 
-const showInterstitial = async () => {
-  const inter = new InterstitialAd('INTER_ID', {
-    type: 'popup',
-    countDownTime: 5,
-    buttonLeftText: '닫기',
-  });
+// 전면 / Interstitial — v2: Basic 전용 / Basic-only
+const inter = new InterstitialAd('INTER_ID');
+inter.addAdEventListener('closed', () => console.log('interstitial closed'));
+inter.addAdEventListener('clicked', () => console.log('interstitial clicked'));
+await inter.load();
+await inter.show();
 
-  inter.addAdEventListener('closed', () => console.log('전면 광고가 닫혔습니다.'));
-  inter.addAdEventListener('clicked', () => console.log('전면 광고가 클릭되었습니다.'));
+// 전면 동영상 / Interstitial video
+const interVideo = new InterstitialVideoAd('INTER_VIDEO_ID');
+interVideo.addAdEventListener('completed', () => console.log('completed'));
+await interVideo.load();
+await interVideo.show();
 
-  try {
-    await inter.load();
-    await inter.show();
-  } catch (error) {
-    console.error('전면 광고 실패:', error);
-  }
-};
+// 리워드 / Rewarded
+const reward = new RewardedAd('REWARD_ID', {
+  customParams: { useid: 'user123' },
+  mute: true, // Android 전용 / Android only
+});
+reward.addAdEventListener('rewarded', (item) => {
+  console.log('rewarded', item); // 정확한 지급은 S2S 콜백 권장 / prefer S2S callback for real grants
+});
+await reward.load();
+await reward.show();
 ```
 
-#### 2) 전면 동영상 광고 (Interstitial Video)
-
-```tsx
-import { InterstitialVideoAd } from 'react-native-nap-ssp';
-
-const showInterstitialVideo = async () => {
-  const interVideo = new InterstitialVideoAd('INTER_VIDEO_ID');
-
-  interVideo.addAdEventListener('completed', () => console.log('전면 동영상 끝까지 시청함!'));
-  interVideo.addAdEventListener('skipped', () => console.log('전면 동영상 스킵됨.'));
-  interVideo.addAdEventListener('closed', () => console.log('전면 동영상 창 닫힘.'));
-
-  await interVideo.load();
-  await interVideo.show();
-};
-```
-
-#### 3) 리워드 동영상 광고 (Rewarded)
-
-```tsx
-import { RewardedAd } from 'react-native-nap-ssp';
-
-const showRewardedAd = async () => {
-  const reward = new RewardedAd('REWARD_ID', {
-    customParams: { useid: 'user123', name: '홍길동' },
-    mute: true  // (안드로이드 전용) 시작 시 음소거
-  });
-
-  reward.addAdEventListener('rewarded', (item) => {
-    console.log('보상 지급 이벤트 발생!', item);
-    // 정확한 보상 처리는 S2S 콜백 사용을 강력 권장합니다.
-  });
-
-  reward.addAdEventListener('closed', () => {
-    console.log('리워드 광고 창이 닫혔습니다.');
-  });
-
-  await reward.load();
-  await reward.show();
-};
-```
+> ℹ️ 전면 광고 popup/countDown 옵션은 v2 에서 제거되었습니다(Basic 전용). / Interstitial popup/countDown options were removed in v2 (Basic-only).
 
 ---
 
+## 🧪 DEBUG 빌드 플레이스홀더 (DEBUG placeholder behavior)
 
-## 🧪 DEBUG 빌드 플레이스홀더 동작
-
-v0.1.5부터 DEBUG 빌드에서는 시뮬레이터/에뮬레이터의 no-fill, SDK timeout, 일부 미디에이션 callback 누락 상황에서도 RN 이벤트 파이프라인을 검증할 수 있도록 플레이스홀더 성공 이벤트를 발행합니다. 실제 광고 노출 검증은 RELEASE 빌드 + 실기기에서 진행하세요. 자세한 기준은 [Troubleshooting](./docs/TROUBLESHOOTING.md)을 확인하세요.
+DEBUG 빌드에서는 시뮬레이터/에뮬레이터의 no-fill·timeout·일부 미디에이션 콜백 누락 상황에서도 RN 이벤트 파이프라인을 검증하도록 플레이스홀더 성공 이벤트를 발행합니다. 실제 노출 검증은 RELEASE 빌드 + 실기기에서 진행하세요.
+In DEBUG builds, placeholder success events are emitted so the RN event pipeline can be validated even on simulators/emulators (no-fill, timeout, missing mediation callbacks). Validate real impressions on RELEASE builds + real devices.
 
 ---
-## ✅ 테스트와 검증
+
+## ✅ 테스트와 검증 (Test & Verify)
 
 ```bash
-npm run verify
+npm run verify   # typecheck + build + smoke:test
 ```
 
-- `typecheck`: TypeScript 타입 확인
-- `build`: `lib/` 생성 확인
-- `smoke:test`: 공개 API 및 기본 초기화 흐름 확인
+- `typecheck`: TypeScript 타입 확인 / type check
+- `build`: `lib/` 생성 / build output
+- `smoke:test`: 공개 API 및 초기화 흐름 / public API + init flow
 
 ---
 
-## 📚 Documentation (가이드 문서)
+## 📚 문서 (Documentation)
 
-프로젝트의 상세 가이드와 검증 리포트는 `docs/` 디렉토리에 정리되어 있습니다.
+상세 가이드는 `docs/` 디렉토리에 있으며 모든 문서가 한/영 2개 언어로 제공됩니다. / Detailed guides live in `docs/` and every guide is bilingual (KR + EN).
 
-- **[Getting Started](./docs/GETTING_STARTED.md)**: 처음 연동할 때 보는 빠른 시작 가이드
-- **[API Reference](./docs/API_REFERENCE.md)**: 컴포넌트 및 클래스 상세 명세
-- **[Troubleshooting](./docs/TROUBLESHOOTING.md)**: 설치 및 런타임 주요 에러 해결 방법
-- **[FAQ](./docs/FAQ.md)**: 자주 묻는 질문
-- **[Android Setup Guide](./docs/ANDROID_SETUP.md)**: 안드로이드 프로젝트 상세 설정
-- **[iOS Setup Guide](./docs/IOS_SETUP.md)**: iOS 프로젝트 상세 설정 (Podfile 포함)
-- **[Mediation Setup Guide](./docs/MEDIATION_GUIDE.md)**: 광고 네트워크별 네이티브 세부 설정
-- **[SPM 통합 가이드](./docs/SPM_GUIDE.md)**: Swift Package Manager 연동 및 제약 사항
-- **[Version Matrix](./docs/VERSION_MATRIX.md)**: 플러그인 및 네이티브 SDK 버전 맵
-- **[Migration Guide](./docs/MIGRATION_GUIDE.md)**: 버전별 변경 사항 및 업그레이드 가이드
-- **[NPM 배포 가이드](./docs/PUBLISH_GUIDE.md)**: 플러그인 배포 절차 및 체크리스트
-- **[Privacy & Compliance](./docs/PRIVACY_GUIDE.md)**: COPPA, ATT, AD_ID 설정 가이드
-- **[Native Assets Guide](./docs/NATIVE_ASSETS_GUIDE.md)**: 네이티브 광고 레이아웃 구성 방법
-- **[Expo Compatibility Guide](./docs/EXPO_GUIDE.md)**: Expo 환경에서 사용하는 방법
-- **[Advanced Usage](./docs/ADVANCED_USAGE.md)**: 광고 사전 로딩 및 캐싱 최적화 팁
-- **[Maestro 검증 가이드](./docs/MAESTRO_GUIDE.md)**: 자동화 테스트 환경 설정 및 실행 방법
-- **[Development & Architecture](./docs/DEVELOPMENT.md)**: 내부 구조 설명 및 기여 가이드
-- **[Roadmap](./docs/ROADMAP.md)**: 향후 업데이트 및 기능 추가 계획
+- **[Getting Started](./docs/GETTING_STARTED.md)** — 빠른 시작 / quick start
+- **[API Reference](./docs/API_REFERENCE.md)** — 컴포넌트·클래스 명세 / component & class spec
+- **[Android Setup](./docs/ANDROID_SETUP.md)** · **[iOS Setup](./docs/IOS_SETUP.md)**
+- **[Mediation Guide](./docs/MEDIATION_GUIDE.md)** — 네트워크별 설정 / per-network setup
+- **[SPM Guide](./docs/SPM_GUIDE.md)** · **[Version Matrix](./docs/VERSION_MATRIX.md)**
+- **[Migration Guide](./docs/MIGRATION_GUIDE.md)** — 0.1.x → 0.2.0 / v2 업그레이드
+- **[Privacy & Compliance](./docs/PRIVACY_GUIDE.md)** — COPPA·ATT·AD_ID·GDPR/CCPA
+- **[Native Assets](./docs/NATIVE_ASSETS_GUIDE.md)** · **[Expo](./docs/EXPO_GUIDE.md)** · **[Advanced Usage](./docs/ADVANCED_USAGE.md)**
+- **[Troubleshooting](./docs/TROUBLESHOOTING.md)** · **[FAQ](./docs/FAQ.md)** · **[Glossary](./docs/GLOSSARY.md)** · **[Roadmap](./docs/ROADMAP.md)**
+
+공식 가이드 / Official guide: https://napmx.github.io/
 
 ---
-
-## 지원 범위 메모
-
-- 공식 Android/iOS 네이티브 가이드에는 Bizboard 관련 내용이 포함되어 있지만, 현재 RN 패키지 기준 지원 범위는 배너, 전면, 전면 동영상, 리워드, 네이티브, 인라인 비디오입니다.
 
 ## ❓ 자주 묻는 질문 (FAQ)
 
-- **Q. `NapSsp XXX is not linked` 에러가 발생합니다.**
-  - A. 패키지 설치 후 네이티브 빌드를 다시 해야 합니다. 안드로이드는 `npx react-native run-android`를 다시 실행하세요. iOS는 `cd ios && pod install`을 꼭 해주세요.
-
-- **Q. 광고 로드가 안 되고 실패(Failed to load)가 뜹니다.**
-  - A. 발급받은 `mediaKey`와 `adUnitId`가 정확한지 확인하세요. 또한, 테스트 중에는 실제 인터넷 연결이 필수입니다.
-
-- **Q. iOS에서 시뮬레이터로 돌리는데 안 나옵니다.**
-  - A. 광고 SDK 중 일부는 실기기(Real Device) 환경에서만 정상적으로 로드됩니다. 가급적 실기기에서 테스트해 주세요.
-
-- **Q. 이벤트 리스너의 이름이 헷갈립니다.**
-  - A. JS 클래스의 `addAdEventListener()`는 `loaded`, `loadFailed`, `opened`, `closed`, `clicked`, `impression`, `rewarded`, `completed`, `skipped` 같은 정규화된 이벤트명을 사용합니다. 컴포넌트 props는 `onAdLoaded`처럼 `on` 접두사를 사용합니다. 상세 목록은 [API Reference](./docs/API_REFERENCE.md)를 참조하세요.
+- **Q. `NapSsp XXX is not linked` 에러 / error**
+  A. 네이티브 빌드를 다시 하세요. Android: `npx react-native run-android` 재실행. iOS: `cd ios && pod install`.
+  Rebuild natively — re-run `run-android`, and run `pod install` for iOS.
+- **Q. 광고 로드 실패 / Ad fails to load**
+  A. `mediaKey`·`adUnitId` 값과 인터넷 연결을 확인하세요. / Verify `mediaKey`/`adUnitId` and network connectivity.
+- **Q. iOS 시뮬레이터에서 안 나옴 / Nothing on iOS simulator**
+  A. 일부 네트워크는 실기기에서만 로드됩니다. / Some networks only fill on real devices.
+- **Q. 이벤트 이름 / Event names**
+  A. JS 클래스는 `addAdEventListener('loaded'|'loadFailed'|'opened'|'closed'|'clicked'|'impression'|'rewarded'|'completed'|'skipped')`, 컴포넌트 props 는 `onAdLoaded` 처럼 `on` 접두사. / Classes use normalized event names; component props use the `on` prefix.
 
 ---
 
-> **문의:** nap_adx@nasmedia.co.kr (나스미디어 SDK 운영팀)
+> **문의 / Contact:** nap_mx@nasmedia.co.kr (나스미디어 nap mx 운영팀 / nap mx operations team)

@@ -50,89 +50,16 @@ internal object NapSspSdkBridge {
                     initializeMethod.invoke(adMixer, context.applicationContext, config.mediaKey, java.util.ArrayList(config.adUnitIds))
                     android.util.Log.d("NapSspSdkBridge", "AdMixer initialized with ${initializeMethod.name}")
 
-                    val registerAdapter = try {
-                        adMixerClass.getMethod("registerAdapter", String::class.java)
-                    } catch (_: Throwable) { null }
-                    val adapters = listOf(
-                        "ADAPTER_ADMANAGER",
-                        "ADAPTER_ADFIT",
-                        "ADAPTER_MOBWITH",
-                        "ADAPTER_PANGLE",
-                        "ADAPTER_APPLOVIN",
-                        "ADAPTER_UNITY"
-                    )
-                    if (registerAdapter != null) {
-                        // Determine if static or instance by checking modifiers
-                        val isStatic = java.lang.reflect.Modifier.isStatic(registerAdapter.modifiers)
-                        val receiver = if (isStatic) null else adMixer
-                        for (adapterConst in adapters) {
-                            try {
-                                val field = adMixerClass.getField(adapterConst)
-                                val adapterName = field.get(null) as? String
-                                if (adapterName != null) {
-                                    registerAdapter.invoke(receiver, adapterName)
-                                    android.util.Log.d("NapSspSdkBridge", "Registered adapter: $adapterName")
-                                }
-                            } catch (_: Throwable) {
-                                // ignore missing adapter constants
-                            }
-                        }
-                    }
-                    // Initialize mediation-specific SDKs after AdMixer adapters are registered
-                    initializeMediationSdks(context, config)
+                    // v2.0.0: 미디에이션 어댑터/네트워크 SDK 는 initialize() 시 자동 등록되고 워터폴에서
+                    // 지연 초기화됩니다. 네트워크별 키(Pangle app_id, AppLovin sdkKey 등)는 media-conf
+                    // 서버 설정으로 전달되므로 앱에서 별도 SDK init 호출이 필요 없습니다.
+                    // (v2 auto-registers adapters and lazily inits network SDKs — no manual init needed.)
                 } catch (e: Throwable) {
                     android.util.Log.e("NapSspSdkBridge", "Vendor SDK initialization failed: ${e.message}", e)
                 }
             }
         } catch (_: Throwable) {
             // reflection guard - silently ignore
-        }
-    }
-
-    private fun initializeMediationSdks(context: android.content.Context, config: NapSspConfig) {
-        // Pangle — requires appId
-        val pangleAppId = config.mediations?.pangle?.get("appId") as? String
-        if (!pangleAppId.isNullOrBlank()) {
-            try {
-                val pagConfigBuilderClass = Class.forName("com.bytedance.sdk.openadsdk.api.init.PAGConfig\$Builder")
-                val pagConfigBuilder = pagConfigBuilderClass.getConstructor().newInstance()
-                pagConfigBuilderClass.getMethod("appId", String::class.java).invoke(pagConfigBuilder, pangleAppId)
-                val pagConfig = pagConfigBuilderClass.getMethod("build").invoke(pagConfigBuilder)
-                val pagSdkClass = Class.forName("com.bytedance.sdk.openadsdk.api.init.PAGSdk")
-                val callbackClass = Class.forName("com.bytedance.sdk.openadsdk.api.init.PAGSdk\$PAGInitCallback")
-                val callbackProxy = java.lang.reflect.Proxy.newProxyInstance(
-                    callbackClass.classLoader, arrayOf(callbackClass)
-                ) { _, _, _ -> null }
-                pagSdkClass.getMethod("init", android.content.Context::class.java, pagConfig.javaClass, callbackClass)
-                    .invoke(null, context.applicationContext, pagConfig, callbackProxy)
-            } catch (_: Throwable) {}
-        }
-
-        // AppLovin — requires sdkKey
-        val appLovinSdkKey = config.mediations?.appLovin?.get("sdkKey") as? String
-        if (!appLovinSdkKey.isNullOrBlank()) {
-            try {
-                val alSdkClass = Class.forName("com.applovin.sdk.AppLovinSdk")
-                val alSdkSettingsClass = Class.forName("com.applovin.sdk.AppLovinSdkSettings")
-                val alSdkSettings = alSdkSettingsClass.getConstructor().newInstance()
-                val getInstance = alSdkClass.getMethod("getInstance", String::class.java, alSdkSettingsClass, android.content.Context::class.java)
-                val alSdk = getInstance.invoke(null, appLovinSdkKey, alSdkSettings, context.applicationContext)
-                alSdkClass.getMethod("initializeSdk", android.content.Context::class.java).invoke(alSdk, context.applicationContext)
-            } catch (_: Throwable) {}
-        }
-
-        // UnityAds — requires appId
-        val unityAppId = config.mediations?.unityAds?.get("appId") as? String
-        if (!unityAppId.isNullOrBlank()) {
-            try {
-                val unityAdsClass = Class.forName("com.unity3d.ads.UnityAds")
-                val listenerClass = Class.forName("com.unity3d.ads.IUnityAdsInitializationListener")
-                val listenerProxy = java.lang.reflect.Proxy.newProxyInstance(
-                    listenerClass.classLoader, arrayOf(listenerClass)
-                ) { _, _, _ -> null }
-                unityAdsClass.getMethod("initialize", android.content.Context::class.java, String::class.java, Boolean::class.javaPrimitiveType, listenerClass)
-                    .invoke(null, context.applicationContext, unityAppId, false, listenerProxy)
-            } catch (_: Throwable) {}
         }
     }
 
@@ -208,6 +135,8 @@ internal object NapSspSdkBridge {
             runtime["mediationFlags"] = mapOf(
                 "adFitEnabled" to (config.mediations?.adFitEnabled == true),
                 "mobwithEnabled" to (config.mediations?.mobwithEnabled == true),
+                "naverAdManagerEnabled" to (config.mediations?.naverAdManagerEnabled == true),
+                "teadsEnabled" to (config.mediations?.teadsEnabled == true),
                 "pangleConfigured" to (config.mediations?.pangle != null),
                 "appLovinConfigured" to (config.mediations?.appLovin != null),
                 "unityConfigured" to (config.mediations?.unityAds != null),

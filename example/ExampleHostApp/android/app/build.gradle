@@ -109,9 +109,9 @@ dependencies {
 
     // Add specific adapter libs so mediation adapters are packaged into the host APK for testing.
     // Start with Pangle adapter (server shows Pangle in priority list).
-    implementation 'io.github.nasmedia-tech:admixer-pangle:1.0.12_beta'
+    implementation 'io.github.nasmedia-tech:admixer-pangle:2.0.0'
     // Add AdFit adapter next
-    implementation 'io.github.nasmedia-tech:admixer-adfit:1.0.12_beta'
+    implementation 'io.github.nasmedia-tech:admixer-adfit:2.0.0'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {

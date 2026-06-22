@@ -22,27 +22,9 @@ class InterstitialModule: NSObject {
         reject("napssp_invalid_ad_unit", "Interstitial adUnitId must be numeric on iOS.", nil)
         return
       }
+      // v2.3.7 부터 전면 광고는 Basic 전용입니다. popup/countDown 타입 옵션
+      // (viewType·popupOption·countDownOption)은 SDK 에서 제거되었습니다.
       let config = AMMInterstitialConfig()
-      let adType = options?["type"] as? String ?? "default"
-      switch adType {
-      case "popup":
-        config.viewType = .popup
-        let buttonTitle = options?["buttonLeftText"] as? String ?? "닫기"
-        config.popupOption = AMMInterstitialPopupOption(
-          buttonTitle: buttonTitle,
-          buttonTextColor: .white,
-          buttonBackgroundColor: .black
-        )
-      case "countdown":
-        config.viewType = .countDown
-        let countDownTime = options?["countDownTime"] as? Int ?? 5
-        config.countDownOption = AMMInterstitialCountDownOption(
-          countDownTime: max(2, min(5, countDownTime)),
-          countDownType: .gauge
-        )
-      default:
-        config.viewType = .basic
-      }
       if let ratio = options?["closeButtonTouchAreaRatio"] as? Double {
         config.closeButtonTouchAreaRatio = Float(max(0.2, min(1.0, ratio)))
       }

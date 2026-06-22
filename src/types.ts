@@ -38,6 +38,10 @@ export interface MediationConfig {
   };
   adFit?: boolean;
   mobwith?: boolean;
+  /** Naver Ad Manager 어댑터 활성화 (v2.0.0+). PUBLISHER_CD는 SDK가 제공하므로 추가 설정 불필요 / Enable Naver Ad Manager adapter (v2.0.0+); PUBLISHER_CD is provided by the SDK. */
+  naverAdManager?: boolean;
+  /** Teads 어댑터 활성화 (v2.0.0+). Teads Maven 저장소 추가 필요 / Enable Teads adapter (v2.0.0+); requires Teads Maven repositories. */
+  teads?: boolean;
 }
 
 export interface NapSspConfig {
@@ -72,11 +76,16 @@ export interface AdError {
 }
 
 export interface InterstitialAdOptions {
-  type?: 'default' | 'popup' | 'countdown';
-  countDownTime?: number;
-  buttonLeftText?: string;
-  buttonRightText?: string;
-  closeButtonTouchAreaRatio?: number; // iOS only: 0.2~1.0 (basic/countdown only)
+  /**
+   * 전면 광고 닫기(X) 버튼 터치 영역 비율 (0.2~1.0). iOS 전용 / iOS only.
+   * Android 는 AdInfo.setCloseButtonBound(20~100%) 로 서버 설정을 따릅니다.
+   */
+  closeButtonTouchAreaRatio?: number;
+  // NOTE: v2(AOS 2.0.0 / iOS 2.3.7)부터 전면 광고는 Basic 전용입니다.
+  // popup/countDown 타입 및 관련 옵션(type/countDownTime/buttonLeftText 등)은
+  // 네이티브 SDK 에서 제거되어 더 이상 지원하지 않습니다.
+  // v2 (AOS 2.0.0 / iOS 2.3.7) makes interstitials Basic-only; popup/countDown
+  // types and their options were removed from the native SDKs.
 }
 
 export interface RewardedAdOptions {

@@ -159,8 +159,8 @@ allprojects {
 ```gradle
 dependencies {
     // ... 기존 의존성 유지 ...
-    implementation 'io.github.nasmedia-tech:admixer-ssp:1.0.23'
-    implementation 'com.google.android.gms:play-services-ads-identifier:18.3.0'
+    implementation 'io.github.nasmedia-tech:admixer-ssp:2.0.0'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.2.0'
 }
 ```
 

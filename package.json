@@ -1,6 +1,6 @@
 {
   "name": "react-native-nap-ssp",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "description": "React Native plugin for KT Nasmedia nap ssp SDK",
   "author": "gwangy",
   "license": "MIT",

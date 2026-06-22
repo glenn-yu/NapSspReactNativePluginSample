@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.2.0 - 2026-06-22
+
+> 메이저 네이티브 SDK 업그레이드 / Major native SDK upgrade.
+
+### Changed
+- **Android 벤더 SDK v1.x → v2.0.0 마이그레이션** / migrated Android vendor SDK to v2.0.0:
+  - 모든 `io.github.nasmedia-tech:admixer-*` 좌표를 `2.0.0` 으로 상향, `play-services-ads-identifier` `18.3.0 → 18.2.0`.
+  - 클래스명 변경 흡수(AdView→AMMBannerView, InterstitialAd→AMMInterstitial, RewardInterstitialVideoAd→AMMRewardVideo, InterstitialVideoAd→AMMVideoInterstitial, NativeAdView→AMMNativeAdView, VideoAdView→AMMVideoView) — 플러그인 내부 reflection 처리.
+  - `AdListener` interface→abstract class 전환에 맞춰 이름 있는 콜백(`onAdDisplayed/Clicked/Closed/Completed/Skipped/Rewarded` + `onAdShowFailed`)으로 브리지 재구성 (`NapAdListener`/`NapListenerBridge` 추가).
+  - `registerAdapter()` 수동 등록 제거(자동 등록).
+  - 라이프사이클 정리 메서드 `onDestroy()` → `destroy()`.
+- **iOS 벤더 SDK 2.3.3 → 2.3.7** (`ios/Package.swift` binaryTarget + checksum 갱신), 최소 배포 타겟 `13.0 → 14.0` 정렬.
+
+### Added
+- **NaverAdManager·Teads 미디에이션 추가** / added NaverAdManager & Teads mediation:
+  - Android: `admixer-naveradmanager:2.0.0`, `admixer-teads:2.0.0` (Teads Maven 저장소 포함).
+  - iOS: `AdMixerMediationNAM` podspec subspec 추가 (iOS 는 Teads 미지원).
+  - JS: `MediationConfig.naverAdManager?`, `MediationConfig.teads?` 추가.
+- 모든 가이드 문서를 **한국어+영어 2개 언어** 로 갱신, `RELEASE_NOTES.md` 추가.
+
+### Fixed
+- 인라인 뷰(배너/네이티브/비디오)의 `setAdViewListener` reflection 파라미터 타입 버그 수정 — v2 시그니처가 `Object` 인데 `AdListener` 로 조회하여 `NoSuchMethodException` 으로 광고 로드가 실패하던 문제 해결. / Fixed inline-view `setAdViewListener` reflection (v2 signature is `Object`, not `AdListener`), which broke ad loading.
+- iOS 전면 광고 popup/countDown 옵션 제거(2.3.7 에서 SDK 제거) — `AMMInterstitialConfig` 컴파일 오류 해소, **Basic 전용**. / Removed iOS interstitial popup/countDown usage removed in 2.3.7 (Basic-only).
+- JS `InterstitialAdOptions` 정리: 무효 옵션(type/countDownTime/buttonLeftText/buttonRightText) 제거, `closeButtonTouchAreaRatio`(iOS) 만 유지.
+
+### Removed
+- 커밋되어 있던 빌드 산출물 `example/.../index.android.bundle` 추적 해제(.gitignore 추가). / Untracked the committed `index.android.bundle` build artifact.
+
+---
+
 ## 0.1.8 - 2026-05-08
 
 ### Fixed

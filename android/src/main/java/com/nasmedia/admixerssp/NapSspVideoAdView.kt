@@ -92,7 +92,7 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
         currentState = NapSspLoadState.DESTROYED
         adViewInstance?.let {
             runCatching { it.javaClass.getMethod("onPause").invoke(it) }
-            runCatching { it.javaClass.getMethod("onDestroy").invoke(it) }
+            runCatching { it.javaClass.getMethod("destroy").invoke(it) }
         }
         adViewInstance = null
         removeAllViews()
@@ -148,100 +148,106 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
         if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) throw UnsupportedOperationException("vendor SDK disabled")
 
         val activityContext: android.content.Context = (context as? ThemedReactContext)?.currentActivity ?: context
-        val videoAdViewClass = Class.forName("com.nasmedia.admixerssp.ads.VideoAdView")
+        val videoAdViewClass = Class.forName("com.nasmedia.admixerssp.ads.AMMVideoView")
         val adInfoBuilderClass = Class.forName("com.nasmedia.admixerssp.ads.AdInfo\$Builder")
         val adInfoClass = Class.forName("com.nasmedia.admixerssp.ads.AdInfo")
-        val listenerClass = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
 
         // 1. Create VideoAdView
         val videoAdView = videoAdViewClass.getConstructor(android.content.Context::class.java).newInstance(activityContext)
         adViewInstance = videoAdView as android.view.View
 
-        // 2. Setup Proxy Listener
-        val listener = java.lang.reflect.Proxy.newProxyInstance(
-            listenerClass.classLoader,
-            arrayOf(listenerClass)
-        ) { _, method, args ->
-            when (method.name) {
-                "onReceivedAd" -> {
-                    val hasAd = runCatching { 
-                        adViewInstance?.javaClass?.getField("hasAd")?.getBoolean(adViewInstance) 
-                    }.getOrDefault(true) ?: true
+        // 2. Setup Listener using NapAdListener via reflection
+        val bridge = object : NapListenerBridge {
+            override fun onReceivedAd(adapterName: String, ad: Any) {
+                val hasAd = runCatching { 
+                    adViewInstance?.javaClass?.getField("hasAd")?.get(adViewInstance) as? Boolean
+                }.getOrNull() ?: true
 
-                    if (!hasAd) {
-                        if (BuildConfig.DEBUG) {
-                            emitDebugPlaceholderLoad(normalizedAdUnitId, "debug-no-fill")
-                        } else {
-                            currentState = NapSspLoadState.FAILED
-                            NapSspEventEmitter.emitViewEvent(
-                                this@NapSspVideoAdView,
-                                NapSspContracts.VIEW_EVENT_AD_FAILED,
-                                mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO, "code" to -1, "message" to "No fill (hasAd is false)")
-                            )
-                        }
-                        return@newProxyInstance null
-                    }
-
-                    post {
-                        val av = adViewInstance ?: return@post
-                        removeAllViews()
-                        addView(av, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-                        
-                        // Force RN layout sync
-                        post(measureAndLayout)
-                    }
-                    currentState = NapSspLoadState.LOADED
-                    NapSspEventEmitter.emitViewEvent(
-                        this@NapSspVideoAdView,
-                        NapSspContracts.VIEW_EVENT_AD_LOADED,
-                        mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
-                    )
-                }
-                "onFailedToReceiveAd" -> {
+                if (!hasAd) {
                     if (BuildConfig.DEBUG) {
-                        emitDebugPlaceholderLoad(normalizedAdUnitId, "debug-sdk-failed:${args?.getOrNull(3)?.toString() ?: "unknown"}")
+                        emitDebugPlaceholderLoad(normalizedAdUnitId, "debug-no-fill")
                     } else {
                         currentState = NapSspLoadState.FAILED
                         NapSspEventEmitter.emitViewEvent(
                             this@NapSspVideoAdView,
                             NapSspContracts.VIEW_EVENT_AD_FAILED,
-                            mapOf(
-                                "adUnitId" to normalizedAdUnitId,
-                                "format" to NapSspContracts.FORMAT_VIDEO,
-                                "code" to (args?.get(2) as? Int ?: -1),
-                                "message" to (args?.get(3)?.toString() ?: ""),
-                            ),
+                            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO, "code" to -1, "message" to "No fill (hasAd is false)")
                         )
                     }
+                    return
                 }
-                "onEventAd" -> {
-                    val normalizedEvent = args?.get(1)?.toString()?.trim()?.uppercase()
-                    when (normalizedEvent) {
-                        "COMPLETION", "COMPLETE", "COMPLETED" -> NapSspEventEmitter.emitViewEvent(
-                            this@NapSspVideoAdView,
-                            NapSspContracts.VIEW_EVENT_AD_COMPLETED,
-                            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
-                        )
-                        "SKIPPED" -> NapSspEventEmitter.emitViewEvent(
-                            this@NapSspVideoAdView,
-                            NapSspContracts.VIEW_EVENT_AD_SKIPPED,
-                            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
-                        )
-                        "CLICK", "CLICKED" -> NapSspEventEmitter.emitViewEvent(
-                            this@NapSspVideoAdView,
-                            NapSspContracts.VIEW_EVENT_AD_CLICKED,
-                            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
-                        )
-                        "DISPLAYED" -> NapSspEventEmitter.emitViewEvent(
-                            this@NapSspVideoAdView,
-                            NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
-                            mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
-                        )
-                    }
+
+                post {
+                    val av = adViewInstance ?: return@post
+                    removeAllViews()
+                    addView(av, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+                    
+                    // Force RN layout sync
+                    post(measureAndLayout)
+                }
+                currentState = NapSspLoadState.LOADED
+                NapSspEventEmitter.emitViewEvent(
+                    this@NapSspVideoAdView,
+                    NapSspContracts.VIEW_EVENT_AD_LOADED,
+                    mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
+                )
+            }
+
+            override fun onFailedToReceiveAd(ad: Any?, name: String, code: Int, msg: String?) {
+                if (BuildConfig.DEBUG) {
+                    emitDebugPlaceholderLoad(normalizedAdUnitId, "debug-sdk-failed:$msg")
+                } else {
+                    currentState = NapSspLoadState.FAILED
+                    NapSspEventEmitter.emitViewEvent(
+                        this@NapSspVideoAdView,
+                        NapSspContracts.VIEW_EVENT_AD_FAILED,
+                        mapOf(
+                            "adUnitId" to normalizedAdUnitId,
+                            "format" to NapSspContracts.FORMAT_VIDEO,
+                            "code" to code,
+                            "message" to msg,
+                        ),
+                    )
                 }
             }
-            null
+
+            override fun onAdClicked() {
+                NapSspEventEmitter.emitViewEvent(
+                    this@NapSspVideoAdView,
+                    NapSspContracts.VIEW_EVENT_AD_CLICKED,
+                    mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
+                )
+            }
+
+            override fun onAdDisplayed() {
+                NapSspEventEmitter.emitViewEvent(
+                    this@NapSspVideoAdView,
+                    NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
+                    mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
+                )
+            }
+
+            override fun onAdCompleted() {
+                NapSspEventEmitter.emitViewEvent(
+                    this@NapSspVideoAdView,
+                    NapSspContracts.VIEW_EVENT_AD_COMPLETED,
+                    mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
+                )
+            }
+
+            override fun onAdSkipped() {
+                NapSspEventEmitter.emitViewEvent(
+                    this@NapSspVideoAdView,
+                    NapSspContracts.VIEW_EVENT_AD_SKIPPED,
+                    mapOf("adUnitId" to normalizedAdUnitId, "format" to NapSspContracts.FORMAT_VIDEO),
+                )
+            }
         }
+
+        val listenerClass = Class.forName("com.nasmedia.admixerssp.NapAdListener")
+        val bridgeClass = Class.forName("com.nasmedia.admixerssp.NapListenerBridge")
+        val listener = listenerClass.getConstructor(bridgeClass).newInstance(bridge)
+        // AMMVideoView.setAdViewListener(Object) — v2 인라인 뷰 시그니처는 Object 파라미터.
         videoAdViewClass.getMethod("setAdViewListener", Any::class.java).invoke(videoAdView, listener)
 
         // 3. Prepare AdInfo
@@ -296,7 +302,7 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
         (context as? ThemedReactContext)?.removeLifecycleEventListener(this)
         adViewInstance?.let {
             runCatching { it.javaClass.getMethod("onPause").invoke(it) }
-            runCatching { it.javaClass.getMethod("onDestroy").invoke(it) }
+            runCatching { it.javaClass.getMethod("destroy").invoke(it) }
         }
         adViewInstance = null
     }
@@ -312,7 +318,7 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
     override fun onHostDestroy() {
         adViewInstance?.let {
             runCatching { it.javaClass.getMethod("onPause").invoke(it) }
-            runCatching { it.javaClass.getMethod("onDestroy").invoke(it) }
+            runCatching { it.javaClass.getMethod("destroy").invoke(it) }
         }
         adViewInstance = null
     }

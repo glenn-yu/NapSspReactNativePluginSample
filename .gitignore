@@ -37,6 +37,9 @@ ios/DerivedData
 .expo/*
 .expo-shared/*
 .metro/*
+# Metro/RN 빌드 산출물(번들) — 커밋 금지 (재생성 가능) / generated JS bundles must not be committed
+*.jsbundle
+**/src/main/assets/index.android.bundle
 example/ExampleHostApp/.bundle/
 example/ExampleHostApp/node_modules/
 example/ExampleHostApp/android/build
@@ -91,3 +94,16 @@ build
 # Swift Build Artifacts
 .build/
 **/.build/
+
+# Docs — 내부/개발 전용 산출물(공개 레포에 불필요) / internal dev-only doc artifacts (not for the public repo)
+docs/native_guides/
+docs/nap_ssp_react_native_plan.docx
+docs/*.docx
+docs/error.png
+docs/warn1.png
+docs/WORK_STATUS_*.md
+docs/REVIEW_*.md
+docs/MAESTRO_RUN_*.md
+docs/MAESTRO_READINESS_*.md
+docs/MAESTRO_ENV_*.md
+docs/PROJECT_TESTING_STRUCTURE.md

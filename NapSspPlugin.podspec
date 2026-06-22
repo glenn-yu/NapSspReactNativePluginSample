@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'NapSspPlugin'
-  s.version      = '0.1.8'
+  s.version      = '0.2.0'
   s.summary      = 'React Native scaffold for KT Nasmedia nap ssp SDK'
   s.homepage     = 'https://github.com/glenn-yu/react-native-nap-ssp'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
@@ -42,5 +42,10 @@ Pod::Spec.new do |s|
 
   s.subspec 'UnityAds' do |ss|
     ss.dependency 'AdMixerMediationUnityAds'
+  end
+
+  # Naver Ad Manager — v2.3.7 가이드에서 추가된 어댑터 / adapter added in the v2.3.7 guide
+  s.subspec 'NAM' do |ss|
+    ss.dependency 'AdMixerMediationNAM'
   end
 end

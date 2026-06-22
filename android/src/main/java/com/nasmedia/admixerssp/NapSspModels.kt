@@ -18,6 +18,8 @@ internal data class NapSspMediationConfig(
     val unityAds: Map<String, Any?>? = null,
     val adFitEnabled: Boolean = false,
     val mobwithEnabled: Boolean = false,
+    val naverAdManagerEnabled: Boolean = false,
+    val teadsEnabled: Boolean = false,
 )
 
 internal enum class NapSspLoadState {
@@ -77,6 +79,8 @@ private fun ReadableMap.toMediationConfig(): NapSspMediationConfig {
         unityAds = readNestedMap("unityAds"),
         adFitEnabled = if (hasKey("adFit") && !isNull("adFit")) getBoolean("adFit") else false,
         mobwithEnabled = if (hasKey("mobwith") && !isNull("mobwith")) getBoolean("mobwith") else false,
+        naverAdManagerEnabled = if (hasKey("naverAdManager") && !isNull("naverAdManager")) getBoolean("naverAdManager") else false,
+        teadsEnabled = if (hasKey("teads") && !isNull("teads")) getBoolean("teads") else false,
     )
 }
 

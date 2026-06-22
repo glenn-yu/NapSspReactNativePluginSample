@@ -23,13 +23,15 @@ def mediationEnabled = { String name -> enabledMediations.isEmpty() || enabledMe
 
 // Keep Android vendor SDK dependencies pinned to the latest published Maven artifacts.
 def napSspSdkCoordinates = [
-    core: 'io.github.nasmedia-tech:admixer-ssp:1.0.23',
-    adManager: 'io.github.nasmedia-tech:admixer-admanager:1.0.15_delta',
-    adFit: 'io.github.nasmedia-tech:admixer-adfit:1.0.12_beta',
-    pangle: 'io.github.nasmedia-tech:admixer-pangle:1.0.12_beta',
-    appLovin: 'io.github.nasmedia-tech:admixer-applovin:1.0.10_beta',
-    unity: 'io.github.nasmedia-tech:admixer-unity:1.0.7_beta',
-    adsIdentifier: 'com.google.android.gms:play-services-ads-identifier:18.3.0',
+    core: 'io.github.nasmedia-tech:admixer-ssp:2.0.0',
+    adManager: 'io.github.nasmedia-tech:admixer-admanager:2.0.0',
+    adFit: 'io.github.nasmedia-tech:admixer-adfit:2.0.0',
+    pangle: 'io.github.nasmedia-tech:admixer-pangle:2.0.0',
+    appLovin: 'io.github.nasmedia-tech:admixer-applovin:2.0.0',
+    unity: 'io.github.nasmedia-tech:admixer-unity:2.0.0',
+    naveradmanager: 'io.github.nasmedia-tech:admixer-naveradmanager:2.0.0',
+    teads: 'io.github.nasmedia-tech:admixer-teads:2.0.0',
+    adsIdentifier: 'com.google.android.gms:play-services-ads-identifier:18.2.0',
 ]
 
 android {
@@ -48,6 +50,8 @@ android {
         buildConfigField 'String', 'NAP_SSP_PANGLE_COORDINATE', "\"${napSspSdkCoordinates.pangle}\""
         buildConfigField 'String', 'NAP_SSP_APP_LOVIN_COORDINATE', "\"${napSspSdkCoordinates.appLovin}\""
         buildConfigField 'String', 'NAP_SSP_UNITY_COORDINATE', "\"${napSspSdkCoordinates.unity}\""
+        buildConfigField 'String', 'NAP_SSP_NAVER_AD_MANAGER_COORDINATE', "\"${napSspSdkCoordinates.naveradmanager}\""
+        buildConfigField 'String', 'NAP_SSP_TEADS_COORDINATE', "\"${napSspSdkCoordinates.teads}\""
         buildConfigField 'String', 'NAP_SSP_ADS_IDENTIFIER_COORDINATE', "\"${napSspSdkCoordinates.adsIdentifier}\""
     }
 
@@ -75,10 +79,15 @@ repositories {
     // Required once the host app opts into the real vendor SDK dependencies.
     maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }
     maven { url 'https://artifact.bytedance.com/repository/pangle/' }
+    // Teads 사용 시 필수
+    maven { url "https://sdk.teads.tv/android/repo" }
+    maven { url "https://teads.jfrog.io/artifactory/SDKAndroid-maven-prod" }
 }
 
 dependencies {
     compileOnly 'com.facebook.react:react-android'
+    // compileOnly core to allow compile-time subclassing of AdListener
+    compileOnly napSspSdkCoordinates.core
 
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
@@ -101,6 +110,12 @@ dependencies {
         }
         if (mediationEnabled('unity')) {
             implementation napSspSdkCoordinates.unity
+        }
+        if (mediationEnabled('naveradmanager')) {
+            implementation napSspSdkCoordinates.naveradmanager
+        }
+        if (mediationEnabled('teads')) {
+            implementation napSspSdkCoordinates.teads
         }
     }
 }

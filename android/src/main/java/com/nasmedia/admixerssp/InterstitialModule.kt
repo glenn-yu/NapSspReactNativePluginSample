@@ -110,8 +110,10 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
             loadPromises.remove(normalizedAdUnitId)?.reject("NAP_SSP_INTERSTITIAL_LOAD_CANCELLED", "Superseded by start")
             startPromises[normalizedAdUnitId]?.reject("NAP_SSP_INTERSTITIAL_START_CANCELLED", "Superseded by start")
             startPromises[normalizedAdUnitId] = promise
-            Log.d(tag, "startInterstitial request adUnitId=$normalizedAdUnitId")
-            interstitial.javaClass.getMethod("startInterstitial").invoke(interstitial)
+            // v2: 즉시 노출 startInterstitial()이 제거됨 → 로드만 시작하고
+            // 수신(onReceivedAd) 시점에 showInterstitial()로 자동 노출한다.
+            Log.d(tag, "start interstitial (load → auto-show) adUnitId=$normalizedAdUnitId")
+            interstitial.javaClass.getMethod("loadInterstitial").invoke(interstitial)
         } catch (error: Throwable) {
             loadPromises.remove(normalizedAdUnitId)?.reject("NAP_SSP_INTERSTITIAL_START_FAILED", error)
             startPromises.remove(normalizedAdUnitId)
@@ -190,50 +192,15 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
     }
 
     private fun applyInterstitialOptions(builder: Any, builderClass: Class<*>, options: com.facebook.react.bridge.ReadableMap?) {
-        if (options == null) return
-        try {
-            val adType = options.getString("type") ?: "default"
-            val interstitialAdTypeClass = Class.forName("com.nasmedia.admixerssp.ads.AdInfo\$InterstitialAdType")
-            val typeValue = when (adType) {
-                "popup", "countdown" -> interstitialAdTypeClass.getField("Popup").get(null)
-                else -> interstitialAdTypeClass.getField("Basic").get(null)
-            }
-            builderClass.getMethod("interstitialAdType", interstitialAdTypeClass).invoke(builder, typeValue)
-        } catch (_: Throwable) {}
-
-        if (options.hasKey("buttonLeftText") || options.hasKey("buttonRightText") || options.getString("type") == "countdown") {
-            try {
-                val popupOptionClass = Class.forName("com.nasmedia.admixerssp.ads.PopupInterstitialAdOption")
-                val popupConfig = popupOptionClass.getConstructor().newInstance()
-
-                val buttonLeft = options.getString("buttonLeftText") ?: "닫기"
-                popupOptionClass.getMethod("setButtonLeft", String::class.java, String::class.java)
-                    .invoke(popupConfig, buttonLeft, null)
-
-                val buttonRight = if (options.hasKey("buttonRightText")) options.getString("buttonRightText") else null
-                if (buttonRight != null) {
-                    popupOptionClass.getMethod("setButtonRight", String::class.java, String::class.java)
-                        .invoke(popupConfig, buttonRight, null)
-                }
-
-                if (options.getString("type") == "countdown") {
-                    val countDownTime = if (options.hasKey("countDownTime")) options.getInt("countDownTime") else 5
-                    popupOptionClass.getMethod("setCountDown", Int::class.java, Int::class.java)
-                        .invoke(popupConfig, 0, countDownTime.coerceIn(2, 5))
-                }
-
-                builderClass.getMethod("popupAdOption", popupOptionClass).invoke(builder, popupConfig)
-            } catch (_: Throwable) {}
-        }
+        // In v2.0.0, interstitial options like popup type and countdown are deprecated and removed.
     }
 
     private fun createOrGetInterstitial(adUnitId: String, activity: android.app.Activity, options: com.facebook.react.bridge.ReadableMap?): Any {
         interstitialAds[adUnitId]?.let { return it }
 
-        val interstitialClass = Class.forName("com.nasmedia.admixerssp.ads.InterstitialAd")
+        val interstitialClass = Class.forName("com.nasmedia.admixerssp.ads.AMMInterstitial")
         val adInfoClass = Class.forName("com.nasmedia.admixerssp.ads.AdInfo")
         val builderClass = Class.forName("com.nasmedia.admixerssp.ads.AdInfo\$Builder")
-        val listenerClass = Class.forName("com.nasmedia.admixerssp.ads.AdListener")
 
         val builder = builderClass.getConstructor(String::class.java).newInstance(adUnitId)
         applyInterstitialOptions(builder!!, builderClass, options)
@@ -242,101 +209,104 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
         val interstitial = interstitialClass.getConstructor(android.content.Context::class.java).newInstance(activity)
         interstitialClass.getMethod("setAdInfo", adInfoClass).invoke(interstitial, adInfo)
 
-        val listener = Proxy.newProxyInstance(listenerClass.classLoader, arrayOf(listenerClass)) { _, method, args ->
-            when (method.name) {
-                "onReceivedAd" -> {
-                    Log.d(tag, "onReceivedAd adUnitId=$adUnitId args=${args?.contentToString()}")
-                    val hasInterstitial = runCatching {
-                        interstitial.javaClass.getField("hasInterstitial").getBoolean(interstitial)
-                    }.getOrDefault(true)
+        val bridge = object : NapListenerBridge {
+            override fun onReceivedAd(adapterName: String, ad: Any) {
+                Log.d(tag, "onReceivedAd adUnitId=$adUnitId")
+                val hasInterstitial = runCatching {
+                    interstitial.javaClass.getField("hasInterstitial").get(interstitial) as? Boolean
+                }.getOrNull() ?: true
 
-                    if (!hasInterstitial) {
-                        val message = "No fill (hasInterstitial is false)"
-                        NapSspEventEmitter.emitModuleEvent(
-                            reactContext,
-                            NapSspContracts.EVENT_AD_FAILED,
-                            mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "code" to -1, "message" to message)
-                        )
-                        loadedAdUnitIds.remove(adUnitId)
-                        NapSspSdkBridge.clearInterstitial(adUnitId)
-                        if (startPromises.containsKey(adUnitId)) {
-                            startPromises.remove(adUnitId)?.reject("NAP_SSP_INTERSTITIAL_LOAD_FAILED", message)
-                        } else {
-                            loadPromises.remove(adUnitId)?.reject("NAP_SSP_INTERSTITIAL_LOAD_FAILED", message)
-                        }
-                        return@newProxyInstance null
-                    }
-
-                    loadedAdUnitIds[adUnitId] = true
-                    NapSspSdkBridge.markInterstitialState(adUnitId, NapSspLoadState.LOADED)
-                    NapSspEventEmitter.emitModuleEvent(
-                        reactContext,
-                        NapSspContracts.EVENT_AD_LOADED,
-                        mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL),
-                    )
-                    val startPromise = startPromises.remove(adUnitId)
-                    if (startPromise != null) {
-                        Log.d(tag, "onReceivedAd startPromise=true adUnitId=$adUnitId")
-                        startPromise.resolve(null)
-                    } else {
-                        val loadPromise = loadPromises.remove(adUnitId)
-                        Log.d(tag, "onReceivedAd loadPromise=${loadPromise != null} adUnitId=$adUnitId")
-                        if (loadPromise != null) {
-                            loadPromise.resolve(null)
-                        } else {
-                            Log.w(tag, "onReceivedAd without pending promise adUnitId=$adUnitId loaded=${loadedAdUnitIds[adUnitId]}")
-                        }
-                    }
-                }
-                "onFailedToReceiveAd" -> {
-                    Log.d(tag, "onFailedToReceiveAd adUnitId=$adUnitId args=${args?.contentToString()}")
-                    val code = args?.getOrNull(2) as? Int ?: -1
-                    val message = args?.getOrNull(3)?.toString() ?: "unknown"
+                if (!hasInterstitial) {
+                    val message = "No fill (hasInterstitial is false)"
                     NapSspEventEmitter.emitModuleEvent(
                         reactContext,
                         NapSspContracts.EVENT_AD_FAILED,
-                        mapOf(
-                            "adUnitId" to adUnitId,
-                            "format" to NapSspContracts.FORMAT_INTERSTITIAL,
-                            "code" to code,
-                            "message" to message,
-                        ),
+                        mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "code" to -1, "message" to message)
                     )
-                    if (loadedAdUnitIds[adUnitId] != true) {
-                        loadedAdUnitIds.remove(adUnitId)
-                        NapSspSdkBridge.clearInterstitial(adUnitId)
-                        if (startPromises.containsKey(adUnitId)) {
-                            Log.d(tag, "ignoring intermediate load failure for active start flow adUnitId=$adUnitId")
-                        } else {
-                            loadPromises.remove(adUnitId)?.reject("NAP_SSP_INTERSTITIAL_LOAD_FAILED", message)
-                        }
+                    loadedAdUnitIds.remove(adUnitId)
+                    NapSspSdkBridge.clearInterstitial(adUnitId)
+                    if (startPromises.containsKey(adUnitId)) {
+                        startPromises.remove(adUnitId)?.reject("NAP_SSP_INTERSTITIAL_LOAD_FAILED", message)
+                    } else {
+                        loadPromises.remove(adUnitId)?.reject("NAP_SSP_INTERSTITIAL_LOAD_FAILED", message)
                     }
+                    return
                 }
-                "onEventAd" -> {
-                    val rawEvent = args?.getOrNull(1)
-                    val eventName = rawEvent?.toString()?.trim()?.uppercase()
-                    Log.d(tag, "onEventAd adUnitId=$adUnitId rawEvent=$rawEvent normalized=$eventName args=${args?.contentToString()}")
-                    when (eventName) {
-                        "DISPLAYED", "OPEN", "OPENED", "SHOW", "SHOWN" -> {
-                            NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_OPENED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "rawEvent" to rawEvent?.toString()))
-                            NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_IMPRESSION, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "rawEvent" to rawEvent?.toString()))
-                        }
-                        "CLICK", "CLICKED", "LEFT_CLICK", "RIGHT_CLICK" -> NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_CLICKED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "rawEvent" to rawEvent?.toString()))
-                        "CLOSE", "CLOSED", "DISMISS", "DISMISSED" -> {
-                            NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_CLOSED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL, "rawEvent" to rawEvent?.toString()))
-                            loadedAdUnitIds.remove(adUnitId)
-                            NapSspSdkBridge.clearInterstitial(adUnitId)
-                        }
-                        else -> {
-                            Log.d(tag, "onEventAd unhandled adUnitId=$adUnitId rawEvent=$rawEvent normalized=$eventName")
-                        }
+
+                loadedAdUnitIds[adUnitId] = true
+                NapSspSdkBridge.markInterstitialState(adUnitId, NapSspLoadState.LOADED)
+                NapSspEventEmitter.emitModuleEvent(
+                    reactContext,
+                    NapSspContracts.EVENT_AD_LOADED,
+                    mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL),
+                )
+                val startPromise = startPromises.remove(adUnitId)
+                if (startPromise != null) {
+                    Log.d(tag, "onReceivedAd startPromise=true adUnitId=$adUnitId")
+                    // start() = 로드 후 자동 노출. v2에서 startInterstitial()이 제거되어
+                    // 수신 콜백 시점에 showInterstitial()로 노출한다.
+                    runCatching {
+                        NapSspSdkBridge.markInterstitialState(adUnitId, NapSspLoadState.SHOWN)
+                        interstitial.javaClass.getMethod("showInterstitial").invoke(interstitial)
+                        startPromise.resolve(null)
+                    }.onFailure {
+                        Log.e(tag, "auto-show interstitial failed adUnitId=$adUnitId: ${it.message}", it)
+                        startPromise.reject("NAP_SSP_INTERSTITIAL_SHOW_FAILED", it)
+                    }
+                } else {
+                    val loadPromise = loadPromises.remove(adUnitId)
+                    Log.d(tag, "onReceivedAd loadPromise=${loadPromise != null} adUnitId=$adUnitId")
+                    if (loadPromise != null) {
+                        loadPromise.resolve(null)
+                    } else {
+                        Log.w(tag, "onReceivedAd without pending promise adUnitId=$adUnitId loaded=${loadedAdUnitIds[adUnitId]}")
                     }
                 }
             }
-            null
+
+            override fun onFailedToReceiveAd(ad: Any?, name: String, code: Int, msg: String?) {
+                Log.d(tag, "onFailedToReceiveAd adUnitId=$adUnitId code=$code msg=$msg")
+                NapSspEventEmitter.emitModuleEvent(
+                    reactContext,
+                    NapSspContracts.EVENT_AD_FAILED,
+                    mapOf(
+                        "adUnitId" to adUnitId,
+                        "format" to NapSspContracts.FORMAT_INTERSTITIAL,
+                        "code" to code,
+                        "message" to msg,
+                    ),
+                )
+                if (loadedAdUnitIds[adUnitId] != true) {
+                    loadedAdUnitIds.remove(adUnitId)
+                    NapSspSdkBridge.clearInterstitial(adUnitId)
+                    if (startPromises.containsKey(adUnitId)) {
+                        Log.d(tag, "ignoring intermediate load failure for active start flow adUnitId=$adUnitId")
+                    } else {
+                        loadPromises.remove(adUnitId)?.reject("NAP_SSP_INTERSTITIAL_LOAD_FAILED", msg)
+                    }
+                }
+            }
+
+            override fun onAdClicked() {
+                NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_CLICKED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL))
+            }
+
+            override fun onAdDisplayed() {
+                NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_OPENED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL))
+                NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_IMPRESSION, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL))
+            }
+
+            override fun onAdClosed() {
+                NapSspEventEmitter.emitModuleEvent(reactContext, NapSspContracts.EVENT_AD_CLOSED, mapOf("adUnitId" to adUnitId, "format" to NapSspContracts.FORMAT_INTERSTITIAL))
+                loadedAdUnitIds.remove(adUnitId)
+                NapSspSdkBridge.clearInterstitial(adUnitId)
+            }
         }
 
-        interstitialClass.getMethod("setAdListener", listenerClass).invoke(interstitial, listener)
+        val listenerClass = Class.forName("com.nasmedia.admixerssp.NapAdListener")
+        val bridgeClass = Class.forName("com.nasmedia.admixerssp.NapListenerBridge")
+        val listener = listenerClass.getConstructor(bridgeClass).newInstance(bridge)
+        interstitialClass.getMethod("setAdListener", Class.forName("com.nasmedia.admixerssp.ads.AdListener")).invoke(interstitial, listener)
         interstitialAds[adUnitId] = interstitial
         return interstitial
     }
