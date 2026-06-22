@@ -106,4 +106,9 @@ docs/REVIEW_*.md
 docs/MAESTRO_RUN_*.md
 docs/MAESTRO_READINESS_*.md
 docs/MAESTRO_ENV_*.md
+docs/MAESTRO_GUIDE.md
 docs/PROJECT_TESTING_STRUCTURE.md
+docs/DEVELOPMENT.md
+docs/PUBLISH_GUIDE.md
+docs/test/
+integration-test-app/maestro/*.md

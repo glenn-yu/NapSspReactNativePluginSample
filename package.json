@@ -38,9 +38,6 @@
     "CHANGELOG.md",
     "RELEASE_NOTES.md"
   ],
-  "jest": {
-    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"]
-  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "prepack": "npm run build",
