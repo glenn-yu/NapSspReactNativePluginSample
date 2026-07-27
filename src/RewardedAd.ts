@@ -7,6 +7,7 @@ interface NativeRewardedModule {
   load?: (adUnitId: string, options?: RewardedAdOptions) => Promise<void>;
   start?: (adUnitId: string, options?: RewardedAdOptions) => Promise<void>;
   show?: (adUnitId: string) => Promise<void>;
+  cancelLoad?: (adUnitId: string) => Promise<void>;
   destroy?: (adUnitId: string) => void;
 }
 
@@ -149,6 +150,13 @@ export class RewardedAd {
 
   isLoaded(): boolean {
     return this._loaded;
+  }
+
+  async cancelLoad(): Promise<void> {
+    const nativeModule = getNativeModuleFromNames<NativeRewardedModule>(NativeModuleNames.rewarded);
+    if (nativeModule?.cancelLoad) {
+      await nativeModule.cancelLoad(this.adUnitId);
+    }
   }
 
   destroy(): void {

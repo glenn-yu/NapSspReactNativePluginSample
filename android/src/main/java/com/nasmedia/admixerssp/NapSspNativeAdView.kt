@@ -128,12 +128,12 @@ class NapSspNativeAdView(context: Context) : FrameLayout(context), LifecycleEven
             val binderBuilderClass= Class.forName("com.nasmedia.admixerssp.common.nativeads.NativeAdViewBinder\$Builder")
 
             val nativeLayoutId = layoutRes("nap_ssp_native_ad", R.layout.nap_ssp_native_ad)
-            val nativeIconId = idRes("nap_ssp_native_icon", R.id.nap_ssp_native_icon)
-            val nativeTitleId = idRes("nap_ssp_native_title", R.id.nap_ssp_native_title)
-            val nativeAdvId = idRes("nap_ssp_native_adv", R.id.nap_ssp_native_adv)
-            val nativeDescId = idRes("nap_ssp_native_desc", R.id.nap_ssp_native_desc)
-            val nativeMainId = idRes("nap_ssp_native_main", R.id.nap_ssp_native_main)
-            val nativeCtaId = idRes("nap_ssp_native_cta", R.id.nap_ssp_native_cta)
+            val nativeIconId = idRes("nap_mx_iv_icon", R.id.nap_mx_iv_icon)
+            val nativeTitleId = idRes("nap_mx_tv_title", R.id.nap_mx_tv_title)
+            val nativeAdvId = idRes("nap_mx_tv_adv", R.id.nap_mx_tv_adv)
+            val nativeDescId = idRes("nap_mx_tv_desc", R.id.nap_mx_tv_desc)
+            val nativeMainId = idRes("nap_mx_iv_main", R.id.nap_mx_iv_main)
+            val nativeCtaId = idRes("nap_mx_btn_cta", R.id.nap_mx_btn_cta)
             Log.d(TAG, "resourceIds layout=$nativeLayoutId icon=$nativeIconId title=$nativeTitleId adv=$nativeAdvId desc=$nativeDescId main=$nativeMainId cta=$nativeCtaId package=${context.packageName}")
 
             // AdInfo

@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.3.0 - 2026-07-27
+
+> 공식 nap mx SDK 최신 가이드 기준 동기화 및 팩트체크 마이그레이션 / Sync and fact-checked migration with latest nap mx SDK guides.
+
+### Changed
+- **Android SDK BOM 도입 및 버전 상향** / Adopted Android SDK BOM (`io.github.nasmedia-tech:admixer-bom:2026.07.03`):
+  - Core (`admixer-ssp`) `2.0.0 → 2.1.1`, AdManager `2.0.0 → 2.0.2`, AdFit `2.0.0 → 2.0.3`, Pangle/AppLovin/Unity/NaverAd `2.0.0 → 2.0.2`, Teads `2.0.0 → 2.1.0`.
+- **네이티브 광고 View ID 표준화** / Updated Native Ad View ID prefixes to official standard:
+  - 타 라이브러리와의 리소스 충돌 방지 및 공식 규약에 따라 `nap_ssp_native_*` → `nap_mx_*` (`nap_mx_tv_title`, `nap_mx_iv_icon`, `nap_mx_tv_adv`, `nap_mx_tv_desc`, `nap_mx_iv_main`, `nap_mx_btn_cta`) 로 갱신.
+- **Android 리스너 콜백 표준화** / Aligned Android listener callbacks with v2.1.1 standard:
+  - 수신 실패 콜백 `onFailedToReceiveAd(int code, String msg)` 2-인자 표준 콜백 래핑 지원 추가.
+
+### Added
+- **진행 중 로드 취소 API (`cancelLoad`) 추가** / Added `cancelLoad()` API for fullscreen ads:
+  - 표시 중인 광고에는 영향을 주지 않고 진행 중인 로드 작업만 취소할 수 있는 `cancelLoad()` 메서드를 전면(`InterstitialAd`), 리워드(`RewardedAd`), 전면 동영상(`InterstitialVideoAd`) 모듈에 추가.
+
 ## 0.2.0 - 2026-06-22
 
 > 메이저 네이티브 SDK 업그레이드 / Major native SDK upgrade.

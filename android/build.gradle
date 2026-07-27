@@ -23,14 +23,15 @@ def mediationEnabled = { String name -> enabledMediations.isEmpty() || enabledMe
 
 // Keep Android vendor SDK dependencies pinned to the latest published Maven artifacts.
 def napSspSdkCoordinates = [
-    core: 'io.github.nasmedia-tech:admixer-ssp:2.0.0',
-    adManager: 'io.github.nasmedia-tech:admixer-admanager:2.0.0',
-    adFit: 'io.github.nasmedia-tech:admixer-adfit:2.0.0',
-    pangle: 'io.github.nasmedia-tech:admixer-pangle:2.0.0',
-    appLovin: 'io.github.nasmedia-tech:admixer-applovin:2.0.0',
-    unity: 'io.github.nasmedia-tech:admixer-unity:2.0.0',
-    naveradmanager: 'io.github.nasmedia-tech:admixer-naveradmanager:2.0.0',
-    teads: 'io.github.nasmedia-tech:admixer-teads:2.0.0',
+    bom: 'io.github.nasmedia-tech:admixer-bom:2026.07.03',
+    core: 'io.github.nasmedia-tech:admixer-ssp:2.1.1',
+    adManager: 'io.github.nasmedia-tech:admixer-admanager:2.0.2',
+    adFit: 'io.github.nasmedia-tech:admixer-adfit:2.0.3',
+    pangle: 'io.github.nasmedia-tech:admixer-pangle:2.0.2',
+    appLovin: 'io.github.nasmedia-tech:admixer-applovin:2.0.2',
+    unity: 'io.github.nasmedia-tech:admixer-unity:2.0.2',
+    naveradmanager: 'io.github.nasmedia-tech:admixer-naveradmanager:2.0.2',
+    teads: 'io.github.nasmedia-tech:admixer-teads:2.1.0',
     adsIdentifier: 'com.google.android.gms:play-services-ads-identifier:18.2.0',
 ]
 
@@ -93,6 +94,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
 
     if (enableVendorSdk) {
+        implementation platform(napSspSdkCoordinates.bom)
         implementation napSspSdkCoordinates.adsIdentifier
         implementation napSspSdkCoordinates.core
 

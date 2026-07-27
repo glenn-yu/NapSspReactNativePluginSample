@@ -264,6 +264,10 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
                 }
             }
 
+            override fun onFailedToReceiveAd(code: Int, msg: String?) {
+                onFailedToReceiveAd(null, "", code, msg)
+            }
+
             override fun onFailedToReceiveAd(ad: Any?, name: String, code: Int, msg: String?) {
                 Log.d(tag, "onFailedToReceiveAd adUnitId=$adUnitId code=$code msg=$msg")
                 NapSspEventEmitter.emitModuleEvent(
@@ -312,6 +316,17 @@ class InterstitialModule(private val reactContext: ReactApplicationContext) : Re
     }
 
     private fun isDebuggableApp(): Boolean = (reactContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+
+    @ReactMethod
+    fun cancelLoad(adUnitId: String, promise: Promise) {
+        val normalizedAdUnitId = adUnitId.trim()
+        val interstitial = interstitialAds[normalizedAdUnitId]
+        if (interstitial != null) {
+            runCatching { interstitial.javaClass.getMethod("cancelLoad").invoke(interstitial) }
+        }
+        loadPromises.remove(normalizedAdUnitId)?.reject("NAP_SSP_INTERSTITIAL_LOAD_CANCELLED", "Cancelled by user")
+        promise.resolve(null)
+    }
 
     @ReactMethod
     fun addListener(eventName: String) = Unit

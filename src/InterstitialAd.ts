@@ -7,6 +7,7 @@ interface NativeInterstitialModule {
   load?: (adUnitId: string, options?: InterstitialAdOptions) => Promise<void>;
   start?: (adUnitId: string, options?: InterstitialAdOptions) => Promise<void>;
   show?: (adUnitId: string) => Promise<void>;
+  cancelLoad?: (adUnitId: string) => Promise<void>;
   destroy?: (adUnitId: string) => void;
 }
 
@@ -122,6 +123,13 @@ export class InterstitialAd {
 
   isLoaded(): boolean {
     return this._loaded;
+  }
+
+  async cancelLoad(): Promise<void> {
+    const nativeModule = getNativeModuleFromNames<NativeInterstitialModule>(NativeModuleNames.interstitial);
+    if (nativeModule?.cancelLoad) {
+      await nativeModule.cancelLoad(this.adUnitId);
+    }
   }
 
   addAdEventListener<K extends keyof InterstitialAdEventMap>(

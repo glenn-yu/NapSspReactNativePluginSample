@@ -12,6 +12,7 @@ export interface FullscreenAdSpec extends TurboModule {
   start(adUnitId: string, options: Object | null): Promise<void>;
   show(adUnitId: string): Promise<void>;
   isLoaded(adUnitId: string): Promise<boolean>;
+  cancelLoad(adUnitId: string): Promise<void>;
   destroy(adUnitId: string): void;
   addListener(eventName: string): void;
   removeListeners(count: number): void;

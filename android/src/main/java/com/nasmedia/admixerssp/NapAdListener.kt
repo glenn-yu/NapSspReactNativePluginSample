@@ -7,6 +7,10 @@ class NapAdListener(private val bridge: NapListenerBridge) : AdListener() {
         bridge.onReceivedAd(adapterName, ad)
     }
 
+    override fun onFailedToReceiveAd(code: Int, msg: String?) {
+        bridge.onFailedToReceiveAd(code, msg)
+    }
+
     override fun onFailedToReceiveAd(ad: Any?, name: String, code: Int, msg: String?) {
         bridge.onFailedToReceiveAd(ad, name, code, msg)
     }

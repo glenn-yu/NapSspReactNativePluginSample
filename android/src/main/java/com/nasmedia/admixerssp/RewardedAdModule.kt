@@ -290,6 +290,10 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
                 }
             }
 
+            override fun onFailedToReceiveAd(code: Int, msg: String?) {
+                onFailedToReceiveAd(null, "", code, msg)
+            }
+
             override fun onFailedToReceiveAd(ad: Any?, name: String, code: Int, msg: String?) {
                 Log.d(tag, "onFailedToReceiveAd adUnitId=$adUnitId code=$code msg=$msg")
                 NapSspEventEmitter.emitModuleEvent(
@@ -352,6 +356,17 @@ class RewardedAdModule(private val reactContext: ReactApplicationContext) : Reac
     }
 
     private fun isDebuggableApp(): Boolean = (reactContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+
+    @ReactMethod
+    fun cancelLoad(adUnitId: String, promise: Promise) {
+        val normalizedAdUnitId = adUnitId.trim()
+        val rewardedAd = rewardedAds[normalizedAdUnitId]
+        if (rewardedAd != null) {
+            runCatching { rewardedAd.javaClass.getMethod("cancelLoad").invoke(rewardedAd) }
+        }
+        loadPromises.remove(normalizedAdUnitId)?.reject("NAP_SSP_REWARDED_LOAD_CANCELLED", "Cancelled by user")
+        promise.resolve(null)
+    }
 
     @ReactMethod
     fun addListener(eventName: String) = Unit

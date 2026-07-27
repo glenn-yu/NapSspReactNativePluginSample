@@ -7,6 +7,7 @@ interface NativeInterstitialVideoModule {
   load?: (adUnitId: string, options?: InterstitialVideoAdOptions) => Promise<void>;
   start?: (adUnitId: string, options?: InterstitialVideoAdOptions) => Promise<void>;
   show?: (adUnitId: string) => Promise<void>;
+  cancelLoad?: (adUnitId: string) => Promise<void>;
   destroy?: (adUnitId: string) => void;
 }
 
@@ -131,6 +132,13 @@ export class InterstitialVideoAd {
 
   isLoaded(): boolean {
     return this._loaded;
+  }
+
+  async cancelLoad(): Promise<void> {
+    const nativeModule = getNativeModuleFromNames<NativeInterstitialVideoModule>(NativeModuleNames.interstitialVideo);
+    if (nativeModule?.cancelLoad) {
+      await nativeModule.cancelLoad(this.adUnitId);
+    }
   }
 
   addAdEventListener<K extends keyof InterstitialVideoAdEventMap>(

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'NapSspPlugin'
-  s.version      = '0.2.0'
+  s.version      = '0.3.0'
   s.summary      = 'React Native scaffold for KT Nasmedia nap ssp SDK'
   s.homepage     = 'https://github.com/glenn-yu/react-native-nap-ssp'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }

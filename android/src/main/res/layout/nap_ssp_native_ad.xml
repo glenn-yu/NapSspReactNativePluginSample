@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    공식 nap SSP 네이티브 광고 레이아웃 (SDK NativeAdViewBinder 전달용)
-    6개 asset: icon / title / advertiser / description / mainView(NativeMainAdView) / cta
+    공식 nap mx SSP 네이티브 광고 레이아웃 (SDK NativeAdViewBinder 전달용)
+    v2.0.0 표준 View ID (nap_mx_ 접두사 적용):
+    6개 asset: nap_mx_iv_icon / nap_mx_tv_title / nap_mx_tv_adv / nap_mx_tv_desc / nap_mx_iv_main(NativeMainAdView) / nap_mx_btn_cta
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -11,7 +12,7 @@
 
     <!-- 아이콘 -->
     <ImageView
-        android:id="@+id/nap_ssp_native_icon"
+        android:id="@+id/nap_mx_iv_icon"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_alignParentStart="true"
@@ -20,12 +21,12 @@
 
     <!-- 제목 -->
     <TextView
-        android:id="@+id/nap_ssp_native_title"
+        android:id="@+id/nap_mx_tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginStart="8dp"
-        android:layout_toEndOf="@id/nap_ssp_native_icon"
+        android:layout_toEndOf="@id/nap_mx_iv_icon"
         android:maxLines="2"
         android:textColor="#212121"
         android:textSize="14sp"
@@ -33,21 +34,21 @@
 
     <!-- 광고주 -->
     <TextView
-        android:id="@+id/nap_ssp_native_adv"
+        android:id="@+id/nap_mx_tv_adv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/nap_ssp_native_title"
+        android:layout_below="@id/nap_mx_tv_title"
         android:layout_marginStart="8dp"
-        android:layout_toEndOf="@id/nap_ssp_native_icon"
+        android:layout_toEndOf="@id/nap_mx_iv_icon"
         android:textColor="#9E9E9E"
         android:textSize="11sp" />
 
     <!-- 설명 -->
     <TextView
-        android:id="@+id/nap_ssp_native_desc"
+        android:id="@+id/nap_mx_tv_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/nap_ssp_native_icon"
+        android:layout_below="@id/nap_mx_iv_icon"
         android:layout_marginTop="8dp"
         android:maxLines="3"
         android:textColor="#424242"
@@ -59,14 +60,14 @@
         vendorSdk enabled 시에만 inflate 되는 코드 경로에서 사용됨
     -->
     <com.nasmedia.admixerssp.common.nativeads.NativeMainAdView
-        android:id="@+id/nap_ssp_native_main"
+        android:id="@+id/nap_mx_iv_main"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_below="@id/nap_ssp_native_desc"
+        android:layout_below="@id/nap_mx_tv_desc"
         android:layout_marginTop="8dp">
 
         <ImageView
-            android:id="@+id/nap_ssp_native_main_image"
+            android:id="@+id/nap_mx_iv_main_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY" />
@@ -75,10 +76,10 @@
 
     <!-- CTA 버튼 -->
     <Button
-        android:id="@+id/nap_ssp_native_cta"
+        android:id="@+id/nap_mx_btn_cta"
         android:layout_width="match_parent"
         android:layout_height="44dp"
-        android:layout_below="@id/nap_ssp_native_main"
+        android:layout_below="@id/nap_mx_iv_main"
         android:layout_marginTop="8dp"
         android:background="#1565C0"
         android:textColor="#FFFFFF"
