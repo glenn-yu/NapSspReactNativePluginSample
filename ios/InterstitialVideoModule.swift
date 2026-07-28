@@ -23,7 +23,11 @@ class InterstitialVideoModule: NSObject {
         return
       }
 
-      AMMVideoInterstitial.load(adUnitID: adUnit) { [weak self] ad, error in
+      // SDK 2.4.2 에서 2-인자 클로저(@nonobjc) 오버로드가 제거되어 (ad, adapterName, error) 3-인자
+      // 오버로드를 사용합니다. 이 시그니처는 2.3.7 과 2.4.2 양쪽에 동일하게 존재합니다.
+      // The 2-argument (@nonobjc) overload was removed in SDK 2.4.2; the 3-argument
+      // (ad, adapterName, error) form exists identically in both 2.3.7 and 2.4.2.
+      AMMVideoInterstitial.load(adUnitID: adUnit) { [weak self] ad, _, error in
         guard let _ = self else {
           reject("napssp_module_released", "Module was released during load.", nil)
           return

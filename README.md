@@ -21,7 +21,7 @@ Monetize React Native apps with banners, native ads, inline video, interstitials
 
 > ⚠️ **If you copied code from the v0.3.0 README or API guide**, it referenced `initSdk()` and `setAdapterConfig()`, which this package has never exported. Initialization is `NapSspAd.initialize({ mediaKey, adUnitIds, ... })`, and mediation keys go in that same `mediations` object. See the [API Reference](./docs/API.md).
 
-> ⚠️ **iOS 2.4.x is not yet build-verified in this repository.** Build and smoke-test your iOS target before shipping to production — details in the [Migration Guide](./docs/MIGRATION.md#1-v040--native-sdk-refresh).
+> ℹ️ **iOS 2.4.2 was source-verified** by diffing the shipped `.swiftinterface` of both SDK versions against every symbol this plugin calls. One breaking change was found and fixed (`AMMVideoInterstitial.load`, see the [Migration Guide](./docs/MIGRATION.md#1-v040--native-sdk-refresh)). A full Xcode build has not been run, so smoke-test your iOS target before shipping.
 
 ---
 

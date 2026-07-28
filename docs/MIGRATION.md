@@ -37,7 +37,29 @@ No plugin API changed in this release. It advances both native SDKs to the versi
 | **Android** | Re-sync Gradle. If another dependency pulls `play-services-ads` `25.3.0+`, force `25.2.0` — see [Setup §3②](./SETUP.md#-bundled-artifact-versions). |
 | **iOS** | `pod install --repo-update`, or resolve SPM packages again. Add the `Teads` subspec if you serve Teads. |
 
-> ⚠️ **iOS 2.4.x is not yet build-verified in this repository.** The bump follows the official release notes (2.4.0 "loadAd API 개선", 2.4.1 simulator fix, 2.4.2 stability + adapter updates), but it was applied on a machine without Xcode. Build and smoke-test your iOS target before shipping to production.
+### iOS 2.4.2 source compatibility — what was verified
+
+The upgrade was verified by diffing the `arm64-apple-ios` and simulator `.swiftinterface` files shipped inside both XCFrameworks, then checking every AdMixerMediation symbol this plugin references against the 2.4.2 interface.
+
+**One breaking change affected this plugin and is fixed in v0.4.0:**
+
+`AMMVideoInterstitial.load(adUnitID:completion:)` lost its `@nonobjc` **2-argument** closure overload in 2.4.2. `InterstitialVideoModule.swift` used it, which would not have compiled. It now uses the 3-argument `(videoInterstitial, adapterName, error)` overload, which is present and identical in **both 2.3.7 and 2.4.2**.
+
+**Verified as safe** — everything else this plugin touches is source-compatible:
+
+| Area | Result |
+| :--- | :--- |
+| `AMMediation.shared.initialize(mediaKey:adunitID:)`, `setDebugEnabled(isEnabled:)` | Unchanged |
+| `AMMInterstitialConfig.closeButtonTouchAreaRatio` | Unchanged |
+| Instance `load()` / `stop()` / `show(rootViewController:)` on all ad classes | Unchanged |
+| `AMMInterstitial.load` / `AMMRewardVideo.load` 2-argument overloads | Still present |
+| `AMMBannerViewDelegate`, `AMMNativeDelegate`, `AMMVideoViewDelegate` | `onFailBanner()` / `onFailNative()` / `onFailVideo()` keep the original no-argument signature as `@objc optional`, now marked deprecated. The `error:`-carrying variants belong to the internal `BannerHandler` / `NativeHandler` / `VideoHandler` protocols, which this plugin does not implement. Callbacks still fire. |
+| `NetworkType` → `AdNetworkType` rename | Not referenced by this plugin |
+| `rootViewController` becoming `weak` / optional | Only passed to initializers here, never read back |
+
+> ⚠️ A full Xcode build was not run (the upgrade was prepared on Windows). Source compatibility is established, but smoke-test your iOS target before shipping to production.
+
+> ℹ️ Deprecation warnings are expected on 2.4.2 for the `onSuccessBanner()` / `onFailBanner()` / `onTapBanner()` family and the `load(...)` statics. They remain functional; migrating to `onSuccessShowBanner()` and `loadAd(...)` is tracked in the [roadmap](#5-roadmap).
 
 ---
 
@@ -145,5 +167,7 @@ These originate in the native SDKs. Most are absorbed by the plugin, but they af
 
 ## 5. Roadmap
 * Surface the native `isReady()` / `isLoading()` state through the JS bridge.
-* Build-verify the iOS 2.4.x upgrade in CI.
+* Migrate iOS off the deprecated `load(...)` statics and `onSuccessBanner()` / `onFailBanner()` / `onTapBanner()` callbacks to `loadAd(...)` and the `onSuccessShowBanner()` family.
+* Expose the new iOS `AMMConsent` API (GDPR / US sale / child-directed / under-age) through `MediationConfig`.
+* Add an Xcode build to CI so iOS SDK bumps are build-verified, not just source-verified.
 * Fabric / TurboModule native layer optimizations.

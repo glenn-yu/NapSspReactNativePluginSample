@@ -10,7 +10,12 @@
   - BOM `2026.07.03 → 2026.07.06`, Core (`admixer-ssp`) `2.1.1 → 2.1.3`, AdManager (`admixer-admanager`) `2.0.2 → 2.0.4`. 나머지 어댑터는 변경 없음.
 - **iOS 네이티브 SDK 상향** / Bumped the iOS native SDK:
   - `AdMixerMediation` XCFramework `2.3.7 → 2.4.2` (`ios/Package.swift` URL + checksum 갱신). 2.4.0 `loadAd` API 개선, 2.4.1 시뮬레이터 실행 이슈 수정, 2.4.2 안정성 개선 및 어댑터 갱신 반영.
-  - ⚠️ Xcode 빌드 검증은 아직 수행하지 않았습니다 — 배포 전 iOS 타깃 빌드/스모크 테스트 필요. / Not yet build-verified with Xcode; verify before shipping.
+  - 양 버전 XCFramework 에 동봉된 `.swiftinterface`(device·simulator 슬라이스) 를 diff 하여 플러그인이 참조하는 전체 심볼의 소스 호환성을 검증. / Source compatibility verified by diffing the bundled `.swiftinterface` of both versions across device and simulator slices.
+  - ⚠️ Xcode 전체 빌드는 미수행 — 배포 전 iOS 타깃 스모크 테스트 권장. / Full Xcode build not run; smoke-test before shipping.
+
+### Fixed
+- **iOS 전면 동영상 로드 컴파일 오류 수정 (2.4.2 대응)** / Fixed an iOS interstitial-video compile break under SDK 2.4.2:
+  - `AMMVideoInterstitial.load(adUnitID:completion:)` 의 2-인자 클로저(`@nonobjc`) 오버로드가 2.4.2 에서 제거되어, 양 버전에 동일하게 존재하는 3-인자 `(videoInterstitial, adapterName, error)` 오버로드로 전환 (`ios/InterstitialVideoModule.swift`).
 - **문서 전면 정정** / Corrected all guides:
   - v0.3.0 문서가 실제로 export 되지 않는 `initSdk()` / `setAdapterConfig()` API 와 잘못된 이벤트명(`onAdLoaded` 등), 잘못된 `AdError` 형태를 안내하고 있던 문제를 수정. 실제 export(`NapSspAd.initialize()`, 축약 이벤트명 `loaded`/`loadFailed`/…, `AdError { code, message, nativeCode?, nativeDomain?, details? }`) 기준으로 재작성.
   - `MIGRATION.md` 버전 매트릭스에서 Google Ad Manager 아티팩트를 `admixer-gma-nextgen` → `admixer-admanager` 로 정정(GMA NextGen 은 beta 이며 AdManager·NaverAd 와 공존 불가).
