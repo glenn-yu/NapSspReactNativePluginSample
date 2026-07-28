@@ -37,10 +37,17 @@ export interface MediationConfig {
     appId: string;
   };
   adFit?: boolean;
+  /**
+   * @deprecated 공식 nap mx 가이드의 지원 네트워크 목록에서 제외되었습니다. 설정해도 무시됩니다.
+   * Deprecated: no longer listed as a supported network in the official nap mx guide; ignored.
+   */
   mobwith?: boolean;
   /** Naver Ad Manager 어댑터 활성화 (v2.0.0+). PUBLISHER_CD는 SDK가 제공하므로 추가 설정 불필요 / Enable Naver Ad Manager adapter (v2.0.0+); PUBLISHER_CD is provided by the SDK. */
   naverAdManager?: boolean;
-  /** Teads 어댑터 활성화 (v2.0.0+). Teads Maven 저장소 추가 필요 / Enable Teads adapter (v2.0.0+); requires Teads Maven repositories. */
+  /**
+   * Teads 어댑터 활성화. Android 는 Teads Maven 저장소 추가 필요, iOS 는 `Teads` subspec 필요.
+   * Enable the Teads adapter; Android needs the Teads Maven repositories, iOS needs the `Teads` subspec.
+   */
   teads?: boolean;
 }
 

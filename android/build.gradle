@@ -23,9 +23,9 @@ def mediationEnabled = { String name -> enabledMediations.isEmpty() || enabledMe
 
 // Keep Android vendor SDK dependencies pinned to the latest published Maven artifacts.
 def napSspSdkCoordinates = [
-    bom: 'io.github.nasmedia-tech:admixer-bom:2026.07.03',
-    core: 'io.github.nasmedia-tech:admixer-ssp:2.1.1',
-    adManager: 'io.github.nasmedia-tech:admixer-admanager:2.0.2',
+    bom: 'io.github.nasmedia-tech:admixer-bom:2026.07.06',
+    core: 'io.github.nasmedia-tech:admixer-ssp:2.1.3',
+    adManager: 'io.github.nasmedia-tech:admixer-admanager:2.0.4',
     adFit: 'io.github.nasmedia-tech:admixer-adfit:2.0.3',
     pangle: 'io.github.nasmedia-tech:admixer-pangle:2.0.2',
     appLovin: 'io.github.nasmedia-tech:admixer-applovin:2.0.2',
@@ -83,6 +83,8 @@ repositories {
     // Teads 사용 시 필수
     maven { url "https://sdk.teads.tv/android/repo" }
     maven { url "https://teads.jfrog.io/artifactory/SDKAndroid-maven-prod" }
+    // Teads 공식 설치 가이드가 Huawei 단말 호환을 위해 필수로 안내
+    maven { url "https://developer.huawei.com/repo/" }
 }
 
 dependencies {

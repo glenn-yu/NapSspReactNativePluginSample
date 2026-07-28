@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.4.0 - 2026-07-28
+
+> 공식 nap mx 가이드(Android BOM 2026.07.06 / iOS 2.4.2) 기준 네이티브 SDK 상향 및 문서 정정.
+> Native SDK refresh against the current official nap mx guides, plus documentation corrections.
+
+### Changed
+- **Android 네이티브 SDK 상향** / Bumped the Android native SDK:
+  - BOM `2026.07.03 → 2026.07.06`, Core (`admixer-ssp`) `2.1.1 → 2.1.3`, AdManager (`admixer-admanager`) `2.0.2 → 2.0.4`. 나머지 어댑터는 변경 없음.
+- **iOS 네이티브 SDK 상향** / Bumped the iOS native SDK:
+  - `AdMixerMediation` XCFramework `2.3.7 → 2.4.2` (`ios/Package.swift` URL + checksum 갱신). 2.4.0 `loadAd` API 개선, 2.4.1 시뮬레이터 실행 이슈 수정, 2.4.2 안정성 개선 및 어댑터 갱신 반영.
+  - ⚠️ Xcode 빌드 검증은 아직 수행하지 않았습니다 — 배포 전 iOS 타깃 빌드/스모크 테스트 필요. / Not yet build-verified with Xcode; verify before shipping.
+- **문서 전면 정정** / Corrected all guides:
+  - v0.3.0 문서가 실제로 export 되지 않는 `initSdk()` / `setAdapterConfig()` API 와 잘못된 이벤트명(`onAdLoaded` 등), 잘못된 `AdError` 형태를 안내하고 있던 문제를 수정. 실제 export(`NapSspAd.initialize()`, 축약 이벤트명 `loaded`/`loadFailed`/…, `AdError { code, message, nativeCode?, nativeDomain?, details? }`) 기준으로 재작성.
+  - `MIGRATION.md` 버전 매트릭스에서 Google Ad Manager 아티팩트를 `admixer-gma-nextgen` → `admixer-admanager` 로 정정(GMA NextGen 은 beta 이며 AdManager·NaverAd 와 공존 불가).
+  - Android 네트워크별 최소 API/Kotlin 요구사항, `play-services-ads` 25.2.0 상한, Google App ID meta-data, `networkSecurityConfig` 병합 충돌 해결법, 16KB 페이지 정렬 등 공식 가이드 항목 추가.
+
+### Added
+- **iOS Teads 어댑터 지원** / Added iOS Teads support:
+  - `NapSspPlugin.podspec` 에 `Teads` subspec(`AdMixerMediationTeads`) 추가. 기존에는 Android 전용이었습니다.
+- **Huawei Maven 저장소 추가** / Added the Huawei Maven repository:
+  - Teads 공식 설치 가이드가 Huawei 단말 호환을 위해 요구하는 `https://developer.huawei.com/repo/` 를 `android/build.gradle` 에 추가.
+
+### Deprecated
+- `MediationConfig.mobwith` — 공식 가이드의 지원 네트워크 목록에서 제외되었습니다. 타입은 유지되나 무시됩니다. / No longer a supported nap mx network; the field remains for compatibility but is ignored.
+
 ## 0.3.0 - 2026-07-27
 
 > 공식 nap mx SDK 최신 가이드 기준 동기화 및 팩트체크 마이그레이션 / Sync and fact-checked migration with latest nap mx SDK guides.
