@@ -5,26 +5,31 @@ export { default as VideoAd } from './VideoAd';
 export { InterstitialAd } from './InterstitialAd';
 export { RewardedAd } from './RewardedAd';
 export { InterstitialVideoAd } from './InterstitialVideoAd';
-export { isNativeModuleAvailable, isNativeViewAvailable, NativeModuleNames } from './nativeBridge';
+export {
+  isNativeModuleAvailable,
+  isNativeViewAvailable,
+  NativeModuleNames,
+} from './nativeBridge';
 export { normalizeAdError } from './errors';
 
-export type { RewardedEventName } from './RewardedAd';
-
 export type { BannerAdProps } from './BannerAd';
+export type { RewardedEventName } from './RewardedAd';
 export type {
   AdError,
+  AdViewHandle,
   BannerSize,
-  NativeAdProps,
-  VideoAdProps,
-  InterstitialAdOptions,
-  RewardedAdOptions,
-  InterstitialVideoAdOptions,
   InterstitialAdEventMap,
+  InterstitialAdOptions,
   InterstitialVideoAdEventMap,
+  InterstitialVideoAdOptions,
   LogLevel,
   MediationConfig,
   NapSspConfig,
   NapSspStatus,
+  NativeAdProps,
+  PrivacyConsent,
   RewardedAdEventMap,
+  RewardedAdOptions,
   RewardPayload,
+  VideoAdProps,
 } from './types';

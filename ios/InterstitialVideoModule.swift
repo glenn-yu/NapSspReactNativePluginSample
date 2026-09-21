@@ -1,165 +1,197 @@
-import Foundation
 import React
+import Foundation
+import UIKit
 #if canImport(AdMixerMediation)
 import AdMixerMediation
 #endif
 
+/// Bridges `AMMVideoInterstitial` (full-screen video).
+/// https://napmx.github.io/#/ios/native/video
 @objc(NapSspInterstitialVideo)
-class InterstitialVideoModule: NSObject {
-  @objc
-  static func requiresMainQueueSetup() -> Bool { false }
+final class InterstitialVideoModule: NSObject {
+  private static let format = "interstitial_video"
+
+  #if canImport(AdMixerMediation)
+  private let registry = NapSspFullScreenRegistry<AMMVideoInterstitial>()
+  #endif
+
+  @objc static func requiresMainQueueSetup() -> Bool { false }
 
   @objc
-  func load(_ adUnitId: String, options: NSDictionary?, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+  func load(
+    _ adUnitId: String,
+    options: NSDictionary?,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    performLoad(adUnitId, autoShow: false, resolve: resolve, reject: reject)
+  }
+
+  @objc
+  func start(
+    _ adUnitId: String,
+    options: NSDictionary?,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    performLoad(adUnitId, autoShow: true, resolve: resolve, reject: reject)
+  }
+
+  @objc
+  func show(
+    _ adUnitId: String,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
     DispatchQueue.main.async {
-      NSLog("[NapSspInterstitialVideo] load requested adUnitId=%@ options=%@", adUnitId, options ?? [:])
       #if canImport(AdMixerMediation)
-      guard NapSspRuntime.shared.isInitialized else {
-        reject(NapSspError.notInitialized.errorCode, NapSspError.notInitialized.errorDescription, nil)
+      let key = adUnitId.trimmingCharacters(in: .whitespacesAndNewlines)
+      guard let ad = self.registry.ad(for: key), ad.isAdReady else {
+        reject(
+          NapSspError.adNotLoaded("No interstitial video is ready for \"\(key)\".").errorCode,
+          "No interstitial video is ready for \"\(key)\". Await load() first.",
+          nil
+        )
         return
       }
-      guard let adUnit = Int(adUnitId) else {
-        reject("napssp_invalid_ad_unit", "Interstitial video adUnitId must be numeric on iOS.", nil)
-        return
-      }
-
-      // SDK 2.4.2 에서 2-인자 클로저(@nonobjc) 오버로드가 제거되어 (ad, adapterName, error) 3-인자
-      // 오버로드를 사용합니다. 이 시그니처는 2.3.7 과 2.4.2 양쪽에 동일하게 존재합니다.
-      // The 2-argument (@nonobjc) overload was removed in SDK 2.4.2; the 3-argument
-      // (ad, adapterName, error) form exists identically in both 2.3.7 and 2.4.2.
-      AMMVideoInterstitial.load(adUnitID: adUnit) { [weak self] ad, _, error in
-        guard let _ = self else {
-          reject("napssp_module_released", "Module was released during load.", nil)
-          return
-        }
-        if let error = error {
-          NSLog("[NapSspInterstitialVideo] load failed adUnitId=%@ error=%@", adUnitId, error.localizedDescription)
-          let payload = napSspErrorPayload(adUnitId: adUnitId, format: "interstitial_video", error: error)
-          reject(payload["code"] as? String ?? "LOAD_FAILED", payload["message"] as? String ?? "Load failed", error)
-          NapSspModule.shared?.emitEvent(name: "onAdFailedToLoad", payload: payload)
-          return
-        }
-        if let ad = ad {
-          NSLog("[NapSspInterstitialVideo] load succeeded adUnitId=%@ storing instance", adUnitId)
-          NapSspRuntime.shared.storeInterstitialVideo(adUnitId: adUnitId, instance: ad)
-        } else {
-          NSLog("[NapSspInterstitialVideo] load completed adUnitId=%@ with nil instance and no error", adUnitId)
-        }
-        resolve(nil)
-        NapSspModule.shared?.emitEvent(name: "onAdLoaded", payload: [
-          "adUnitId": adUnitId, "format": "interstitial_video"
-        ])
-      }
-      #else
+      guard let rootVC = NapSspFullScreenGuard.rootViewController(reject: reject) else { return }
+      ad.show(rootViewController: rootVC)
       resolve(nil)
-      NapSspModule.shared?.emitEvent(name: "onAdLoaded", payload: [
-        "adUnitId": adUnitId,
-        "format": "interstitial_video"
-      ])
+      #else
+      NapSspFullScreenGuard.sdkNotLinked(reject)
       #endif
     }
   }
 
   @objc
-  func show(_ adUnitId: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
-    DispatchQueue.main.async {
-      NSLog("[NapSspInterstitialVideo] show requested adUnitId=%@", adUnitId)
-      guard NapSspRuntime.shared.isInitialized else {
-        reject(NapSspError.notInitialized.errorCode, NapSspError.notInitialized.errorDescription ?? "NapSsp has not been initialized yet.", nil)
-        return
-      }
+  func isLoaded(
+    _ adUnitId: String,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    #if canImport(AdMixerMediation)
+    resolve(registry.ad(for: adUnitId.trimmingCharacters(in: .whitespacesAndNewlines))?.isAdReady ?? false)
+    #else
+    resolve(false)
+    #endif
+  }
 
-      #if canImport(AdMixerMediation)
-      guard let ad = NapSspRuntime.shared.consumeStoredInterstitialVideo(adUnitId: adUnitId) else {
-        NSLog("[NapSspInterstitialVideo] show missing stored ad adUnitId=%@", adUnitId)
-        reject("NOT_LOADED", "InterstitialVideo ad '\(adUnitId)' is not loaded.", nil)
-        return
-      }
-
-      guard let rootVC = NapSspRuntime.activeRootViewController() else {
-        NSLog("[NapSspInterstitialVideo] show missing rootVC adUnitId=%@", adUnitId)
-        reject("NO_ROOT_VC", "No root view controller available.", nil)
-        return
-      }
-
-      let delegate = NapSspInterstitialVideoDelegate(adUnitId: adUnitId)
-      delegate.resolve = resolve
-      delegate.reject = reject
-      NapSspRuntime.shared.storeInterstitialVideoDelegate(adUnitId: adUnitId, delegate: delegate)
-      ad.delegate = delegate
-      NSLog("[NapSspInterstitialVideo] calling show on SDK adUnitId=%@ rootVC=%@", adUnitId, String(describing: type(of: rootVC)))
-      ad.show(rootViewController: rootVC)
-      #else
-      resolve(nil)
-      NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
-      NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
-
-      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-        NapSspModule.shared?.emitEvent(name: "onVideoCompleted", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
-        NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
-      }
-      #endif
-    }
+  @objc
+  func cancelLoad(
+    _ adUnitId: String,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    destroy(adUnitId)
+    resolve(nil)
   }
 
   @objc
   func destroy(_ adUnitId: String) {
+    #if canImport(AdMixerMediation)
+    let key = adUnitId.trimmingCharacters(in: .whitespacesAndNewlines)
+    DispatchQueue.main.async { self.registry.remove(key)?.stop() }
+    #endif
+  }
+
+  // MARK: private
+
+  private func performLoad(
+    _ adUnitId: String,
+    autoShow shouldAutoShow: Bool,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
     DispatchQueue.main.async {
       #if canImport(AdMixerMediation)
-      if let delegate = NapSspRuntime.shared.peekStoredInterstitialVideoDelegate(adUnitId: adUnitId) as? NapSspInterstitialVideoDelegate,
-         let pendingReject = delegate.reject {
-        pendingReject("napssp_destroyed", "InterstitialVideo was destroyed before completing.", nil)
-        delegate.resolve = nil
-        delegate.reject = nil
+      guard let numericAdUnitId = NapSspFullScreenGuard.numericAdUnitId(
+        adUnitId, format: Self.format, reject: reject
+      ) else { return }
+
+      let key = adUnitId.trimmingCharacters(in: .whitespacesAndNewlines)
+      self.registry.remove(key)?.stop()
+
+      let delegate = NapSspInterstitialVideoDelegate(adUnitId: key, module: self)
+
+      AMMVideoInterstitial.loadAd(adUnitID: numericAdUnitId) { ad, adapterType, error in
+        if let error {
+          let payload = napSspErrorPayload(adUnitId: key, format: Self.format, error: error)
+          NapSspModule.shared?.emitEvent(name: "onAdFailedToLoad", payload: payload)
+          reject(payload["code"] as? String ?? "napssp_load_failed", error.localizedDescription, error)
+          return
+        }
+        guard let ad else {
+          reject("napssp_empty_ad", "The SDK returned no interstitial video and no error.", nil)
+          return
+        }
+
+        ad.delegate = delegate
+        self.registry.store(ad, delegate: delegate, for: key)
+
+        NapSspModule.shared?.emitEvent(
+          name: "onAdLoaded",
+          payload: ["adUnitId": key, "format": Self.format, "network": adapterType.adapterName]
+        )
+
+        guard shouldAutoShow else {
+          resolve(nil)
+          return
+        }
+        guard let rootVC = NapSspFullScreenGuard.rootViewController(reject: reject) else { return }
+        ad.show(rootViewController: rootVC)
+        resolve(nil)
       }
-      NapSspRuntime.shared.removeStoredInterstitialVideo(adUnitId: adUnitId)
+      #else
+      NapSspFullScreenGuard.sdkNotLinked(reject)
       #endif
     }
+  }
+
+  fileprivate func releaseAd(_ adUnitId: String) {
+    #if canImport(AdMixerMediation)
+    registry.remove(adUnitId)
+    #endif
   }
 }
 
 #if canImport(AdMixerMediation)
 private final class NapSspInterstitialVideoDelegate: NSObject, AMMVideoInterstitialDelegate {
   private let adUnitId: String
-  var resolve: RCTPromiseResolveBlock?
-  var reject: RCTPromiseRejectBlock?
+  private weak var module: InterstitialVideoModule?
 
-  init(adUnitId: String) { self.adUnitId = adUnitId }
-
-  func onSuccessShowVideoInterstitial() {
-    NSLog("[NapSspInterstitialVideo] delegate success show adUnitId=%@", adUnitId)
-    resolve?(nil)
-    resolve = nil
-    reject = nil
-    NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
-    NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
+  init(adUnitId: String, module: InterstitialVideoModule) {
+    self.adUnitId = adUnitId
+    self.module = module
   }
 
-  func onCloseVideoInterstitial() {
-    NSLog("[NapSspInterstitialVideo] delegate close adUnitId=%@", adUnitId)
-    // resolve가 아직 호출 안 된 경우 (show 성공 콜백 없이 닫힌 경우) reject 처리
-    if let pendingReject = reject {
-      pendingReject("napssp_interstitial_video_show_failed", "InterstitialVideo closed before show succeeded.", nil)
-      reject = nil
-      resolve = nil
-    }
-    NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
-    NapSspRuntime.shared.removeStoredInterstitialVideoDelegate(adUnitId: adUnitId)
+  private var basePayload: [String: Any] { ["adUnitId": adUnitId, "format": "interstitial_video"] }
+
+  func onSuccessShowVideoInterstitial() {
+    NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: basePayload)
+    NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: basePayload)
+  }
+
+  func onFailShowVideoInterstitial(error: Error?) {
+    var payload = napSspErrorPayload(adUnitId: adUnitId, format: "interstitial_video", error: error)
+    payload["phase"] = "show"
+    NapSspModule.shared?.emitEvent(name: "onAdFailedToLoad", payload: payload)
+    module?.releaseAd(adUnitId)
+  }
+
+  func onClickVideoInterstitial() {
+    NapSspModule.shared?.emitEvent(name: "onAdClicked", payload: basePayload)
   }
 
   func onCompleteVideoInterstitial() {
-    NSLog("[NapSspInterstitialVideo] delegate completed adUnitId=%@", adUnitId)
-    NapSspModule.shared?.emitEvent(name: "onVideoCompleted", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
+    NapSspModule.shared?.emitEvent(name: "onVideoCompleted", payload: basePayload)
   }
 
-  func onSkipVideoInterstitial() {
-    NSLog("[NapSspInterstitialVideo] delegate skipped adUnitId=%@", adUnitId)
-    NapSspModule.shared?.emitEvent(name: "onVideoSkipped", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
+  func onCloseVideoInterstitial() {
+    NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: basePayload)
+    module?.releaseAd(adUnitId)
   }
 
-  func onTapVideoInterstitialViewMore() {
-    NSLog("[NapSspInterstitialVideo] delegate tap adUnitId=%@", adUnitId)
-    NapSspModule.shared?.emitEvent(name: "onAdClicked", payload: ["adUnitId": adUnitId, "format": "interstitial_video"])
-  }
+  // NOTE: AMMVideoInterstitialDelegate has no skip callback, so `skipped` never fires for this
+  // format on iOS. Android delivers it through AdListener.onAdSkipped().
 }
 #endif

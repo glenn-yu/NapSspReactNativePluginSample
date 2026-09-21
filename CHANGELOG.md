@@ -1,5 +1,138 @@
 # Changelog
 
+## 0.5.0 - 2026-09-21
+
+> 네이티브 SDK 최신화(Android core 2.3.0 / iOS 2.5.0)와 함께, 디버그 빌드에서 실광고를 가로채던
+> placeholder 시뮬레이션을 전량 제거하고 공식 가이드의 개인정보·테스트 API 를 노출합니다.
+> Refreshes both native SDKs, removes the placeholder simulation that intercepted real ads in debug
+> builds, and exposes the privacy and test APIs from the official guide.
+
+### ⚠️ BREAKING CHANGES
+
+- **React Native 0.76 이상이 필요합니다** / **React Native 0.76+** is now required.
+  - `admixer-ssp:2.3.0` 의 AAR 메타데이터가 **compileSdk 35 이상**을 요구합니다. 34 로 빌드하면
+    `requires libraries and applications that depend on it to compile against version 35 or later`
+    오류로 실패합니다. RN 0.76 부터 템플릿이 35(0.81 부터 36)로 컴파일합니다.
+  - `peerDependencies.react-native` 를 `>=0.72.0` → `>=0.76.0` 으로 정정했습니다.
+- **호스트 앱에 Kotlin 2.1 이상이 필요합니다** / The host app must build with **Kotlin 2.1+**.
+  - nap mx core `admixer-ssp:2.3.0` 이 `kotlin-stdlib:2.2.10`(metadata 2.2.0)을 전이 의존으로 포함합니다.
+    Kotlin 2.0 이하 컴파일러는 이 메타데이터를 읽지 못해 `Class 'kotlin.Unit' was compiled with an
+    incompatible version of Kotlin` 오류로 빌드가 실패합니다.
+  - React Native **0.79 이상은 기본값이 Kotlin 2.1.x** 라 추가 설정이 필요 없습니다.
+    RN 0.72~0.78 은 앱의 최상위 `android/build.gradle` 에 `kotlinVersion = "2.1.21"` 을 지정하세요
+    ([SETUP](./docs/SETUP.md#kotlin-요구사항)).
+- **`napSsp.enableVendorSdk` 제거** / Removed the `napSsp.enableVendorSdk` Gradle flag.
+  - 코어 SDK 가 항상 링크됩니다. 이 값이 남아 있으면 빌드 경고만 출력하고 무시합니다.
+  - 미디에이션 어댑터는 `napSsp.mediations` 로 선택합니다(미지정 시 **코어만** 링크 — 종전에는
+    `enableVendorSdk=true` + 미지정이면 전 어댑터가 포함되었습니다).
+- **placeholder / 시뮬레이션 모드 전면 제거** / Removed placeholder ad simulation entirely.
+  - 종전에는 디버그 빌드에서 `start()`·`show()`·배너/네이티브/동영상 뷰가 실 SDK 대신 가짜 이벤트를
+    발행하거나, 로드 실패를 가짜 성공으로 덮었습니다. 이제 **모든 빌드에서 실 SDK 경로만** 사용하며
+    실패는 실패로 통지됩니다.
+  - 네이티브 모듈/뷰가 링크되지 않은 환경에서는 `onAdFailedToLoad` 로 `nap_ssp_view_not_linked` 가
+    전달되고, 인라인 뷰는 빈 영역을 렌더링합니다(가짜 광고 카드를 그리지 않습니다).
+- **`NapSspAd.setLogLevel()` / `setCoppa()` 가 `Promise` 를 반환합니다** / They now return promises.
+  - 기존에는 `void` 였으며 **Android 에서는 인자 개수 불일치로 예외가 발생**해 동작하지 않았습니다.
+- **`NapSspAd.initialize()` 가 `NapSspStatus` 를 resolve 합니다** / It now resolves the status object
+  (이전에는 `undefined`).
+- **`adUnitIds` 는 숫자 문자열만 허용합니다** / `adUnitIds` must be numeric strings, validated in JS.
+- **미구현 TurboModule 스펙 파일 삭제** / Deleted the unimplemented TurboModule spec files
+  (`src/NativeNapSspModuleSpec.ts`, `src/NativeNapSspInterstitialSpec.ts`). New Architecture 는
+  검증되지 않았으므로 지원한다고 문서화하지 않습니다.
+
+### Added
+
+- **개인정보 동의 API** / Privacy consent API — `NapSspAd.setPrivacyConsent()` 및 `initialize({ privacy })`.
+  - Android: `AdMixer.setTagForChildDirectedTreatment` / `setGdprConsent` / `setCcpaDoNotSell` / `setUsPrivacy`
+  - iOS: `AMMConsent` + `AMMediation.shared.setConsent()`
+  - 종전 `setCoppa()` 는 **양 플랫폼 모두 로컬 플래그만 저장하고 SDK 에 전달하지 않았습니다**(COPPA 미적용).
+- **테스트 모드 API** / Test mode — `NapSspAd.setTestMode()` / `setTestDeviceIds()` 및 `initialize({ testMode, testDeviceIds })`.
+  - Android 전용(`AdMixer.setTestMode` / `setTestDeviceIds`). iOS SDK 에는 전역 테스트 스위치가 없어
+    `false` 를 resolve 합니다.
+- **리워드 `transactionId`** / Reward `transactionId` — S2S 리워드 콜백의 `transaction_id` 와 동일한 값으로
+  앱–서버 지급 대조에 사용합니다. `type`/`amount` 는 SDK 가 제공하지 않는 값이라 deprecated 로 표시했습니다.
+- **`isReady()` / `isLoading()`** — SDK 의 실제 상태를 조회합니다(AOS `isReady`/`isLoading`, iOS `isAdReady`).
+- **인라인 뷰 `reload()`** — `ref` 로 배너·네이티브·동영상을 재요청합니다.
+- **`start()` / `cancelLoad()` / `isLoaded()` iOS 네이티브 구현** — 종전에는 iOS 브릿지에 없어
+  `start()` 는 JS 폴백, `cancelLoad()` 는 무동작이었습니다.
+- **네트워크별 키 주입** / Per-network key injection — `mediations.pangle.appId` / `mediations.appLovin.sdkKey` 가
+  Android 에서 `AdInfo.Builder.setAdapterConfig()` 로 전달됩니다(서버 값 우선).
+- **에러 코드 매핑** — 네이티브 코드를 안정적인 문자열 코드로 변환하고 원본을 `nativeCode` 로 함께 전달합니다.
+
+### Fixed
+
+- **iOS 에러 코드 전량 오매핑 수정** / Fixed the iOS error-code mapping.
+  - 플러그인이 `0~6` 을 가정했으나 실제 SDK/가이드는 `-1 ~ -8` 입니다. 모든 iOS 광고 오류가
+    `napssp_unknown` 으로 보고되던 문제를 수정하고 `NSUnderlyingErrorKey` 를 `details` 로 전달합니다.
+- **Android 리워드 `customParams` 무음 소실 수정** / Fixed silently dropped rewarded `customParams`.
+  - `getMethod("setCustomParams", HashMap.class)` 로 조회했으나 실제 시그니처는 `Map` 이라
+    `NoSuchMethodException` 이 잡혀 사라졌습니다(S2S 커스텀 파라미터 전달 불가).
+- **Android 전면 `closeButtonTouchAreaRatio` 미적용 수정** / The documented interstitial option was never
+  applied on Android (`applyInterstitialOptions` 가 빈 함수였습니다). 이제 `setCloseButtonBound()` 로 전달합니다.
+- **iOS 죽은 델리게이트 제거** / Removed dead iOS delegate methods.
+  - `onRewardVideoSkipped()` / `onSkipVideoInterstitial()` 는 실제 프로토콜에 없는 메서드라 skip 이벤트가
+    영구히 발생하지 않았습니다. iOS 에 skip 콜백이 없다는 사실을 타입과 문서에 명시했습니다.
+- **배너 가짜 클릭 시뮬레이터 제거** / Removed the banner tap simulator that emitted
+  `clicked`/`opened`/`closed` on any container tap, duplicating real SDK clicks.
+- **죽은 리플렉션 호출 제거** / Removed dead reflection — `AdInfo.Builder.setIsUseMediation` 은 SDK 에
+  존재하지 않습니다(3곳에서 호출 후 예외를 삼키고 있었습니다).
+- **Android R 클래스 충돌 위험 제거** / The library namespace moved to `com.nasmedia.admixerssp.reactnative`
+  so its generated `R`/`BuildConfig` no longer collide with the vendor SDK's own `com.nasmedia.admixerssp`
+  package. 공개 클래스명(`NapSspPackage` 등)은 그대로입니다.
+- **중복 podspec 제거** / Deleted the stale `ios/NapSspPlugin.podspec` (v0.2.0) that shadowed the root one.
+- **JVM 타깃 불일치 수정** / Fixed a JVM-target mismatch — the library compiled Kotlin at 11 while
+  modern React Native hosts compile Java at 17, failing with
+  `Inconsistent JVM-target compatibility detected`. Both now default to 17 (`napSsp.javaVersion`
+  overrides it).
+- **미디에이션 Maven 저장소 안내 수정** / Fixed the mediation repository guidance. The library declared
+  the Kakao/ByteDance/Teads repositories in its own `repositories {}` block, which does nothing for
+  the host: Gradle resolves a library's *transitive* dependencies with the **consuming** project's
+  repositories, so AdFit/Pangle/Teads failed with `Could not find tv.teads.sdk.android:sdk`.
+  The build now prints the exact repositories to add to the app, and the docs say so.
+- **`loadAd()` 무음 무시로 promise 가 영구 대기하던 문제 수정** / Fixed a hang: the SDK drops a
+  `loadAd()` re-request **without a callback** when an ad is already READY or a load is in flight,
+  so a caller waiting on the callback waited forever. The bridge now checks `isReady()`/`isLoading()`
+  before requesting. (The official guide warns about exactly this.)
+- **`package.json` 의 객체형 `react-native` 필드 제거** — Metro 의 `resolverMainFields` 는 문자열 진입점을
+  기대하므로 해석을 방해할 수 있었습니다(`react-native.config.js` 가 이미 sourceDir 을 선언합니다).
+
+### Changed
+
+- **Android 네이티브 SDK 상향** — BOM `2026.07.06 → 2026.09.03`, core `2.1.3 → 2.3.0`,
+  admanager `2.0.4 → 2.1.3`, adfit `2.0.3 → 2.0.6`, pangle `2.0.2 → 2.1.2`, applovin `2.0.2 → 2.0.5`,
+  unity `2.0.2 → 2.0.6`, naveradmanager `2.0.2 → 2.1.3`, teads `2.1.0 → 2.1.2`.
+- **iOS 네이티브 SDK 상향** — `AdMixerMediation` `2.4.2 → 2.5.0`.
+- **Android 브릿지를 리플렉션에서 직접 호출로 전환** / Replaced reflection with direct SDK calls, so a
+  signature change now breaks the build instead of failing silently at runtime.
+- **iOS deprecated API 마이그레이션** — `load(...)` → `loadAd(...)`, `onTapX` → `onClickX`,
+  `onSuccessBanner` → `onSuccessShowBanner`, `onRewardVideoEarned()` → `onRewardVideoEarned(rewardInfo:)`.
+- **전면/리워드/전면동영상 3종을 공통 구현으로 통합** — Android `NapSspFullScreenAdHost`,
+  TypeScript `FullScreenAd` 기반 클래스로 중복 약 1,400 줄을 제거했습니다.
+- **`peerDependencies.react`** `^18.2.0` → `>=18.2.0` (React 19 / RN 0.78+ 설치 차단 해소).
+- **Gradle 기본 Kotlin** `1.8.22` → `2.1.21` (`napSsp.kotlinVersion` 으로 재정의 가능).
+- **예제 앱을 연동 레퍼런스로 재작성** — 포맷별 initialize → load → callback → show → reload → cleanup
+  전 구간과 이벤트 로그를 화면에서 확인할 수 있습니다.
+- **smoke test 강화** — 11개 계약 검증(인자 검증, 이벤트 라우팅/필터링, show 단계 실패 처리, 리워드 payload 등).
+
+### Removed
+
+- `@types/react-native` devDependency (RN 0.71 부터 타입이 본체에 포함되며 해당 패키지는 폐기되었습니다).
+- `MediationConfig.mobwith` — 공식 지원 네트워크 목록에서 제외된 지 오래된 no-op 필드.
+
+### Verification
+
+| 항목 | 결과 |
+|---|---|
+| Android 라이브러리 컴파일 (Kotlin 2.1.21 / AGP 8.5.2 / RN 0.76.5, 미디에이션 7종 링크) | ✅ PASS |
+| Android 호스트 앱 전체 빌드 — 리소스·매니페스트 병합 + dex + APK (AGP 8.7.2 / compileSdk 35, 미디에이션 7종) | ✅ PASS |
+| 예제 앱(React Native 0.81.6) Android 빌드 | ✅ PASS |
+| 예제 앱 typecheck / Jest | ✅ PASS |
+| **실기기 런타임 (Galaxy SM-S947N / Android 16)** | ✅ PASS — `AdMixerSDK::2.3.0` 초기화, adUnit 5종 등록, 어댑터(GoogleAdManager·AdFit) 자동 탐색, media-conf 수신, **배너·인라인 동영상 실광고 loaded + impression**, 네이티브는 `nap_ssp_no_ads (native -2147483640)` 실제 no-fill 로 정상 통지 |
+| TypeScript typecheck + build | ✅ PASS |
+| smoke test (11 checks) | ✅ PASS |
+| iOS 빌드 | ⛔ NOT_MEASURED — 개발 환경이 Windows 이며 Xcode 가 없습니다. API 대조는 SDK 2.5.0 의 `.swiftinterface` 전수 비교로 수행했습니다. |
+| New Architecture | ⛔ NOT_MEASURED — 지원한다고 주장하지 않습니다. |
+
 ## 0.4.0 - 2026-07-28
 
 > 공식 nap mx 가이드(Android BOM 2026.07.06 / iOS 2.4.2) 기준 네이티브 SDK 상향 및 문서 정정.

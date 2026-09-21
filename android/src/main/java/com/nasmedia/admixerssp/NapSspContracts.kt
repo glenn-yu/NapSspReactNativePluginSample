@@ -1,5 +1,7 @@
 package com.nasmedia.admixerssp
 
+import com.nasmedia.admixerssp.reactnative.BuildConfig
+
 internal object NapSspContracts {
     const val MODULE_NAME = "NapSspModule"
     const val INTERSTITIAL_MODULE_NAME = "NapSspInterstitial"
@@ -36,7 +38,15 @@ internal object NapSspContracts {
     const val FORMAT_VIDEO = "video"
     const val FORMAT_INTERSTITIAL_VIDEO = "interstitial_video"
 
-    val SUPPORTED_FORMATS = listOf(FORMAT_BANNER, FORMAT_INTERSTITIAL, FORMAT_REWARDED, FORMAT_NATIVE_AD, FORMAT_VIDEO, FORMAT_INTERSTITIAL_VIDEO)
+    val SUPPORTED_FORMATS = listOf(
+        FORMAT_BANNER,
+        FORMAT_INTERSTITIAL,
+        FORMAT_REWARDED,
+        FORMAT_NATIVE_AD,
+        FORMAT_VIDEO,
+        FORMAT_INTERSTITIAL_VIDEO,
+    )
+
     val SUPPORTED_EVENTS = listOf(
         EVENT_AD_LOADED,
         EVENT_AD_FAILED,
@@ -46,54 +56,49 @@ internal object NapSspContracts {
         EVENT_AD_IMPRESSION,
         EVENT_REWARDED,
         EVENT_VIDEO_COMPLETED,
-        EVENT_VIDEO_SKIPPED
+        EVENT_VIDEO_SKIPPED,
+    )
+
+    private val enabledMediations: List<String>
+        get() = BuildConfig.NAP_SSP_MEDIATIONS
+            .split(',')
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+
+    private fun sdkCoordinates(): Map<String, Any?> = linkedMapOf(
+        "bom" to BuildConfig.NAP_SSP_BOM_COORDINATE,
+        "core" to BuildConfig.NAP_SSP_CORE_COORDINATE,
+        "mediations" to enabledMediations,
     )
 
     fun moduleConstants(moduleName: String): Map<String, Any?> = linkedMapOf(
         "moduleName" to moduleName,
-        "placeholderMode" to !BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED,
-        "vendorSdkEnabled" to BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED,
         "supportedFormats" to SUPPORTED_FORMATS,
         "supportedEvents" to SUPPORTED_EVENTS,
-        "sdkCoordinates" to linkedMapOf(
-            "core" to BuildConfig.NAP_SSP_CORE_COORDINATE,
-            "adManager" to BuildConfig.NAP_SSP_AD_MANAGER_COORDINATE,
-            "adFit" to BuildConfig.NAP_SSP_ADFIT_COORDINATE,
-            "pangle" to BuildConfig.NAP_SSP_PANGLE_COORDINATE,
-            "appLovin" to BuildConfig.NAP_SSP_APP_LOVIN_COORDINATE,
-            "unity" to BuildConfig.NAP_SSP_UNITY_COORDINATE,
-            "naverAdManager" to BuildConfig.NAP_SSP_NAVER_AD_MANAGER_COORDINATE,
-            "teads" to BuildConfig.NAP_SSP_TEADS_COORDINATE,
-            "adsIdentifier" to BuildConfig.NAP_SSP_ADS_IDENTIFIER_COORDINATE,
-        ),
+        "sdkCoordinates" to sdkCoordinates(),
     )
 
     fun statusSnapshot(
         initialized: Boolean,
         logLevel: String,
-        coppaEnabled: Boolean,
+        privacy: Map<String, Any?>,
+        testMode: Boolean,
+        testDeviceIdCount: Int,
         configuredAdUnitIds: Collection<String>,
         runtimeState: Map<String, Any?>,
     ): Map<String, Any?> = linkedMapOf(
         "initialized" to initialized,
-        "placeholderMode" to !BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED,
-        "vendorSdkEnabled" to BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED,
+        "platform" to "android",
         "logLevel" to logLevel,
-        "coppa" to coppaEnabled,
+        "privacy" to privacy,
+        // Mirrors privacy.childDirected; kept for backwards compatibility with 0.4.x.
+        "coppa" to (privacy["childDirected"] == true),
+        "testMode" to testMode,
+        "testDeviceIdCount" to testDeviceIdCount,
         "configuredAdUnitIds" to configuredAdUnitIds.toList(),
         "supportedFormats" to SUPPORTED_FORMATS,
         "supportedEvents" to SUPPORTED_EVENTS,
-        "sdkCoordinates" to linkedMapOf(
-            "core" to BuildConfig.NAP_SSP_CORE_COORDINATE,
-            "adManager" to BuildConfig.NAP_SSP_AD_MANAGER_COORDINATE,
-            "adFit" to BuildConfig.NAP_SSP_ADFIT_COORDINATE,
-            "pangle" to BuildConfig.NAP_SSP_PANGLE_COORDINATE,
-            "appLovin" to BuildConfig.NAP_SSP_APP_LOVIN_COORDINATE,
-            "unity" to BuildConfig.NAP_SSP_UNITY_COORDINATE,
-            "naverAdManager" to BuildConfig.NAP_SSP_NAVER_AD_MANAGER_COORDINATE,
-            "teads" to BuildConfig.NAP_SSP_TEADS_COORDINATE,
-            "adsIdentifier" to BuildConfig.NAP_SSP_ADS_IDENTIFIER_COORDINATE,
-        ),
+        "sdkCoordinates" to sdkCoordinates(),
         "runtime" to runtimeState,
     )
 }

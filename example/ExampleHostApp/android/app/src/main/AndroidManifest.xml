@@ -8,7 +8,20 @@
       android:icon="@mipmap/ic_launcher"
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
-      android:theme="@style/AppTheme">
+      android:theme="@style/AppTheme"
+      android:usesCleartextTraffic="${usesCleartextTraffic}"
+      android:supportsRtl="true">
+
+      <!--
+        Required whenever the `admanager` adapter is linked (napSsp.mediations). Without it the
+        Google Mobile Ads SDK throws "Missing application ID" from a ContentProvider and the app
+        crashes before onCreate().
+        This is Google's public sample App ID - replace it with the one nap mx issues for your app.
+      -->
+      <meta-data
+        android:name="com.google.android.gms.ads.APPLICATION_ID"
+        android:value="ca-app-pub-3940256099942544~3347511713" />
+
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

@@ -1,10 +1,23 @@
 {
   "name": "react-native-nap-ssp",
-  "version": "0.4.0",
-  "description": "React Native plugin for KT Nasmedia nap ssp SDK",
+  "version": "0.5.0",
+  "description": "React Native plugin for the nap mx (KT Nasmedia AdMixer SSP) ad SDK — banner, native, video, interstitial, interstitial video and rewarded formats",
   "author": "gwangy",
   "license": "MIT",
   "homepage": "https://gwangy.com",
+  "keywords": [
+    "react-native",
+    "ios",
+    "android",
+    "ads",
+    "advertising",
+    "monetization",
+    "mediation",
+    "nap-mx",
+    "admixer",
+    "nasmedia",
+    "ssp"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/glenn-yu/NapSspReactNativePluginSample.git"
@@ -17,13 +30,12 @@
     "android/build.gradle",
     "android/consumer-rules.pro",
     "ios",
-    "docs/SETUP.md",
-    "docs/API.md",
-    "docs/MIGRATION.md",
-    "docs/FAQ.md",
+    "docs",
     "NapSspPlugin.podspec",
+    "react-native.config.js",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -33,23 +45,17 @@
     "test": "npm run typecheck && npm run smoke:test",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "smoke:test": "node scripts/smoke-test.js",
-    "verify": "npm run typecheck && npm run build && npm run smoke:test",
+    "verify": "npm run clean && npm run typecheck && npm run build && npm run smoke:test",
     "start:example": "npm --prefix example start"
   },
-  "react-native": {
-    "android": {
-      "sourceDir": "./android"
-    }
-  },
   "peerDependencies": {
-    "react": "^18.2.0", 
-    "react-native": ">=0.72.0"
+    "react": ">=18.2.0",
+    "react-native": ">=0.76.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.28",
-    "@types/react-native": "^0.72.8",
     "react": "^18.2.0",
-    "react-native": "^0.72.17",
+    "react-native": "^0.79.7",
     "typescript": "^5.5.4"
   }
 }

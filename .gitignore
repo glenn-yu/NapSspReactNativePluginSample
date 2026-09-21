@@ -5,110 +5,63 @@ node_modules/
 lib/
 dist/
 build/
+.kotlin/
 react-native-nap-ssp-*.tgz
+tsconfig.tsbuildinfo
 
-# Security (CRITICAL)
+# Security
 .npmrc
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 .env*.local
 
 # Android
-.gradle
-android/build
-android/.gradle
-android/app/build
+.gradle/
+android/build/
 local.properties
 *.keystore
 !debug.keystore
 
 # iOS
-ios/Pods
-ios/build
+ios/Pods/
+ios/build/
 ios/*.xcresult
-ios/DerivedData
-.ls_id_cache
+ios/DerivedData/
+.build/
+**/.build/
 *.moved-aside
 
 # React Native / Metro
-.expo/*
-.expo-shared/*
-.metro/*
-# Metro/RN 빌드 산출물(번들) — 커밋 금지 (재생성 가능) / generated JS bundles must not be committed
+.expo/
+.metro/
+# Generated bundles are reproducible build output.
 *.jsbundle
 **/src/main/assets/index.android.bundle
-example/ExampleHostApp/.bundle/
-example/ExampleHostApp/node_modules/
-example/ExampleHostApp/android/build
-example/ExampleHostApp/android/.gradle
-example/ExampleHostApp/ios/Pods
-example/ExampleHostApp/ios/build
-example/ExampleHostApp/capture/*
 
-# Integration Test App
-integration-test-app/node_modules/
-integration-test-app/android/build
-integration-test-app/android/.gradle
-integration-test-app/android/local.properties
-integration-test-app/ios/Pods
-integration-test-app/ios/build
-integration-test-app/maestro/results/
+# Example host app
+example/ExampleHostApp/node_modules/
+example/ExampleHostApp/android/build/
+example/ExampleHostApp/android/app/build/
+example/ExampleHostApp/android/.gradle/
+example/ExampleHostApp/ios/Pods/
+example/ExampleHostApp/ios/build/
 
 # Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-*.log
+*.stackdump
 
-# IDEs and Editors
+# IDEs and editors
 .idea/
 .vscode/
-*.swp
-*.swo
-*.sublime-project
-*.sublime-workspace
 .claude/
 .gemini/
+*.swp
+*.swo
 
 # OS files
 .DS_Store
-.DS_Store?
 ._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
-
-# TypeScript
-tsconfig.tsbuildinfo
-
-# Ignore Gradle build output directory
-build
-
-# Ignore Kotlin plugin data
-.kotlin
-
-# Swift Build Artifacts
-.build/
-**/.build/
-
-# Docs — 내부/개발 전용 산출물(공개 레포에 불필요) / internal dev-only doc artifacts (not for the public repo)
-docs/native_guides/
-docs/nap_ssp_react_native_plan.docx
-docs/*.docx
-docs/error.png
-docs/warn1.png
-docs/WORK_STATUS_*.md
-docs/REVIEW_*.md
-docs/MAESTRO_RUN_*.md
-docs/MAESTRO_READINESS_*.md
-docs/MAESTRO_ENV_*.md
-docs/MAESTRO_GUIDE.md
-docs/PROJECT_TESTING_STRUCTURE.md
-docs/DEVELOPMENT.md
-docs/PUBLISH_GUIDE.md
-docs/test/
-integration-test-app/maestro/*.md
+ehthumbs.db

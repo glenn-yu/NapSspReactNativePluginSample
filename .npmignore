@@ -1,45 +1,23 @@
-# Android build artifacts
+# `files` in package.json is the authoritative allow-list; these rules prune anything that could
+# slip into an allow-listed directory.
+
+# Build artifacts inside android/ and ios/
 android/build/
 android/.gradle/
 android/.kotlin/
-android/app/build/
-
-# iOS build artifacts
 ios/build/
 ios/Pods/
-ios/*.xcresult
 ios/DerivedData/
+ios/*.xcresult
 ios/.build/
 
 # Security
 .npmrc
 .env
-.env.*
+.env*.local
 
-# Dev tooling
-.idea/
-.vscode/
-.claude/
-.gemini/
-scripts/
-integration-test-app/
-example/
-jest.setup.js
-tsconfig.json
-tsconfig.tsbuildinfo
-*.tgz
-
-# Docs — internal/development-only files
-docs/native_guides/
-docs/nap_ssp_react_native_plan.docx
-docs/error.png
-docs/warn1.png
-docs/MAESTRO_*.md
-docs/REVIEW_*.md
-docs/WORK_STATUS_*.md
-docs/PROJECT_TESTING_STRUCTURE.md
-
-# Logs & OS
+# Logs, dumps and OS files
 *.log
+*.stackdump
 .DS_Store
 Thumbs.db

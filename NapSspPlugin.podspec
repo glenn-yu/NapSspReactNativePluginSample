@@ -1,18 +1,24 @@
+require "json"
+
+package = JSON.parse(File.read(File.join(__dir__, "package.json")))
+
 Pod::Spec.new do |s|
   s.name         = 'NapSspPlugin'
-  s.version      = '0.4.0'
-  s.summary      = 'React Native scaffold for KT Nasmedia nap ssp SDK'
-  s.homepage     = 'https://github.com/glenn-yu/react-native-nap-ssp'
+  s.version      = package['version']
+  s.summary      = 'React Native bridge for the nap mx (AdMixer SSP) iOS SDK'
+  s.description  = package['description']
+  s.homepage     = package['homepage']
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
-  s.author       = { 'gwangy' => 'gwangy@example.com' }
+  s.author       = package['author']
+  # The core SDK supports iOS 13; the AdFit and Teads adapters require iOS 14.
   s.platform     = :ios, '14.0'
   s.static_framework = true
-  s.source       = { :path => '.' }
+  s.source       = { :git => package['repository']['url'].sub('git+', ''), :tag => "v#{s.version}" }
   s.preserve_paths = 'ios/**/*', 'LICENSE', 'README.md'
   s.source_files = 'ios/**/*.{h,m,swift}'
-  s.resources = 'ios/**/*.{xib}'
+  s.resources    = 'ios/**/*.xib'
   s.exclude_files = 'ios/Package.swift'
-  s.swift_version = '5.0'
+  s.swift_version = '5.9'
   s.frameworks = 'Foundation', 'UIKit', 'AdSupport', 'StoreKit'
   s.weak_frameworks = 'AppTrackingTransparency'
   s.pod_target_xcconfig = {
@@ -22,8 +28,12 @@ Pod::Spec.new do |s|
   }
 
   s.dependency 'React-Core'
+  # Core SDK — unpinned so `pod update` picks up the latest 2.x. Verified against 2.5.0.
   s.dependency 'AdMixerMediation'
 
+  # Mediation adapters are opt-in. Add the matching subspec to your Podfile, e.g.
+  #   pod 'NapSspPlugin/GAM'
+  # https://napmx.github.io/#/ios/native/getting-started
   s.subspec 'GAM' do |ss|
     ss.dependency 'AdMixerMediationGAM'
   end
@@ -44,13 +54,12 @@ Pod::Spec.new do |s|
     ss.dependency 'AdMixerMediationUnityAds'
   end
 
-  # Naver Ad Manager — v2.3.7 가이드에서 추가된 어댑터 / adapter added in the v2.3.7 guide
+  # Naver Ad Manager
   s.subspec 'NAM' do |ss|
     ss.dependency 'AdMixerMediationNAM'
   end
 
-  # Teads — iOS 어댑터는 v2.3.7(AdMixerMediationTeads v1.0.0)부터 제공, v2.4.2 에서 TeadsSDK 6.2+ 요구
-  # Teads — iOS adapter available since v2.3.7; v2.4.2 requires TeadsSDK 6.2+
+  # Teads — requires TeadsSDK 6.2+ and Xcode 26 or newer.
   s.subspec 'Teads' do |ss|
     ss.dependency 'AdMixerMediationTeads'
   end

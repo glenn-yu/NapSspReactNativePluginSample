@@ -1,7 +1,9 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.nasmedia.admixerssp">
-
-    <!-- Library-only manifest: host apps should provide real ad network meta-data. -->
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The nap mx core SDK contributes the ad-serving permissions and queries through its own AAR
+    manifest, so this library only needs an empty application element.
+    Host apps still add network-specific meta-data (e.g. the Google AdManager APPLICATION_ID).
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application />
-
 </manifest>

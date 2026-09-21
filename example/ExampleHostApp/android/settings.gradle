@@ -1,4 +1,21 @@
+pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
+plugins { id("com.facebook.react.settings") }
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+        // Required by the nap mx mediation adapters that are not on Maven Central.
+        // Only the repositories for adapters listed in napSsp.mediations are actually used.
+        maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }   // Kakao AdFit
+        maven { url 'https://artifact.bytedance.com/repository/pangle/' }         // Pangle
+        maven { url 'https://sdk.teads.tv/android/repo' }                         // Teads
+        maven { url 'https://teads.jfrog.io/artifactory/SDKAndroid-maven-prod' }  // Teads
+        maven { url 'https://developer.huawei.com/repo/' }                        // Teads: Huawei devices
+    }
+}
 rootProject.name = 'ExampleHostApp'
-apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')

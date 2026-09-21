@@ -1,182 +1,200 @@
 import React
 import Foundation
+import UIKit
 #if canImport(AdMixerMediation)
 import AdMixerMediation
 #endif
 
+/// Bridges `AMMInterstitial`.
+/// https://napmx.github.io/#/ios/native/banner (전면 배너)
 @objc(NapSspInterstitial)
-class InterstitialModule: NSObject {
-  @objc
-  static func requiresMainQueueSetup() -> Bool { false }
+final class InterstitialModule: NSObject {
+  private static let format = "interstitial"
+
+  #if canImport(AdMixerMediation)
+  private let registry = NapSspFullScreenRegistry<AMMInterstitial>()
+  #endif
+
+  @objc static func requiresMainQueueSetup() -> Bool { false }
 
   @objc
-  func load(_ adUnitId: String, options: NSDictionary?, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+  func load(
+    _ adUnitId: String,
+    options: NSDictionary?,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    performLoad(adUnitId, options: options, autoShow: false, resolve: resolve, reject: reject)
+  }
+
+  /// Load and present in one call.
+  @objc
+  func start(
+    _ adUnitId: String,
+    options: NSDictionary?,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    performLoad(adUnitId, options: options, autoShow: true, resolve: resolve, reject: reject)
+  }
+
+  @objc
+  func show(
+    _ adUnitId: String,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
     DispatchQueue.main.async {
-      NSLog("[NapSspInterstitial] load requested adUnitId=%@ options=%@", adUnitId, options ?? [:])
       #if canImport(AdMixerMediation)
-      guard NapSspRuntime.shared.isInitialized else {
-        reject(NapSspError.notInitialized.errorCode, NapSspError.notInitialized.errorDescription, nil)
+      let key = adUnitId.trimmingCharacters(in: .whitespacesAndNewlines)
+      guard let interstitial = self.registry.ad(for: key), interstitial.isAdReady else {
+        reject(
+          NapSspError.adNotLoaded("No interstitial is ready for \"\(key)\".").errorCode,
+          "No interstitial is ready for \"\(key)\". Await load() first.",
+          nil
+        )
         return
       }
-      guard let adUnit = Int(adUnitId) else {
-        reject("napssp_invalid_ad_unit", "Interstitial adUnitId must be numeric on iOS.", nil)
-        return
-      }
-      // v2.3.7 부터 전면 광고는 Basic 전용입니다. popup/countDown 타입 옵션
-      // (viewType·popupOption·countDownOption)은 SDK 에서 제거되었습니다.
-      let config = AMMInterstitialConfig()
-      if let ratio = options?["closeButtonTouchAreaRatio"] as? Double {
-        config.closeButtonTouchAreaRatio = Float(max(0.2, min(1.0, ratio)))
-      }
-      AMMInterstitial.load(adUnitID: adUnit, config: config) { [weak self] interstitial, error in
-        guard let _ = self else {
-          reject("napssp_module_released", "Module was released during load.", nil)
-          return
-        }
-        if let error = error {
-          NSLog("[NapSspInterstitial] load failed adUnitId=%@ error=%@", adUnitId, error.localizedDescription)
-          let errPayload = napSspErrorPayload(adUnitId: adUnitId, format: "interstitial", error: error)
-          reject(errPayload["code"] as? String ?? "napssp_interstitial_load_failed", error.localizedDescription, error)
-          NapSspModule.shared?.emitEvent(name: "onAdFailedToLoad", payload: errPayload)
-          return
-        }
-        if let interstitial = interstitial {
-          NSLog("[NapSspInterstitial] load succeeded adUnitId=%@ storing instance", adUnitId)
-          NapSspRuntime.shared.storeInterstitial(adUnitId: adUnitId, instance: interstitial)
-        } else {
-          NSLog("[NapSspInterstitial] load completed adUnitId=%@ with nil instance and no error", adUnitId)
-        }
-        resolve(nil)
-        NapSspModule.shared?.emitEvent(name: "onAdLoaded", payload: ["adUnitId": adUnitId, "format": "interstitial"])
-      }
+      guard let rootVC = NapSspFullScreenGuard.rootViewController(reject: reject) else { return }
+      interstitial.show(rootViewController: rootVC)
+      resolve(nil)
       #else
-      do {
-        let status = try NapSspRuntime.shared.registerInterstitialLoad(adUnitId: adUnitId)
-        resolve(status)
-        NapSspModule.shared?.emitEvent(name: "onAdLoaded", payload: [
-          "adUnitId": adUnitId,
-          "format": "interstitial"
-        ])
-      } catch let error as NapSspError {
-        reject(error.errorCode, error.errorDescription ?? error.errorCode, nil)
-        NapSspModule.shared?.emitEvent(name: "onAdFailedToLoad", payload: [
-          "adUnitId": adUnitId,
-          "format": "interstitial",
-          "code": error.errorCode,
-          "message": error.errorDescription ?? error.errorCode
-        ])
-      } catch {
-        reject("napssp_interstitial_load_failed", error.localizedDescription, error)
-        NapSspModule.shared?.emitEvent(name: "onAdFailedToLoad", payload: [
-          "adUnitId": adUnitId,
-          "format": "interstitial",
-          "code": "napssp_interstitial_load_failed",
-          "message": error.localizedDescription
-        ])
-      }
+      NapSspFullScreenGuard.sdkNotLinked(reject)
       #endif
     }
   }
 
   @objc
-  func show(_ adUnitId: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
-    DispatchQueue.main.async {
-      NSLog("[NapSspInterstitial] show requested adUnitId=%@", adUnitId)
-      guard NapSspRuntime.shared.isInitialized else {
-        reject(NapSspError.notInitialized.errorCode, NapSspError.notInitialized.errorDescription ?? "NapSsp has not been initialized yet.", nil)
-        return
-      }
+  func isLoaded(
+    _ adUnitId: String,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    #if canImport(AdMixerMediation)
+    let key = adUnitId.trimmingCharacters(in: .whitespacesAndNewlines)
+    resolve(registry.ad(for: key)?.isAdReady ?? false)
+    #else
+    resolve(false)
+    #endif
+  }
 
-      #if canImport(AdMixerMediation)
-      guard let interstitial = NapSspRuntime.shared.consumeStoredInterstitial(adUnitId: adUnitId) else {
-        NSLog("[NapSspInterstitial] show missing stored interstitial adUnitId=%@", adUnitId)
-        reject(NapSspError.adNotLoaded("No interstitial has been loaded yet.").errorCode, "No interstitial has been loaded yet.", nil)
-        return
-      }
-      guard let rootVC = NapSspRuntime.activeRootViewController() else {
-        NSLog("[NapSspInterstitial] show missing rootVC adUnitId=%@", adUnitId)
-        reject("napssp_no_view_controller", "No root view controller found.", nil)
-        return
-      }
-      interstitial.delegate = NapSspInterstitialDelegate.shared(adUnitId: adUnitId)
-      NSLog("[NapSspInterstitial] calling show on SDK adUnitId=%@ rootVC=%@", adUnitId, String(describing: type(of: rootVC)))
-      interstitial.show(rootViewController: rootVC)
-      resolve(nil)
-      #if DEBUG
-      // Some simulator mediation builds resolve show() without delivering presentation callbacks.
-      // Keep integration tests focused on the RN event bridge while production keeps SDK-only callbacks.
-      NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: ["adUnitId": adUnitId, "format": "interstitial"])
-      NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: ["adUnitId": adUnitId, "format": "interstitial"])
-      #endif
-      #else
-      guard let payload = NapSspRuntime.shared.consumeInterstitialPresentation(adUnitId: adUnitId) else {
-        reject(NapSspError.adNotLoaded("No interstitial has been loaded yet.").errorCode, "No interstitial has been loaded yet.", nil)
-        return
-      }
-      resolve(payload)
-      NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: ["adUnitId": adUnitId, "format": "interstitial"])
-      NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: ["adUnitId": adUnitId, "format": "interstitial"])
-      NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: ["adUnitId": adUnitId, "format": "interstitial"])
-      #endif
-    }
+  /// The iOS SDK cancels an in-flight load through `stop()`; a showing ad is already detached.
+  @objc
+  func cancelLoad(
+    _ adUnitId: String,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter reject: @escaping RCTPromiseRejectBlock
+  ) {
+    destroy(adUnitId)
+    resolve(nil)
   }
 
   @objc
   func destroy(_ adUnitId: String) {
+    #if canImport(AdMixerMediation)
+    let key = adUnitId.trimmingCharacters(in: .whitespacesAndNewlines)
+    DispatchQueue.main.async { self.registry.remove(key)?.stop() }
+    #endif
+  }
+
+  // MARK: private
+
+  private func performLoad(
+    _ adUnitId: String,
+    options: NSDictionary?,
+    autoShow shouldAutoShow: Bool,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
     DispatchQueue.main.async {
       #if canImport(AdMixerMediation)
-      NapSspRuntime.shared.removeStoredInterstitial(adUnitId: adUnitId)
-      NapSspInterstitialDelegate.release(adUnitId: adUnitId)
+      guard let numericAdUnitId = NapSspFullScreenGuard.numericAdUnitId(
+        adUnitId, format: Self.format, reject: reject
+      ) else { return }
+
+      let key = adUnitId.trimmingCharacters(in: .whitespacesAndNewlines)
+      // Replace any previous instance so a re-load never leaks the old one.
+      self.registry.remove(key)?.stop()
+
+      let config = AMMInterstitialConfig()
+      if let ratio = options?["closeButtonTouchAreaRatio"] as? Double {
+        config.closeButtonTouchAreaRatio = Float(min(max(ratio, 0.2), 1.0))
+      }
+
+      let delegate = NapSspInterstitialDelegate(adUnitId: key, module: self)
+
+      AMMInterstitial.loadAd(adUnitID: numericAdUnitId, config: config) { interstitial, adapterType, error in
+        if let error {
+          let payload = napSspErrorPayload(adUnitId: key, format: Self.format, error: error)
+          NapSspModule.shared?.emitEvent(name: "onAdFailedToLoad", payload: payload)
+          reject(payload["code"] as? String ?? "napssp_load_failed", error.localizedDescription, error)
+          return
+        }
+        guard let interstitial else {
+          reject("napssp_empty_ad", "The SDK returned no interstitial and no error.", nil)
+          return
+        }
+
+        interstitial.delegate = delegate
+        self.registry.store(interstitial, delegate: delegate, for: key)
+
+        NapSspModule.shared?.emitEvent(
+          name: "onAdLoaded",
+          payload: ["adUnitId": key, "format": Self.format, "network": adapterType.adapterName]
+        )
+
+        guard shouldAutoShow else {
+          resolve(nil)
+          return
+        }
+        guard let rootVC = NapSspFullScreenGuard.rootViewController(reject: reject) else { return }
+        interstitial.show(rootViewController: rootVC)
+        resolve(nil)
+      }
+      #else
+      NapSspFullScreenGuard.sdkNotLinked(reject)
       #endif
     }
+  }
+
+  fileprivate func releaseAd(_ adUnitId: String) {
+    #if canImport(AdMixerMediation)
+    registry.remove(adUnitId)
+    #endif
   }
 }
 
 #if canImport(AdMixerMediation)
 private final class NapSspInterstitialDelegate: NSObject, AMMInterstitialDelegate {
   private let adUnitId: String
-  private static var instances: [String: NapSspInterstitialDelegate] = [:]
+  private weak var module: InterstitialModule?
 
-  private init(adUnitId: String) { self.adUnitId = adUnitId }
-
-  static func shared(adUnitId: String) -> NapSspInterstitialDelegate {
-    if let existing = instances[adUnitId] { return existing }
-    let delegate = NapSspInterstitialDelegate(adUnitId: adUnitId)
-    instances[adUnitId] = delegate
-    return delegate
+  init(adUnitId: String, module: InterstitialModule) {
+    self.adUnitId = adUnitId
+    self.module = module
   }
 
-  static func release(adUnitId: String) {
-    instances.removeValue(forKey: adUnitId)
-  }
+  private var basePayload: [String: Any] { ["adUnitId": adUnitId, "format": "interstitial"] }
 
   func onSuccessShowInterstitial() {
-    NSLog("[NapSspInterstitial] delegate success show adUnitId=%@", adUnitId)
-    NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: ["adUnitId": adUnitId, "format": "interstitial"])
-    NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: ["adUnitId": adUnitId, "format": "interstitial"])
+    NapSspModule.shared?.emitEvent(name: "onAdOpened", payload: basePayload)
+    NapSspModule.shared?.emitEvent(name: "onAdImpression", payload: basePayload)
   }
 
   func onFailShowInterstitial(error: Error?) {
-    NSLog("[NapSspInterstitial] delegate fail show adUnitId=%@ error=%@", adUnitId, error?.localizedDescription ?? "unknown")
-    NapSspModule.shared?.emitEvent(name: "onAdFailedToLoad", payload: [
-      "adUnitId": adUnitId, "format": "interstitial",
-      "code": "napssp_interstitial_show_failed",
-      "message": error?.localizedDescription ?? "unknown"
-    ])
-    NapSspRuntime.shared.removeStoredInterstitial(adUnitId: adUnitId)
-    NapSspInterstitialDelegate.release(adUnitId: adUnitId)
+    var payload = napSspErrorPayload(adUnitId: adUnitId, format: "interstitial", error: error)
+    payload["phase"] = "show"
+    NapSspModule.shared?.emitEvent(name: "onAdFailedToLoad", payload: payload)
+    module?.releaseAd(adUnitId)
   }
 
-  func onTapInterstitial() {
-    NSLog("[NapSspInterstitial] delegate tap adUnitId=%@", adUnitId)
-    NapSspModule.shared?.emitEvent(name: "onAdClicked", payload: ["adUnitId": adUnitId, "format": "interstitial"])
+  func onClickInterstitial() {
+    NapSspModule.shared?.emitEvent(name: "onAdClicked", payload: basePayload)
   }
 
   func onCloseInterstitial() {
-    NSLog("[NapSspInterstitial] delegate close adUnitId=%@", adUnitId)
-    NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: ["adUnitId": adUnitId, "format": "interstitial"])
-    NapSspRuntime.shared.removeStoredInterstitial(adUnitId: adUnitId)
-    NapSspInterstitialDelegate.release(adUnitId: adUnitId)
+    NapSspModule.shared?.emitEvent(name: "onAdClosed", payload: basePayload)
+    module?.releaseAd(adUnitId)
   }
 }
 #endif

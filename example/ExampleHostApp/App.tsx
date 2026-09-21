@@ -1,6 +1,15 @@
-import React, {useEffect, useState} from 'react';
+/**
+ * react-native-nap-ssp integration reference.
+ *
+ * Each panel walks the full lifecycle a media app needs:
+ *   initialize → load → callback → show/render → success or failure → reload → cleanup
+ *
+ * Every callback is written to the shared event log, so you can see exactly which SDK events fire
+ * (and which do not) on each platform.
+ */
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
-  Alert,
+  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -17,366 +26,527 @@ import {
   NativeAd,
   RewardedAd,
   VideoAd,
-  isNativeModuleAvailable,
-  isNativeViewAvailable,
-} from '../../src';
+  type AdError,
+  type AdViewHandle,
+  type NapSspStatus,
+} from 'react-native-nap-ssp';
 
-import {Platform} from 'react-native';
+import {adConfig, allAdUnitIds} from './adConfig';
 
-const TEST_CONFIG_ANDROID = {
-  mediaKey: '10771',
-  bannerId: '104701', // 320x50
-  nativeAdId: '104588',
-  videoAdId: '104591', // instream
-  // 104704 is configured as banner on the server; 104703 is marked fullscreen=true so use it for fullscreen flows
-  interstitialId: '104703',
-  interstitialVideoId: '104703',
-  rewardedId: '103722',
-};
+type LogFn = (message: string) => void;
+type AdViewRef = React.RefObject<AdViewHandle | null>;
 
-const TEST_CONFIG_IOS = {
-  mediaKey: '10347',
-  bannerId: '103790', // 320x50
-  nativeAdId: '101626',
-  videoAdId: '104711',
-  interstitialId: '104707',
-  interstitialVideoId: '103868',
-  rewardedId: '104710',
-};
+function describeError(error: unknown): string {
+  const adError = error as AdError | undefined;
+  if (adError?.code) {
+    const native = adError.nativeCode !== undefined ? ` (native ${adError.nativeCode})` : '';
+    return `${adError.code}${native}: ${adError.message}`;
+  }
+  return error instanceof Error ? error.message : String(error);
+}
 
-const TEST_CONFIG = Platform.OS === 'ios' ? TEST_CONFIG_IOS : TEST_CONFIG_ANDROID;
+// ─────────────────────────────────────────────────────────────────────────────
+// UI primitives
+// ─────────────────────────────────────────────────────────────────────────────
 
-function App(): JSX.Element {
-  const [statusText, setStatusText] = useState('Waiting for SDK initialization...');
-  const appendStatus = (label: string, payload?: unknown) => {
-    const line = payload === undefined ? label : `${label}: ${JSON.stringify(payload)}`;
-    console.log(`[NapSspExample] ${line}`);
-    setStatusText((prev) => `${line}\n\n${prev}`);
-  };
-  const hasNativeModule = isNativeModuleAvailable([
-    'NapSspModule',
-    'NapSspInterstitialVideo',
-  ]);
-  const hasBannerView = Platform.OS === 'ios' && isNativeViewAvailable('NapSspBannerView');
-  const hasNativeAdView = Platform.OS === 'ios' && isNativeViewAvailable('NapSspNativeAdView');
-  const hasVideoAdView = Platform.OS === 'ios' && isNativeViewAvailable('NapSspVideoAdView');
+function Button({
+  title,
+  onPress,
+  disabled,
+  primary,
+}: {
+  title: string;
+  onPress: () => void;
+  disabled?: boolean;
+  primary?: boolean;
+}) {
+  return (
+    <TouchableOpacity
+      style={[styles.button, primary && styles.buttonPrimary, disabled && styles.buttonDisabled]}
+      onPress={onPress}
+      disabled={disabled}>
+      <Text style={[styles.buttonText, primary && styles.buttonTextInverted]}>{title}</Text>
+    </TouchableOpacity>
+  );
+}
 
+function Section({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      {subtitle ? <Text style={styles.sectionSubtitle}>{subtitle}</Text> : null}
+      {children}
+    </View>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Full-screen formats: interstitial, interstitial video, rewarded
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** The subset of the ad API this panel drives. */
+interface FullScreenAdController {
+  load(): Promise<void>;
+  show(): Promise<void>;
+  start(): Promise<void>;
+  cancelLoad(): Promise<void>;
+  isReady(): Promise<boolean>;
+  destroy(): void;
+}
+
+interface PanelHandlers {
+  onLoaded: () => void;
+  onLoadFailed: (error: AdError) => void;
+  onOpened: () => void;
+  onImpression: () => void;
+  onClicked: () => void;
+  onClosed: () => void;
+}
+
+/**
+ * `subscribe` is supplied per call site so the ad keeps its concrete type — the three ad classes
+ * expose different event maps, so a shared union would not be callable.
+ */
+function FullScreenAdPanel<T extends FullScreenAdController>({
+  title,
+  subtitle,
+  adUnitId,
+  create,
+  subscribe,
+  log,
+}: {
+  title: string;
+  subtitle: string;
+  adUnitId: string;
+  create: () => T;
+  subscribe: (ad: T, handlers: PanelHandlers) => Array<() => void>;
+  log: LogFn;
+}) {
+  const adRef = useRef<T | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  // One ad instance per panel: created with the component, destroyed with it. destroy() is what
+  // releases the native ad and the SDK's server-config listener.
   useEffect(() => {
-    let isMounted = true;
+    const ad = create();
+    adRef.current = ad;
 
-    const initialize = async () => {
-      const config = {
-        mediaKey: TEST_CONFIG.mediaKey,
-        adUnitIds: [
-          TEST_CONFIG.bannerId,
-          TEST_CONFIG.nativeAdId,
-          TEST_CONFIG.videoAdId,
-          TEST_CONFIG.interstitialId,
-          TEST_CONFIG.interstitialVideoId,
-          TEST_CONFIG.rewardedId,
-        ],
-        logLevel: 'debug' as const,
-      };
-
-      appendStatus('initialize.start', {
-        platform: Platform.OS,
-        nativeAvailable: hasNativeModule,
-        bannerViewAvailable: hasBannerView,
-        nativeAdViewAvailable: hasNativeAdView,
-        videoAdViewAvailable: hasVideoAdView,
-        config,
-      });
-
-      try {
-        await NapSspAd.initialize(config);
-        appendStatus('initialize.success');
-
-        const status = await NapSspAd.getStatus();
-        appendStatus('getStatus.success', status);
-      } catch (error) {
-        console.warn('NapSsp initialize failed', error);
-        appendStatus('initialize.failed', String(error));
-        if (isMounted) {
-          setStatusText((prev) => `Initialization failed: ${String(error)}\n\n${prev}`);
-        }
-      }
-    };
-
-    initialize();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const refreshStatus = async () => {
-    try {
-      const status = await NapSspAd.getStatus();
-      appendStatus('refreshStatus.success', status);
-    } catch (error) {
-      appendStatus('refreshStatus.failed', String(error));
-      Alert.alert('Status', `Unable to fetch status: ${String(error)}`);
-    }
-  };
-
-  const handleShowInterstitial = async () => {
-    const interstitial = new InterstitialAd(TEST_CONFIG.interstitialId);
-    interstitial.addAdEventListener('loaded', () => appendStatus('interstitial.loaded', TEST_CONFIG.interstitialId));
-    interstitial.addAdEventListener('loadFailed', (error) => appendStatus('interstitial.loadFailed', error));
-    interstitial.addAdEventListener('opened', () => appendStatus('interstitial.opened', TEST_CONFIG.interstitialId));
-    interstitial.addAdEventListener('closed', () => appendStatus('interstitial.closed', TEST_CONFIG.interstitialId));
-    interstitial.addAdEventListener('clicked', () => appendStatus('interstitial.clicked', TEST_CONFIG.interstitialId));
-    interstitial.addAdEventListener('impression', () => appendStatus('interstitial.impression', TEST_CONFIG.interstitialId));
-    try {
-      appendStatus('interstitial.load.start', TEST_CONFIG.interstitialId);
-      await interstitial.load();
-      appendStatus('interstitial.isLoaded.afterLoad', interstitial.isLoaded());
-      appendStatus('interstitial.show.start', TEST_CONFIG.interstitialId);
-      await interstitial.show();
-    } catch (error) {
-      appendStatus('interstitial.failed', String(error));
-      Alert.alert('알림', `전면 광고를 불러오지 못했습니다.\n${String(error)}`);
-    }
-  };
-
-  const handleShowInterstitialVideo = async () => {
-    const interstitialVideo = new InterstitialVideoAd(TEST_CONFIG.interstitialVideoId);
-    interstitialVideo.addAdEventListener('loaded', () => appendStatus('interstitialVideo.loaded', TEST_CONFIG.interstitialVideoId));
-    interstitialVideo.addAdEventListener('loadFailed', (error) => appendStatus('interstitialVideo.loadFailed', error));
-    interstitialVideo.addAdEventListener('opened', () => appendStatus('interstitialVideo.opened', TEST_CONFIG.interstitialVideoId));
-    interstitialVideo.addAdEventListener('closed', () => appendStatus('interstitialVideo.closed', TEST_CONFIG.interstitialVideoId));
-    interstitialVideo.addAdEventListener('clicked', () => appendStatus('interstitialVideo.clicked', TEST_CONFIG.interstitialVideoId));
-    interstitialVideo.addAdEventListener('impression', () => appendStatus('interstitialVideo.impression', TEST_CONFIG.interstitialVideoId));
-    try {
-      appendStatus('interstitialVideo.load.start', TEST_CONFIG.interstitialVideoId);
-      await interstitialVideo.load();
-      appendStatus('interstitialVideo.isLoaded.afterLoad', interstitialVideo.isLoaded());
-      appendStatus('interstitialVideo.show.start', TEST_CONFIG.interstitialVideoId);
-      await interstitialVideo.show();
-      Alert.alert('알림', '전면 동영상 광고 show()가 호출되었습니다.');
-    } catch (error) {
-      appendStatus('interstitialVideo.failed', String(error));
-      Alert.alert('알림', `전면 동영상 광고를 불러오지 못했습니다.\n${String(error)}`);
-    }
-  };
-
-  const handleShowRewarded = async () => {
-    const rewarded = new RewardedAd(TEST_CONFIG.rewardedId);
-
-    rewarded.addAdEventListener('loaded', () => appendStatus('rewarded.loaded', TEST_CONFIG.rewardedId));
-    rewarded.addAdEventListener('loadFailed', (error) => appendStatus('rewarded.loadFailed', error));
-    rewarded.addAdEventListener('opened', () => appendStatus('rewarded.opened', TEST_CONFIG.rewardedId));
-    rewarded.addAdEventListener('closed', () => appendStatus('rewarded.closed', TEST_CONFIG.rewardedId));
-    rewarded.addAdEventListener('clicked', () => appendStatus('rewarded.clicked', TEST_CONFIG.rewardedId));
-    rewarded.addAdEventListener('impression', () => appendStatus('rewarded.impression', TEST_CONFIG.rewardedId));
-    rewarded.addAdEventListener('onRewarded', () => {
-      appendStatus('rewarded.rewarded', TEST_CONFIG.rewardedId);
-      Alert.alert('보상 획득!', '보상 이벤트가 발생했습니다.');
+    const unsubscribers = subscribe(ad, {
+      onLoaded: () => {
+        setLoaded(true);
+        log(`${title} ▸ loaded`);
+      },
+      onLoadFailed: (error) => {
+        setLoaded(false);
+        log(`${title} ▸ loadFailed — ${describeError(error)}`);
+      },
+      onOpened: () => log(`${title} ▸ opened`),
+      onImpression: () => log(`${title} ▸ impression`),
+      onClicked: () => log(`${title} ▸ clicked`),
+      onClosed: () => {
+        setLoaded(false);
+        log(`${title} ▸ closed`);
+      },
     });
 
-    try {
-      appendStatus('rewarded.load.start', TEST_CONFIG.rewardedId);
-      await rewarded.load();
-      appendStatus('rewarded.show.start', TEST_CONFIG.rewardedId);
-      await rewarded.show();
-    } catch (error) {
-      appendStatus('rewarded.failed', String(error));
-      Alert.alert('알림', `보상형 광고를 불러오지 못했습니다.\n${String(error)}`);
-    }
-  };
+    return () => {
+      unsubscribers.forEach((unsubscribe) => unsubscribe());
+      ad.destroy();
+      adRef.current = null;
+    };
+    // `create` and `subscribe` are stable for the lifetime of the panel.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const run = useCallback(
+    async (label: string, action: (ad: T) => Promise<void>) => {
+      const ad = adRef.current;
+      if (!ad) {
+        return;
+      }
+      setBusy(true);
+      log(`${title} ▸ ${label}…`);
+      try {
+        await action(ad);
+        log(`${title} ▸ ${label} resolved`);
+      } catch (error) {
+        log(`${title} ▸ ${label} rejected — ${describeError(error)}`);
+      } finally {
+        setBusy(false);
+      }
+    },
+    [log, title],
+  );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Section title={title} subtitle={`${subtitle} · adUnitId ${adUnitId}`}>
+      <Text style={styles.state}>
+        state: {busy ? 'working…' : loaded ? 'ready to show' : 'idle'}
+      </Text>
+      <View style={styles.buttonRow}>
+        <Button title="Load" onPress={() => run('load()', (ad) => ad.load())} disabled={busy} />
+        <Button
+          title="Show"
+          primary
+          onPress={() => run('show()', (ad) => ad.show())}
+          disabled={busy || !loaded}
+        />
+        <Button
+          title="Load + Show"
+          onPress={() => run('start()', (ad) => ad.start())}
+          disabled={busy}
+        />
+      </View>
+      <View style={styles.buttonRow}>
+        <Button
+          title="Cancel load"
+          onPress={() => run('cancelLoad()', (ad) => ad.cancelLoad())}
+          disabled={busy}
+        />
+        <Button
+          title="isReady()"
+          onPress={() =>
+            run('isReady()', async (ad) => {
+              const ready = await ad.isReady();
+              setLoaded(ready);
+              log(`${title} ▸ isReady() = ${ready}`);
+            })
+          }
+          disabled={busy}
+        />
+      </View>
+    </Section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Inline formats: banner, native, inline video
+// ─────────────────────────────────────────────────────────────────────────────
+
+function InlineAdPanel({
+  title,
+  subtitle,
+  adUnitId,
+  log,
+  render,
+}: {
+  title: string;
+  subtitle: string;
+  adUnitId: string;
+  log: LogFn;
+  render: (handlers: {
+    ref: AdViewRef;
+    onAdLoaded: () => void;
+    onAdFailedToLoad: (error: AdError) => void;
+    onAdClicked: () => void;
+    onAdImpression: () => void;
+  }) => React.ReactNode;
+}) {
+  const ref = useRef<AdViewHandle | null>(null);
+  const [state, setState] = useState<'loading' | 'loaded' | 'failed'>('loading');
+
+  const handlers = useMemo(
+    () => ({
+      ref,
+      onAdLoaded: () => {
+        setState('loaded');
+        log(`${title} ▸ loaded`);
+      },
+      onAdFailedToLoad: (error: AdError) => {
+        setState('failed');
+        log(`${title} ▸ failed — ${describeError(error)}`);
+      },
+      onAdClicked: () => log(`${title} ▸ clicked`),
+      onAdImpression: () => log(`${title} ▸ impression`),
+    }),
+    [log, title],
+  );
+
+  return (
+    <Section title={title} subtitle={`${subtitle} · adUnitId ${adUnitId}`}>
+      <Text style={styles.state}>state: {state}</Text>
+      <View style={styles.adSlot}>{render(handlers)}</View>
+      <View style={styles.buttonRow}>
+        <Button
+          title="Reload"
+          onPress={() => {
+            setState('loading');
+            log(`${title} ▸ reload()`);
+            ref.current?.reload();
+          }}
+        />
+      </View>
+    </Section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// App
+// ─────────────────────────────────────────────────────────────────────────────
+
+const MAX_LOG_LINES = 60;
+
+export default function App() {
+  const [log, setLog] = useState<string[]>([]);
+  const [status, setStatus] = useState<NapSspStatus | null>(null);
+  const [initError, setInitError] = useState<string | null>(null);
+
+  const append = useCallback((message: string) => {
+    const line = `${new Date().toLocaleTimeString()}  ${message}`;
+    console.log(`[NapSspExample] ${line}`);
+    setLog((previous) => [line, ...previous].slice(0, MAX_LOG_LINES));
+  }, []);
+
+  // Step 1 — initialize once, before any ad is requested.
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        // iOS: resolve tracking permission first so the first request can carry the IDFA.
+        if (Platform.OS === 'ios') {
+          append(`ATT status: ${await NapSspAd.requestTrackingAuthorization()}`);
+        }
+
+        const result = await NapSspAd.initialize({
+          mediaKey: adConfig.mediaKey,
+          adUnitIds: allAdUnitIds,
+          logLevel: __DEV__ ? 'verbose' : 'error',
+          // Privacy travels with initialize() so it reaches every network before it starts.
+          privacy: {childDirected: false},
+          // Android only; resolves false on iOS.
+          testMode: __DEV__,
+        });
+
+        if (!cancelled) {
+          setStatus(result);
+          append('NapSspAd.initialize() resolved');
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setInitError(describeError(error));
+          append(`NapSspAd.initialize() failed — ${describeError(error)}`);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [append]);
+
+  const initialized = status?.initialized === true;
+
+  return (
+    <SafeAreaView style={styles.screen}>
       <StatusBar barStyle="dark-content" />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Nap SSP 광고 테스트</Text>
-          <Text style={styles.subtitle}>
-            iOS 브리지 예제를 처음 보는 분도 따라할 수 있도록 placeholder/native-safe
-            동작과 실제 API 호출 경로를 함께 보여줍니다.
-          </Text>
-        </View>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.heading}>react-native-nap-ssp</Text>
+        <Text style={styles.subheading}>
+          {Platform.OS} · mediaKey {adConfig.mediaKey}
+        </Text>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>0. 초기화 상태</Text>
-          <View style={styles.statusCard}>
-            <Text style={styles.statusLabel}>Native modules available</Text>
-            <Text style={styles.statusValue}>
-              {String(
-                hasNativeModule,
-              )}
+        <Section title="1. SDK status">
+          {initError ? (
+            <Text style={styles.error}>initialize() failed: {initError}</Text>
+          ) : (
+            <Text style={styles.state}>
+              {initialized
+                ? `initialized · testMode ${String(status?.testMode ?? false)}${
+                    status?.testModeSupported === false ? ' (not supported on iOS)' : ''
+                  }`
+                : 'initializing…'}
             </Text>
-            <Text style={styles.statusLabel}>NapSspAd.getStatus()</Text>
-            <Text style={styles.statusJson}>{statusText}</Text>
-            <View style={styles.statusActions}>
-              <TouchableOpacity style={styles.smallButton} onPress={refreshStatus}>
-                <Text style={styles.buttonText}>새로고침</Text>
-              </TouchableOpacity>
-            </View>
+          )}
+          <View style={styles.buttonRow}>
+            <Button
+              title="Refresh getStatus()"
+              onPress={async () => {
+                const next = await NapSspAd.getStatus();
+                setStatus(next);
+                append(`getStatus() → privacy ${JSON.stringify(next.privacy ?? {})}`);
+              }}
+            />
           </View>
-        </View>
+        </Section>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>1. 배너 광고 (Banner)</Text>
-          <View style={styles.adContainer}>
-            {hasBannerView ? (
-              <BannerAd
-                adUnitId={TEST_CONFIG.bannerId}
-                size="BANNER_320x50"
-                onAdLoaded={() => appendStatus('banner.loaded', TEST_CONFIG.bannerId)}
-                onAdFailedToLoad={(e) => appendStatus('banner.loadFailed', e)}
-              />
-            ) : (
-              <Text style={{color: '#6B7280'}}>Native banner not available (placeholder)</Text>
-            )}
-          </View>
-        </View>
+        {initialized ? (
+          <>
+            <InlineAdPanel
+              title="2. Banner"
+              subtitle="loads on mount"
+              adUnitId={adConfig.banner}
+              log={append}
+              render={(h) => (
+                <BannerAd
+                  ref={h.ref}
+                  adUnitId={adConfig.banner}
+                  size="BANNER_320x50"
+                  onAdLoaded={h.onAdLoaded}
+                  onAdFailedToLoad={h.onAdFailedToLoad}
+                  onAdClicked={h.onAdClicked}
+                  onAdImpression={h.onAdImpression}
+                />
+              )}
+            />
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>2. 네이티브 광고 (Native Ad)</Text>
-          <View style={styles.adContainer}>
-            {hasNativeAdView ? (
-              <NativeAd adUnitId={TEST_CONFIG.nativeAdId} />
-            ) : (
-              <Text style={{color: '#6B7280'}}>Native ad not available (placeholder)</Text>
-            )}
-          </View>
-        </View>
+            <InlineAdPanel
+              title="3. Native"
+              subtitle="rendered by the SDK into the plugin layout"
+              adUnitId={adConfig.nativeAd}
+              log={append}
+              render={(h) => (
+                <NativeAd
+                  ref={h.ref}
+                  adUnitId={adConfig.nativeAd}
+                  style={styles.nativeAd}
+                  onAdLoaded={h.onAdLoaded}
+                  onAdFailedToLoad={h.onAdFailedToLoad}
+                  onAdClicked={h.onAdClicked}
+                  onAdImpression={h.onAdImpression}
+                />
+              )}
+            />
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>3. 동영상 광고 뷰 (Video Ad)</Text>
-          <View style={styles.adContainer}>
-            {hasVideoAdView ? (
-              <VideoAd adUnitId={TEST_CONFIG.videoAdId} />
-            ) : (
-              <Text style={{color: '#6B7280'}}>Video ad not available (placeholder)</Text>
-            )}
-          </View>
-        </View>
+            <InlineAdPanel
+              title="4. Inline video"
+              subtitle="in-feed video"
+              adUnitId={adConfig.video}
+              log={append}
+              render={(h) => (
+                <VideoAd
+                  ref={h.ref}
+                  adUnitId={adConfig.video}
+                  style={styles.videoAd}
+                  onAdLoaded={h.onAdLoaded}
+                  onAdFailedToLoad={h.onAdFailedToLoad}
+                  onAdClicked={h.onAdClicked}
+                  onAdImpression={h.onAdImpression}
+                  onAdCompleted={() => append('4. Inline video ▸ completed')}
+                  onAdSkipped={() => append('4. Inline video ▸ skipped')}
+                />
+              )}
+            />
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>4. 전면 광고 (Interstitial)</Text>
-          <TouchableOpacity style={styles.button} onPress={handleShowInterstitial}>
-            <Text style={styles.buttonText}>전면 광고 보기</Text>
-          </TouchableOpacity>
-        </View>
+            <FullScreenAdPanel
+              title="5. Interstitial"
+              subtitle="full-screen image/HTML"
+              adUnitId={adConfig.interstitial}
+              log={append}
+              create={() =>
+                new InterstitialAd(adConfig.interstitial, {closeButtonTouchAreaRatio: 0.6})
+              }
+              subscribe={(ad, h) => [
+                ad.addAdEventListener('loaded', h.onLoaded),
+                ad.addAdEventListener('loadFailed', h.onLoadFailed),
+                ad.addAdEventListener('opened', h.onOpened),
+                ad.addAdEventListener('impression', h.onImpression),
+                ad.addAdEventListener('clicked', h.onClicked),
+                ad.addAdEventListener('closed', h.onClosed),
+              ]}
+            />
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>5. 전면 동영상 광고 (Interstitial Video)</Text>
-          <TouchableOpacity
-            style={[styles.button, styles.secondaryButton]}
-            onPress={handleShowInterstitialVideo}
-          >
-            <Text style={styles.buttonText}>전면 동영상 광고 보기</Text>
-          </TouchableOpacity>
-        </View>
+            <FullScreenAdPanel
+              title="6. Interstitial video"
+              subtitle="skipped never fires on iOS"
+              adUnitId={adConfig.interstitialVideo}
+              log={append}
+              create={() => new InterstitialVideoAd(adConfig.interstitialVideo, {timeout: 20})}
+              subscribe={(ad, h) => [
+                ad.addAdEventListener('loaded', h.onLoaded),
+                ad.addAdEventListener('loadFailed', h.onLoadFailed),
+                ad.addAdEventListener('opened', h.onOpened),
+                ad.addAdEventListener('impression', h.onImpression),
+                ad.addAdEventListener('clicked', h.onClicked),
+                ad.addAdEventListener('closed', h.onClosed),
+                ad.addAdEventListener('completed', () => append('6. Interstitial video ▸ completed')),
+                ad.addAdEventListener('skipped', () => append('6. Interstitial video ▸ skipped')),
+              ]}
+            />
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>6. 보상형 광고 (Rewarded)</Text>
-          <TouchableOpacity style={styles.button} onPress={handleShowRewarded}>
-            <Text style={styles.buttonText}>보상형 광고 보기</Text>
-          </TouchableOpacity>
-        </View>
+            <FullScreenAdPanel
+              title="7. Rewarded"
+              subtitle="grant the reward from the rewarded event"
+              adUnitId={adConfig.rewarded}
+              log={append}
+              create={() =>
+                new RewardedAd(adConfig.rewarded, {customParams: {userId: 'example-user'}})
+              }
+              subscribe={(ad, h) => [
+                ad.addAdEventListener('loaded', h.onLoaded),
+                ad.addAdEventListener('loadFailed', h.onLoadFailed),
+                ad.addAdEventListener('opened', h.onOpened),
+                ad.addAdEventListener('impression', h.onImpression),
+                ad.addAdEventListener('clicked', h.onClicked),
+                ad.addAdEventListener('closed', h.onClosed),
+                ad.addAdEventListener('completed', () => append('7. Rewarded ▸ completed')),
+                ad.addAdEventListener('skipped', () => append('7. Rewarded ▸ skipped')),
+                // transactionId is what reconciles with the S2S reward callback.
+                ad.addAdEventListener('rewarded', (reward) =>
+                  append(`7. Rewarded ▸ rewarded — transactionId=${reward.transactionId ?? 'n/a'}`),
+                ),
+              ]}
+            />
+          </>
+        ) : null}
+
+        <Section title="Event log" subtitle="newest first">
+          {log.length === 0 ? (
+            <Text style={styles.state}>No events yet.</Text>
+          ) : (
+            log.map((line, index) => (
+              <Text key={`${index}-${line}`} style={styles.logLine}>
+                {line}
+              </Text>
+            ))
+          )}
+        </Section>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5F7',
-  },
-  scrollContent: {
-    padding: 20,
-  },
-  header: {
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1D1D1F',
-  },
-  subtitle: {
-    marginTop: 8,
-    color: '#636366',
-    lineHeight: 20,
-  },
+  screen: {backgroundColor: '#F5F6F8', flex: 1},
+  content: {padding: 16, paddingBottom: 48},
+  heading: {color: '#111827', fontSize: 22, fontWeight: '700'},
+  subheading: {color: '#6B7280', fontSize: 13, marginBottom: 16, marginTop: 2},
   section: {
-    marginBottom: 32,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
-    color: '#3A3A3C',
-  },
-  statusCard: {
     backgroundColor: '#FFFFFF',
+    borderColor: '#E5E7EB',
     borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
+    borderWidth: 1,
+    marginBottom: 12,
+    padding: 14,
   },
-  statusLabel: {
-    color: '#6B7280',
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    marginTop: 8,
-  },
-  statusValue: {
-    color: '#111827',
-    fontSize: 14,
-    marginTop: 4,
-  },
-  statusJson: {
-    color: '#111827',
-    fontSize: 12,
-    marginTop: 4,
-    fontFamily: 'Menlo',
-  },
-  statusActions: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 16,
-  },
-  adContainer: {
-    backgroundColor: '#FFFFFF',
-    padding: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
+  sectionTitle: {color: '#111827', fontSize: 16, fontWeight: '600'},
+  sectionSubtitle: {color: '#6B7280', fontSize: 12, marginTop: 2},
+  state: {color: '#374151', fontSize: 13, marginTop: 8},
+  error: {color: '#B91C1C', fontSize: 13, marginTop: 8},
+  adSlot: {alignItems: 'center', marginTop: 12},
+  nativeAd: {minHeight: 280, width: '100%'},
+  videoAd: {height: 200, width: '100%'},
+  buttonRow: {flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12},
   button: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
-  smallButton: {
-    flex: 1,
-    backgroundColor: '#007AFF',
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  secondaryButton: {
-    backgroundColor: '#FF9500',
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  buttonPrimary: {backgroundColor: '#2563EB', borderColor: '#2563EB'},
+  buttonDisabled: {opacity: 0.45},
+  buttonText: {color: '#111827', fontSize: 13, fontWeight: '600'},
+  buttonTextInverted: {color: '#FFFFFF'},
+  logLine: {color: '#4B5563', fontSize: 11, marginTop: 4},
 });
-
-export default App;

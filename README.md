@@ -1,146 +1,200 @@
 # react-native-nap-ssp
 
 [![npm version](https://img.shields.io/npm/v/react-native-nap-ssp.svg?style=flat-square)](https://www.npmjs.com/package/react-native-nap-ssp)
-[![Android SDK](https://img.shields.io/badge/Android%20SDK-v2.1.3-brightgreen.svg?style=flat-square)](https://napmx.github.io/#/android/)
-[![iOS SDK](https://img.shields.io/badge/iOS%20SDK-v2.4.2-brightgreen.svg?style=flat-square)](https://napmx.github.io/#/ios/)
+[![Android SDK](https://img.shields.io/badge/Android%20SDK-2.3.0-brightgreen.svg?style=flat-square)](https://napmx.github.io/#/android/)
+[![iOS SDK](https://img.shields.io/badge/iOS%20SDK-2.5.0-brightgreen.svg?style=flat-square)](https://napmx.github.io/#/ios/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](./LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-The **React Native bridge** for **KT Nasmedia's nap mx (AdMixer SSP) SDK**.
-Monetize React Native apps with banners, native ads, inline video, interstitials, interstitial video, and rewarded video.
+React Native bridge for **nap mx** (KT Nasmedia's AdMixer SSP) — banner, native, inline video,
+interstitial, interstitial video and rewarded video, with the mediation waterfall handled by the
+native SDK.
 
----
-
-## 🚀 What's New in v0.4.0
-
-* **Android SDK `2.1.1` → `2.1.3`** (BOM `2026.07.03` → `2026.07.06`, AdManager adapter `2.0.2` → `2.0.4`) — stability fixes plus deterministic failure reporting for unregistered ad units.
-* **iOS SDK `2.3.7` → `2.4.2`** — improved `loadAd` handling, a simulator launch fix, and adapter refreshes.
-* **iOS Teads support** — `AdMixerMediationTeads` is now available as the `Teads` subspec. Teads was previously Android-only here.
-* **Huawei Maven repository** added on Android, required by the official Teads installation guide.
-* **Documentation corrected** — the guides now match the actual exported API surface. See the note below if you followed the v0.3.0 docs.
-
-> ⚠️ **If you copied code from the v0.3.0 README or API guide**, it referenced `initSdk()` and `setAdapterConfig()`, which this package has never exported. Initialization is `NapSspAd.initialize({ mediaKey, adUnitIds, ... })`, and mediation keys go in that same `mediations` object. See the [API Reference](./docs/API.md).
-
-> ℹ️ **iOS 2.4.2 was source-verified** by diffing the shipped `.swiftinterface` of both SDK versions against every symbol this plugin calls. One breaking change was found and fixed (`AMMVideoInterstitial.load`, see the [Migration Guide](./docs/MIGRATION.md#1-v040--native-sdk-refresh)). A full Xcode build has not been run, so smoke-test your iOS target before shipping.
+Official native guides: [Android](https://napmx.github.io/#/android/) · [iOS](https://napmx.github.io/#/ios/)
 
 ---
 
-## 📚 Documentation
+## What's new in 0.5.0
+
+0.5.0 is a correctness release. If you are on 0.4.x, read the
+[migration notes](./docs/MIGRATION.md) — there are breaking changes.
+
+* **Placeholder simulation is gone.** Earlier versions replaced the real SDK with fake events in
+  debug builds and reported load failures as successes. Every build now takes the real SDK path and
+  failures surface as failures.
+* **Privacy signals actually reach the SDK.** `setCoppa()` only ever stored a local flag. There is
+  now a real `setPrivacyConsent()` (COPPA / GDPR / CCPA) wired to
+  `AdMixer.setTagForChildDirectedTreatment` on Android and `AMMConsent` on iOS.
+* **Test mode** — `setTestMode()` / `setTestDeviceIds()` (Android; the iOS SDK has no equivalent).
+* **Native SDKs refreshed** — Android core `2.1.3 → 2.3.0` (BOM `2026.09.03`), iOS `2.4.2 → 2.5.0`.
+* **Kotlin 2.1+ is now required** in the host app — see [Setup](./docs/SETUP.md#kotlin-요구사항).
+
+Full details in the [CHANGELOG](./CHANGELOG.md).
+
+---
+
+## Documentation
 
 | Guide | Contents |
 | :--- | :--- |
-| 🚀 **[Setup & Installation](./docs/SETUP.md)** | React Native, Android Gradle & BOM, iOS CocoaPods/SPM, Expo, per-network minSdk and Kotlin requirements. |
-| 📖 **[API Reference](./docs/API.md)** | `NapSspAd`, `BannerAd`, `NativeAd`, `VideoAd`, `InterstitialAd`, `RewardedAd`, `InterstitialVideoAd`, events, errors, mediation config. |
-| 🔄 **[Migration & Version Matrix](./docs/MIGRATION.md)** | Upgrade steps, the verified version matrix, and native SDK breaking changes. |
-| ❓ **[FAQ & Troubleshooting](./docs/FAQ.md)** | Build and runtime fixes, privacy compliance (ATT, COPPA), glossary. |
+| 🚀 **[Setup](./docs/SETUP.md)** | Install, Android Gradle & mediation adapters, iOS CocoaPods/SPM, Kotlin and minSdk requirements, ATT. |
+| 📖 **[API reference](./docs/API.md)** | Every export, option, event and error code. |
+| 🔄 **[Migration](./docs/MIGRATION.md)** | 0.4.x → 0.5.0 upgrade steps and the verified version matrix. |
+| ❓ **[FAQ](./docs/FAQ.md)** | Build and runtime troubleshooting, privacy compliance, known platform gaps. |
 
-Official native SDK guides: [Android](https://napmx.github.io/#/android/) · [iOS](https://napmx.github.io/#/ios/)
+A runnable integration reference lives in [`example/ExampleHostApp`](./example) — it exercises
+initialize → load → callback → show → reload → cleanup for all six formats with a live event log.
 
 ---
 
-## ⚡ Quick Start
+## Quick start
 
 ### 1. Install
 
 ```bash
 npm install react-native-nap-ssp
-# or
-yarn add react-native-nap-ssp
 ```
 
-**Android** — enable the vendor SDK in `android/gradle.properties`:
+**Android** — pick the mediation adapters you sell, in `android/gradle.properties`:
 
 ```properties
-napSsp.enableVendorSdk=true
+# comma separated, or "all". Unset links the nap mx core SDK only.
+napSsp.mediations=admanager,adfit
 ```
 
-**iOS** — `cd ios && pod install`.
+and make sure the app builds with Kotlin 2.1 or newer (React Native 0.79+ already does). On older
+React Native, set it in the top-level `android/build.gradle`:
+
+```groovy
+buildscript {
+    ext {
+        kotlinVersion = "2.1.21"
+    }
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+    }
+}
+```
+
+**iOS** — add the subspecs for the adapters you use, then install:
+
+```ruby
+# ios/Podfile
+pod 'NapSspPlugin/GAM'
+pod 'NapSspPlugin/AdFit'
+```
+
+```bash
+cd ios && pod install
+```
 
 ### 2. Initialize
 
-Call this once, before requesting any ad. Every ad unit you use must be registered here.
+Call this once, before requesting any ad. Every ad unit you will use must be registered here, and
+privacy signals belong in this call — several networks read consent only when they start up.
 
 ```tsx
-import React, { useEffect } from 'react';
-import { NapSspAd } from 'react-native-nap-ssp';
+import React, {useEffect} from 'react';
+import {Platform} from 'react-native';
+import {NapSspAd} from 'react-native-nap-ssp';
 
 export default function App() {
   useEffect(() => {
-    NapSspAd.initialize({
-      mediaKey: 'YOUR_MEDIA_KEY',
-      adUnitIds: ['YOUR_BANNER_UNIT_ID', 'YOUR_INTERSTITIAL_UNIT_ID'],
-      logLevel: __DEV__ ? 'verbose' : 'error',
-      mediations: {
-        adManager: { googleAppId: 'YOUR_GOOGLE_APP_ID' },
-        appLovin: { sdkKey: 'YOUR_APPLOVIN_SDK_KEY' },
-        adFit: true,
-      },
-    }).catch((error) => console.warn('nap ssp init failed', error));
+    (async () => {
+      // iOS: resolve tracking permission before the first ad request.
+      if (Platform.OS === 'ios') {
+        await NapSspAd.requestTrackingAuthorization();
+      }
+
+      await NapSspAd.initialize({
+        mediaKey: '10771',
+        adUnitIds: ['104701', '104703', '103722'],
+        logLevel: __DEV__ ? 'verbose' : 'error',
+        privacy: {childDirected: false},
+        testMode: __DEV__, // Android only
+      });
+    })().catch((error) => console.warn('nap mx init failed', error));
   }, []);
 
   return <YourAppRoot />;
 }
 ```
 
+> `mediaKey` and `adUnitIds` are the **numeric** values issued on the
+> [partner site](https://publisher.admixer.co.kr). One media key per app.
+
 ### 3. Show a banner
 
-```tsx
-import { View } from 'react-native';
-import { BannerAd } from 'react-native-nap-ssp';
+The served size comes from the ad unit's server configuration; `size` is only a layout hint.
 
-export default function HomeScreen() {
+```tsx
+import {useRef} from 'react';
+import {BannerAd, type AdViewHandle} from 'react-native-nap-ssp';
+
+function Footer() {
+  const bannerRef = useRef<AdViewHandle>(null);
+
   return (
-    <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-      <BannerAd
-        adUnitId="YOUR_BANNER_UNIT_ID"
-        size="BANNER_320x50"
-        onAdLoaded={() => console.log('banner loaded')}
-        onAdFailedToLoad={(error) => console.warn(error.code, error.message)}
-      />
-    </View>
+    <BannerAd
+      ref={bannerRef}
+      adUnitId="104701"
+      size="BANNER_320x50"
+      onAdLoaded={() => console.log('banner loaded')}
+      onAdFailedToLoad={(error) => console.warn(error.code, error.message)}
+    />
   );
+  // bannerRef.current?.reload() requests a fresh ad.
 }
 ```
 
 ### 4. Load and show an interstitial
 
 ```tsx
-import React, { useEffect, useRef } from 'react';
-import { Button } from 'react-native';
-import { InterstitialAd } from 'react-native-nap-ssp';
+import {useEffect, useRef} from 'react';
+import {Button} from 'react-native';
+import {InterstitialAd} from 'react-native-nap-ssp';
 
-export default function GameScreen() {
+function GameScreen() {
   const adRef = useRef<InterstitialAd>();
 
   useEffect(() => {
-    const interstitial = new InterstitialAd('YOUR_INTERSTITIAL_UNIT_ID');
-    adRef.current = interstitial;
+    const ad = new InterstitialAd('104703');
+    adRef.current = ad;
 
-    const unsubscribe = interstitial.addAdEventListener('loaded', () => {
-      console.log('interstitial ready');
-    });
-    interstitial.addAdEventListener('loadFailed', (error) => {
-      console.warn(error.code, error.message);
-    });
+    const unsubscribe = ad.addAdEventListener('loadFailed', (error) =>
+      console.warn(error.code, error.message),
+    );
 
-    interstitial.load();
+    ad.load().catch((error) => console.warn('load rejected', error.code));
 
     return () => {
       unsubscribe();
-      interstitial.cancelLoad();  // abort an in-flight load
-      interstitial.destroy();
+      ad.destroy(); // cancels an in-flight load and releases the native ad
     };
   }, []);
 
-  return <Button title="Show Ad" onPress={() => adRef.current?.show()} />;
+  return <Button title="Show ad" onPress={() => adRef.current?.show()} />;
 }
 ```
 
-Event names are the short form (`loaded`, `loadFailed`, `opened`, `closed`, `clicked`, `impression`, `rewarded`, `completed`, `skipped`) — see the [full event table](./docs/API.md#event-names).
+`load()` resolves when the SDK reports a fill and rejects with an [`AdError`](./docs/API.md#aderror)
+when the whole waterfall fails. Event names are the short form — `loaded`, `loadFailed`, `opened`,
+`closed`, `clicked`, `impression`, `rewarded`, `completed`, `skipped`.
+
+### 5. Reward a user
+
+Grant the reward from the `rewarded` event and reconcile it with your server using
+`transactionId`, which matches `transaction_id` on the S2S reward callback.
+
+```tsx
+const ad = new RewardedAd('103722', {customParams: {userId}});
+ad.addAdEventListener('rewarded', ({transactionId}) => grantReward(userId, transactionId));
+await ad.load();
+await ad.show();
+```
 
 ---
 
-## 📦 Supported Ad Formats
+## Supported formats
 
 | Format | Export | Android | iOS |
 | :--- | :--- | :---: | :---: |
@@ -151,10 +205,28 @@ Event names are the short form (`loaded`, `loadFailed`, `opened`, `closed`, `cli
 | Interstitial video | `InterstitialVideoAd` | ✅ | ✅ |
 | Rewarded video | `RewardedAd` | ✅ | ✅ |
 
-**Mediation networks**: Google Ad Manager, Kakao AdFit, Pangle, AppLovin, Unity Ads, Naver Ad Manager, Teads.
+**Mediation networks**: Google Ad Manager, Kakao AdFit, Pangle, AppLovin, Unity Ads,
+Naver Ad Manager, Teads.
+
+### Known platform differences
+
+| Behaviour | Android | iOS |
+| :--- | :--- | :--- |
+| `skipped` event (rewarded, interstitial video) | ✅ | ❌ — the iOS delegates have no skip callback |
+| `setTestMode()` / `setTestDeviceIds()` | ✅ | ❌ — resolves `false`; register test devices per network |
+| `privacy.usPrivacy` (IAB US Privacy string) | ✅ | ❌ |
+| `privacy.underAgeOfConsent` | ❌ | ✅ |
+| `InterstitialAdOptions.disableBackKey` | ✅ | n/a |
+| `RewardedAdOptions.mute`, `InterstitialVideoAdOptions.timeout` | ✅ | ❌ |
+
+### Not supported
+
+The New Architecture (TurboModules/Fabric) has **not** been verified against this plugin. It ships
+legacy `ReactPackage` modules and `SimpleViewManager` views, which the interop layer is expected to
+handle, but no build or runtime check has been run — so it is not claimed as supported.
 
 ---
 
-## 🛡️ License
+## License
 
-[MIT](./LICENSE) — Copyright © 2026 KT Nasmedia.
+[MIT](./LICENSE)

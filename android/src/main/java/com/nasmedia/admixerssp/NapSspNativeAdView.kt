@@ -1,323 +1,180 @@
 package com.nasmedia.admixerssp
 
 import android.content.Context
-import android.graphics.Color
-import android.util.Log
-import android.util.TypedValue
-import android.view.Gravity
-import android.view.View
 import android.widget.FrameLayout
-import android.widget.TextView
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.uimanager.ThemedReactContext
+import com.nasmedia.admixerssp.ads.AMMNativeAdView
+import com.nasmedia.admixerssp.ads.AdInfo
+import com.nasmedia.admixerssp.common.AdMixer
+import com.nasmedia.admixerssp.common.nativeads.NativeAdViewBinder
+import com.nasmedia.admixerssp.reactnative.R
 
+/**
+ * React Native host for [AMMNativeAdView].
+ *
+ * The creative is rendered into `res/layout/nap_ssp_native_ad.xml` through a
+ * [NativeAdViewBinder]. Host apps can override the whole layout by shipping their own
+ * `nap_ssp_native_ad.xml` with the same view IDs.
+ * https://napmx.github.io/#/android/native/native-ad
+ */
 class NapSspNativeAdView(context: Context) : FrameLayout(context), LifecycleEventListener {
 
-    companion object {
-        private const val TAG = "NapSspNativeAdView"
-    }
-
-    private var sdkNativeAdView: Any? = null
+    private var adView: AMMNativeAdView? = null
+    private var adListener: NapAdListener? = null
     private var currentState: NapSspLoadState = NapSspLoadState.IDLE
-
-    private fun layoutRes(name: String, fallback: Int): Int {
-        return resources.getIdentifier(name, "layout", context.packageName).takeIf { it != 0 } ?: fallback
-    }
-
-    private fun idRes(name: String, fallback: Int): Int {
-        return resources.getIdentifier(name, "id", context.packageName).takeIf { it != 0 } ?: fallback
-    }
+    private var attachedToWindow = false
 
     private val measureAndLayout = Runnable {
         measure(
             MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+            MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY),
         )
         layout(left, top, right, bottom)
     }
 
-    private val layoutChangeListener = OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-        post(measureAndLayout)
-    }
-
-    private fun emitViewEventOnUi(eventName: String, data: Map<String, Any?> = emptyMap()) {
-        post {
-            NapSspEventEmitter.emitViewEvent(this, eventName, data)
-        }
-    }
-
-    // 플레이스홀더 (SDK 미사용 시)
-    private val placeholder = TextView(context).apply {
-        setTextColor(Color.parseColor("#2E7D32"))
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-        gravity = Gravity.CENTER
-        setBackgroundColor(Color.parseColor("#E8F5E9"))
-        setPadding(24, 24, 24, 24)
-    }
-
     var adUnitId: String? = null
         set(value) {
-            field = value?.trim()?.takeIf { it.isNotEmpty() }
-            updatePlaceholder()
-            maybeAutoLoad()
+            val normalized = value?.trim()?.takeIf { it.isNotEmpty() }
+            if (normalized == field) return
+            field = normalized
+            reload()
         }
 
-    init {
-        if (!BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
-            addView(placeholder, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-        }
-
-        addOnLayoutChangeListener(layoutChangeListener)
-
-        updatePlaceholder()
+    fun reload() {
+        release()
+        currentState = NapSspLoadState.IDLE
+        maybeLoad()
     }
 
     fun destroyNativeAd() {
-        sdkNativeAdView?.let {
-            runCatching { it.javaClass.getMethod("onPause").invoke(it) }
-            runCatching { it.javaClass.getMethod("destroy").invoke(it) }
-        }
-        sdkNativeAdView = null
+        release()
         currentState = NapSspLoadState.DESTROYED
-        removeAllViews()
-    }
-
-    private fun maybeAutoLoad() {
-        val unitId = adUnitId
-        if (unitId.isNullOrBlank()) {
-            currentState = NapSspLoadState.FAILED
-            NapSspEventEmitter.emitViewEvent(
-                this, NapSspContracts.VIEW_EVENT_AD_FAILED,
-                mapOf("adUnitId" to null, "format" to NapSspContracts.FORMAT_NATIVE_AD,
-                    "code" to "NAP_SSP_INVALID_AD_UNIT", "message" to "Native adUnitId is required"),
-            )
-            return
-        }
-
-        if (currentState == NapSspLoadState.LOADED) return
-        currentState = NapSspLoadState.LOADING
-        Log.d(TAG, "maybeAutoLoad unitId=$unitId sdkEnabled=${BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED}")
-
-        if (BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
-            loadWithSdk(unitId)
-        } else {
-            postDelayed({
-                currentState = NapSspLoadState.LOADED
-                NapSspEventEmitter.emitViewEvent(
-                    this, NapSspContracts.VIEW_EVENT_AD_LOADED,
-                    mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
-                )
-                NapSspEventEmitter.emitViewEvent(
-                    this, NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
-                    mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
-                )
-            }, 300)
-        }
-    }
-
-    private fun loadWithSdk(unitId: String) {
-        try {
-            // Activity context 필요 (Adfit 등 미디에이션 필수 요구사항)
-            val activityContext: Context =
-                (context as? ThemedReactContext)?.currentActivity ?: context
-
-            val nativeAdViewClass = Class.forName("com.nasmedia.admixerssp.ads.AMMNativeAdView")
-            val adInfoClass       = Class.forName("com.nasmedia.admixerssp.ads.AdInfo")
-            val builderClass      = Class.forName("com.nasmedia.admixerssp.ads.AdInfo\$Builder")
-            val binderClass       = Class.forName("com.nasmedia.admixerssp.common.nativeads.NativeAdViewBinder")
-            val binderBuilderClass= Class.forName("com.nasmedia.admixerssp.common.nativeads.NativeAdViewBinder\$Builder")
-
-            val nativeLayoutId = layoutRes("nap_ssp_native_ad", R.layout.nap_ssp_native_ad)
-            val nativeIconId = idRes("nap_mx_iv_icon", R.id.nap_mx_iv_icon)
-            val nativeTitleId = idRes("nap_mx_tv_title", R.id.nap_mx_tv_title)
-            val nativeAdvId = idRes("nap_mx_tv_adv", R.id.nap_mx_tv_adv)
-            val nativeDescId = idRes("nap_mx_tv_desc", R.id.nap_mx_tv_desc)
-            val nativeMainId = idRes("nap_mx_iv_main", R.id.nap_mx_iv_main)
-            val nativeCtaId = idRes("nap_mx_btn_cta", R.id.nap_mx_btn_cta)
-            Log.d(TAG, "resourceIds layout=$nativeLayoutId icon=$nativeIconId title=$nativeTitleId adv=$nativeAdvId desc=$nativeDescId main=$nativeMainId cta=$nativeCtaId package=${context.packageName}")
-
-            // AdInfo
-            val adInfoBuilder = builderClass.getConstructor(String::class.java).newInstance(unitId)
-            runCatching {
-                builderClass.getMethod("setIsUseMediation", Boolean::class.javaPrimitiveType)
-                    .invoke(adInfoBuilder, true)
-            }
-            val adInfo = builderClass.getMethod("build").invoke(adInfoBuilder)
-
-            // NativeAdViewBinder
-            val binderBuilder = binderBuilderClass
-                .getConstructor(Int::class.javaPrimitiveType)
-                .newInstance(nativeLayoutId)
-            binderBuilderClass.getMethod("setIconImageId",  Int::class.javaPrimitiveType).invoke(binderBuilder, nativeIconId)
-            binderBuilderClass.getMethod("setTitleId",      Int::class.javaPrimitiveType).invoke(binderBuilder, nativeTitleId)
-            binderBuilderClass.getMethod("setAdvertiserId", Int::class.javaPrimitiveType).invoke(binderBuilder, nativeAdvId)
-            binderBuilderClass.getMethod("setDescriptionId",Int::class.javaPrimitiveType).invoke(binderBuilder, nativeDescId)
-            binderBuilderClass.getMethod("setMainViewId",   Int::class.javaPrimitiveType).invoke(binderBuilder, nativeMainId)
-            binderBuilderClass.getMethod("setCtaId",        Int::class.javaPrimitiveType).invoke(binderBuilder, nativeCtaId)
-            val viewBinder = binderBuilderClass.getMethod("build").invoke(binderBuilder)
-
-            // NativeAdView 생성 (Activity context 사용)
-            val nativeAdView = nativeAdViewClass
-                .getConstructor(Context::class.java)
-                .newInstance(activityContext)
-            nativeAdViewClass.getMethod("setAdInfo",     adInfoClass).invoke(nativeAdView, adInfo)
-            nativeAdViewClass.getMethod("setViewBinder", binderClass).invoke(nativeAdView, viewBinder)
-
-            // 리스너 설정
-            val bridge = object : NapListenerBridge {
-                override fun onReceivedAd(adapterName: String, ad: Any) {
-                    val hasAd = runCatching {
-                        nativeAdViewClass.getField("hasAd").get(nativeAdView) as? Boolean
-                    }.getOrNull() ?: true
-                    if (!hasAd) {
-                        if (BuildConfig.DEBUG) {
-                            emitDebugPlaceholderLoad(unitId, "debug-no-fill")
-                        } else {
-                            currentState = NapSspLoadState.FAILED
-                            emitViewEventOnUi(
-                                NapSspContracts.VIEW_EVENT_AD_FAILED,
-                                mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD, "code" to -1, "message" to "No fill (hasAd is false)")
-                            )
-                        }
-                        return
-                    }
-                    post {
-                        removeAllViews()
-                        addView(
-                            nativeAdView as View,
-                            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT),
-                        )
-                        post(measureAndLayout)
-                    }
-                    currentState = NapSspLoadState.LOADED
-                    Log.d(TAG, "onReceivedAd hasAd=$hasAd")
-                    emitViewEventOnUi(
-                        NapSspContracts.VIEW_EVENT_AD_LOADED,
-                        mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
-                    )
-                }
-
-                override fun onFailedToReceiveAd(ad: Any?, name: String, code: Int, msg: String?) {
-                    Log.e(TAG, "onFailedToReceiveAd code=$code message=$msg")
-                    if (BuildConfig.DEBUG) {
-                        emitDebugPlaceholderLoad(unitId, "debug-sdk-failed:$msg")
-                    } else {
-                        currentState = NapSspLoadState.FAILED
-                        emitViewEventOnUi(
-                            NapSspContracts.VIEW_EVENT_AD_FAILED,
-                            mapOf(
-                                "adUnitId" to unitId,
-                                "format" to NapSspContracts.FORMAT_NATIVE_AD,
-                                "code" to code,
-                                "message" to msg,
-                            ),
-                        )
-                    }
-                }
-
-                override fun onAdClicked() {
-                    emitViewEventOnUi(
-                        NapSspContracts.VIEW_EVENT_AD_CLICKED,
-                        mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
-                    )
-                    emitViewEventOnUi(
-                        NapSspContracts.VIEW_EVENT_AD_OPENED,
-                        mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
-                    )
-                    postDelayed({
-                        emitViewEventOnUi(
-                            NapSspContracts.VIEW_EVENT_AD_CLOSED,
-                            mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
-                        )
-                    }, 200)
-                }
-
-                override fun onAdDisplayed() {
-                    emitViewEventOnUi(
-                        NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
-                        mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD),
-                    )
-                }
-            }
-
-            val listenerClass = Class.forName("com.nasmedia.admixerssp.NapAdListener")
-            val bridgeClass = Class.forName("com.nasmedia.admixerssp.NapListenerBridge")
-            val listener = listenerClass.getConstructor(bridgeClass).newInstance(bridge)
-            // AMMNativeAdView.setAdViewListener(Object) — v2 인라인 뷰 시그니처는 Object 파라미터.
-            nativeAdViewClass.getMethod("setAdViewListener", Any::class.java).invoke(nativeAdView, listener)
-            sdkNativeAdView = nativeAdView
-            Log.d(TAG, "calling loadNativeAd")
-            nativeAdViewClass.getMethod("loadNativeAd").invoke(nativeAdView)
-            if (BuildConfig.DEBUG) {
-                postDelayed({
-                    if (currentState == NapSspLoadState.LOADING) {
-                        emitDebugPlaceholderLoad(unitId, "debug-sdk-timeout")
-                    }
-                }, 12000)
-            }
-
-        } catch (e: Throwable) {
-            Log.e(TAG, "loadWithSdk failed", e)
-            currentState = NapSspLoadState.FAILED
-            NapSspEventEmitter.emitViewEvent(
-                this, NapSspContracts.VIEW_EVENT_AD_FAILED,
-                mapOf(
-                    "adUnitId" to unitId,
-                    "format" to NapSspContracts.FORMAT_NATIVE_AD,
-                    "code" to "NAP_SSP_NATIVE_LOAD_FAILED",
-                    "message" to (e.message ?: "unknown"),
-                ),
-            )
-        }
-    }
-
-    private fun emitDebugPlaceholderLoad(unitId: String, source: String) {
-        currentState = NapSspLoadState.LOADED
-        updatePlaceholder()
-        emitViewEventOnUi(
-            NapSspContracts.VIEW_EVENT_AD_LOADED,
-            mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD, "source" to source),
-        )
-        emitViewEventOnUi(
-            NapSspContracts.VIEW_EVENT_AD_IMPRESSION,
-            mapOf("adUnitId" to unitId, "format" to NapSspContracts.FORMAT_NATIVE_AD, "source" to source),
-        )
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        attachedToWindow = true
         (context as? ThemedReactContext)?.addLifecycleEventListener(this)
-        sdkNativeAdView?.let { runCatching { it.javaClass.getMethod("onResume").invoke(it) } }
+        maybeLoad()
     }
 
     override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        removeOnLayoutChangeListener(layoutChangeListener)
+        attachedToWindow = false
         (context as? ThemedReactContext)?.removeLifecycleEventListener(this)
-        sdkNativeAdView?.let {
-            runCatching { it.javaClass.getMethod("onPause").invoke(it) }
-            runCatching { it.javaClass.getMethod("destroy").invoke(it) }
-        }
-        sdkNativeAdView = null
+        release()
+        super.onDetachedFromWindow()
     }
 
     override fun onHostResume() {
-        sdkNativeAdView?.let { runCatching { it.javaClass.getMethod("onResume").invoke(it) } }
+        adView?.onResume()
     }
 
     override fun onHostPause() {
-        sdkNativeAdView?.let { runCatching { it.javaClass.getMethod("onPause").invoke(it) } }
+        adView?.onPause()
     }
 
     override fun onHostDestroy() {
-        sdkNativeAdView?.let {
-            runCatching { it.javaClass.getMethod("onPause").invoke(it) }
-            runCatching { it.javaClass.getMethod("destroy").invoke(it) }
-        }
-        sdkNativeAdView = null
+        release()
     }
 
-    private fun updatePlaceholder() {
-        placeholder.text = "NapSsp Native Ad\nadUnitId=${adUnitId ?: "<unset>"}\nstate=${currentState.name}"
+    // ── internals ─────────────────────────────────────────────────────────────
+
+    private fun maybeLoad() {
+        if (!attachedToWindow) return
+        if (currentState == NapSspLoadState.LOADING || currentState == NapSspLoadState.LOADED) return
+
+        val unit = adUnitId ?: return
+
+        if (NapSspSdkBridge.getConfiguration() == null) {
+            emitFailure(unit, NapSspAdErrors.NOT_INITIALIZED, "NapSspAd.initialize() must resolve before rendering a native ad.")
+            return
+        }
+
+        currentState = NapSspLoadState.LOADING
+
+        // Adfit and several other adapters reject a non-Activity context.
+        val activityContext = (context as? ThemedReactContext)?.currentActivity ?: context
+        val view = AMMNativeAdView(activityContext)
+
+        val listener = NapAdListener(
+            onReceived = { _, _ -> handleReceived(unit) },
+            onLoadFailed = { code, message -> handleFailure(unit, code, message) },
+            onDisplayed = { emitViewEvent(NapSspContracts.VIEW_EVENT_AD_IMPRESSION, unit) },
+            onClicked = { emitViewEvent(NapSspContracts.VIEW_EVENT_AD_CLICKED, unit) },
+        )
+        adListener = listener
+
+        view.setAdViewListener(listener)
+        view.setViewBinder(buildViewBinder())
+        view.setAdInfo(NapSspSdkBridge.applyAdapterConfig(AdInfo.Builder(unit)).build())
+
+        adView = view
+        removeAllViews()
+        addView(view, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+        view.loadAd()
+    }
+
+    private fun buildViewBinder(): NativeAdViewBinder =
+        NativeAdViewBinder.Builder(R.layout.nap_ssp_native_ad)
+            .setIconImageId(R.id.nap_mx_iv_icon)
+            .setTitleId(R.id.nap_mx_tv_title)
+            .setAdvertiserId(R.id.nap_mx_tv_adv)
+            .setDescriptionId(R.id.nap_mx_tv_desc)
+            .setMainViewId(R.id.nap_mx_iv_main)
+            .setCtaId(R.id.nap_mx_btn_cta)
+            .build()
+
+    private fun handleReceived(unit: String) {
+        val view = adView
+        if (view != null && !view.hasAd) {
+            handleFailure(unit, AdMixer.AX_ERR_NO_ADS, "No fill")
+            return
+        }
+        currentState = NapSspLoadState.LOADED
+        post(measureAndLayout)
+        emitViewEvent(NapSspContracts.VIEW_EVENT_AD_LOADED, unit)
+    }
+
+    private fun handleFailure(unit: String, code: Int, message: String?) {
+        currentState = NapSspLoadState.FAILED
+        NapSspEventEmitter.emitViewEvent(
+            this,
+            NapSspContracts.VIEW_EVENT_AD_FAILED,
+            NapSspAdErrors.payload(unit, NapSspContracts.FORMAT_NATIVE_AD, code, message),
+        )
+    }
+
+    private fun emitFailure(unit: String, code: String, message: String) {
+        currentState = NapSspLoadState.FAILED
+        NapSspEventEmitter.emitViewEvent(
+            this,
+            NapSspContracts.VIEW_EVENT_AD_FAILED,
+            mapOf(
+                "adUnitId" to unit,
+                "format" to NapSspContracts.FORMAT_NATIVE_AD,
+                "code" to code,
+                "message" to message,
+            ),
+        )
+    }
+
+    private fun emitViewEvent(eventName: String, unit: String) {
+        NapSspEventEmitter.emitViewEvent(
+            this,
+            eventName,
+            mapOf("adUnitId" to unit, "format" to NapSspContracts.FORMAT_NATIVE_AD),
+        )
+    }
+
+    private fun release() {
+        adView?.let { view ->
+            runCatching { view.setAdViewListener(null) }
+            runCatching { view.onPause() }
+            runCatching { view.stop() }
+        }
+        adView = null
+        adListener = null
+        removeAllViews()
     }
 }

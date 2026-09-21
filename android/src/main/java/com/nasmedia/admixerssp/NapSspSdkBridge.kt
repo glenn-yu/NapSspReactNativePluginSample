@@ -1,8 +1,21 @@
 package com.nasmedia.admixerssp
 
+import android.content.Context
+import android.util.Log
+import com.nasmedia.admixerssp.ads.AdInfo
+import com.nasmedia.admixerssp.common.AdMixer
+import com.nasmedia.admixerssp.common.AdMixerLog
 import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * Single owner of the global nap mx SDK state.
+ *
+ * Every call below targets the public SDK API directly (no reflection) so that a signature change
+ * in a future SDK release fails the build instead of silently degrading at runtime.
+ */
 internal object NapSspSdkBridge {
+    private const val TAG = "NapSspSdkBridge"
+
     @Volatile
     private var latestConfig: NapSspConfig? = null
 
@@ -10,90 +23,97 @@ internal object NapSspSdkBridge {
     private var logLevel: String = "info"
 
     @Volatile
-    private var coppaEnabled: Boolean = false
+    private var privacy: NapSspPrivacyConsent = NapSspPrivacyConsent()
+
+    @Volatile
+    private var testMode: Boolean = false
+
+    @Volatile
+    private var testDeviceIds: List<String> = emptyList()
 
     private val bannerStates = ConcurrentHashMap<String, NapSspLoadState>()
     private val interstitialStates = ConcurrentHashMap<String, NapSspLoadState>()
     private val rewardedStates = ConcurrentHashMap<String, NapSspLoadState>()
 
-    fun initialize(context: android.content.Context, config: NapSspConfig) {
-        latestConfig = config.requireValid()
-        logLevel = config.logLevel ?: logLevel
-        coppaEnabled = config.coppa
+    fun initialize(context: Context, rawConfig: NapSspConfig) {
+        val config = rawConfig.requireValid()
 
-        // If the vendor SDK is enabled at build time, try to initialize it.
-        // Use reflection so this module can compile without the vendor SDK present (compileOnly).
-        try {
-            if (BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
-                try {
-                    val adMixerClass = Class.forName("com.nasmedia.admixerssp.common.AdMixer")
-                    val getInstance = adMixerClass.getMethod("getInstance")
-                    val adMixer = getInstance.invoke(null)
-                    
-                    // Try "initialize" first (per docs), then fallback to "init"
-                    val initializeMethod = try {
-                        adMixerClass.getMethod(
-                            "initialize",
-                            android.content.Context::class.java,
-                            String::class.java,
-                            java.util.ArrayList::class.java,
-                        )
-                    } catch (_: NoSuchMethodException) {
-                        adMixerClass.getMethod(
-                            "init",
-                            android.content.Context::class.java,
-                            String::class.java,
-                            java.util.ArrayList::class.java,
-                        )
-                    }
-                    
-                    initializeMethod.invoke(adMixer, context.applicationContext, config.mediaKey, java.util.ArrayList(config.adUnitIds))
-                    android.util.Log.d("NapSspSdkBridge", "AdMixer initialized with ${initializeMethod.name}")
+        // Log level first so the initialize() path itself is traceable.
+        config.logLevel?.let { setLogLevel(it) }
 
-                    // v2.0.0: 미디에이션 어댑터/네트워크 SDK 는 initialize() 시 자동 등록되고 워터폴에서
-                    // 지연 초기화됩니다. 네트워크별 키(Pangle app_id, AppLovin sdkKey 등)는 media-conf
-                    // 서버 설정으로 전달되므로 앱에서 별도 SDK init 호출이 필요 없습니다.
-                    // (v2 auto-registers adapters and lazily inits network SDKs — no manual init needed.)
-                } catch (e: Throwable) {
-                    android.util.Log.e("NapSspSdkBridge", "Vendor SDK initialization failed: ${e.message}", e)
-                }
-            }
-        } catch (_: Throwable) {
-            // reflection guard - silently ignore
+        // Privacy and test signals must be applied BEFORE initialize(): adapters read them when the
+        // waterfall lazily initialises each network SDK.
+        // https://napmx.github.io/#/android/native/privacy
+        applyPrivacy(privacy.mergedWith(config.privacy))
+        config.testMode?.let { setTestMode(it) }
+        if (config.testDeviceIds.isNotEmpty()) {
+            setTestDeviceIds(config.testDeviceIds)
         }
+
+        AdMixer.getInstance().initialize(
+            context.applicationContext,
+            config.mediaKey,
+            ArrayList(config.adUnitIds),
+        )
+        latestConfig = config
+        Log.d(TAG, "AdMixer initialized adUnits=${config.adUnitIds.size}")
     }
 
     fun setLogLevel(level: String) {
-        val normalized = level.trim().ifEmpty { logLevel }
+        val normalized = level.trim().lowercase().ifEmpty { logLevel }
         logLevel = normalized
-        if (BuildConfig.NAP_SSP_VENDOR_SDK_ENABLED) {
-            try {
-                val logClass = Class.forName("com.nasmedia.admixerssp.common.AdMixerLog")
-                val logLevelClass = Class.forName("com.nasmedia.admixerssp.common.AdMixerLog\$LogLevel")
-                val levelValue = when (normalized.lowercase()) {
-                    "verbose", "debug" -> logLevelClass.getField("DEBUG").get(null)
-                    "warn" -> logLevelClass.getField("WARN").get(null)
-                    "error" -> logLevelClass.getField("ERROR").get(null)
-                    "none" -> logLevelClass.getField("NONE").get(null)
-                    else -> logLevelClass.getField("INFO").get(null)
-                }
-                logClass.getMethod("setLogLevel", logLevelClass).invoke(null, levelValue)
-            } catch (_: Throwable) {}
-        }
+        AdMixerLog.setLogLevel(
+            when (normalized) {
+                "verbose" -> AdMixerLog.LogLevel.VERBOSE
+                "debug" -> AdMixerLog.LogLevel.DEBUG
+                "warn" -> AdMixerLog.LogLevel.WARN
+                "error" -> AdMixerLog.LogLevel.ERROR
+                "none" -> AdMixerLog.LogLevel.NONE
+                else -> AdMixerLog.LogLevel.INFO
+            },
+        )
     }
 
-    fun setCoppa(enabled: Boolean) {
-        coppaEnabled = enabled
+    fun applyPrivacy(consent: NapSspPrivacyConsent) {
+        privacy = privacy.mergedWith(consent)
+
+        privacy.childDirected?.let {
+            AdMixer.setTagForChildDirectedTreatment(
+                if (it) {
+                    AdMixer.AX_TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE
+                } else {
+                    AdMixer.AX_TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE
+                },
+            )
+        }
+        privacy.gdprConsent?.let { AdMixer.setGdprConsent(it) }
+        privacy.ccpaDoNotSell?.let { AdMixer.setCcpaDoNotSell(it) }
+        privacy.usPrivacy?.takeIf { it.isNotBlank() }?.let { AdMixer.setUsPrivacy(it) }
+    }
+
+    fun setTestMode(enabled: Boolean) {
+        testMode = enabled
+        AdMixer.setTestMode(enabled)
+    }
+
+    fun setTestDeviceIds(ids: List<String>) {
+        testDeviceIds = ids
+        AdMixer.setTestDeviceIds(ids)
     }
 
     fun getConfiguration(): NapSspConfig? = latestConfig
 
+    /** Applies the host-supplied network keys. The media-conf server value always wins. */
+    fun applyAdapterConfig(builder: AdInfo.Builder): AdInfo.Builder {
+        latestConfig?.adapterConfig?.forEach { (adapterName, values) ->
+            builder.setAdapterConfig(adapterName, values)
+        }
+        return builder
+    }
+
     fun markBannerState(adUnitId: String, state: NapSspLoadState) {
         bannerStates[adUnitId] = state
     }
-
-    fun getBannerState(adUnitId: String): NapSspLoadState =
-        bannerStates[adUnitId] ?: NapSspLoadState.IDLE
 
     fun clearBanner(adUnitId: String) {
         bannerStates.remove(adUnitId)
@@ -103,9 +123,6 @@ internal object NapSspSdkBridge {
         interstitialStates[adUnitId] = state
     }
 
-    fun getInterstitialState(adUnitId: String): NapSspLoadState =
-        interstitialStates[adUnitId] ?: NapSspLoadState.IDLE
-
     fun clearInterstitial(adUnitId: String) {
         interstitialStates.remove(adUnitId)
     }
@@ -113,9 +130,6 @@ internal object NapSspSdkBridge {
     fun markRewardedState(adUnitId: String, state: NapSspLoadState) {
         rewardedStates[adUnitId] = state
     }
-
-    fun getRewardedState(adUnitId: String): NapSspLoadState =
-        rewardedStates[adUnitId] ?: NapSspLoadState.IDLE
 
     fun clearRewarded(adUnitId: String) {
         rewardedStates.remove(adUnitId)
@@ -131,23 +145,16 @@ internal object NapSspSdkBridge {
 
         if (config != null) {
             runtime["mediaKeyHash"] = config.mediaKey.hashCode()
-            runtime["mediationConfigured"] = config.mediations != null
-            runtime["mediationFlags"] = mapOf(
-                "adFitEnabled" to (config.mediations?.adFitEnabled == true),
-                "mobwithEnabled" to (config.mediations?.mobwithEnabled == true),
-                "naverAdManagerEnabled" to (config.mediations?.naverAdManagerEnabled == true),
-                "teadsEnabled" to (config.mediations?.teadsEnabled == true),
-                "pangleConfigured" to (config.mediations?.pangle != null),
-                "appLovinConfigured" to (config.mediations?.appLovin != null),
-                "unityConfigured" to (config.mediations?.unityAds != null),
-                "adManagerConfigured" to (config.mediations?.adManager != null),
-            )
+            runtime["mediationFlags"] = config.mediationFlags
+            runtime["adapterConfigKeys"] = config.adapterConfig.keys.toList()
         }
 
         return NapSspContracts.statusSnapshot(
             initialized = config != null,
             logLevel = logLevel,
-            coppaEnabled = coppaEnabled,
+            privacy = privacy.describe(),
+            testMode = testMode,
+            testDeviceIdCount = testDeviceIds.size,
             configuredAdUnitIds = config?.adUnitIds ?: emptyList(),
             runtimeState = runtime,
         )
@@ -156,7 +163,9 @@ internal object NapSspSdkBridge {
     fun reset() {
         latestConfig = null
         logLevel = "info"
-        coppaEnabled = false
+        privacy = NapSspPrivacyConsent()
+        testMode = false
+        testDeviceIds = emptyList()
         bannerStates.clear()
         interstitialStates.clear()
         rewardedStates.clear()

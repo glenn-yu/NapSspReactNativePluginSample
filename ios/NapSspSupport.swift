@@ -26,14 +26,70 @@ import AppLovinSDK
 import UnityAds
 #endif
 
+#if canImport(GFPSDK)
+import GFPSDK
+#endif
+
 extension Notification.Name {
   static let napSspDidInitialize = Notification.Name("com.napssp.didInitialize")
-  static let napSspInterstitialDidLoad = Notification.Name("com.napssp.interstitial.didLoad")
-  static let napSspInterstitialDidPresent = Notification.Name("com.napssp.interstitial.didPresent")
-  static let napSspRewardedDidLoad = Notification.Name("com.napssp.rewarded.didLoad")
-  static let napSspRewardedDidPresent = Notification.Name("com.napssp.rewarded.didPresent")
-  static let napSspRewardedDidEarn = Notification.Name("com.napssp.rewarded.didEarn")
   static let napSspTrackingAuthorizationDidChange = Notification.Name("com.napssp.att.didChange")
+}
+
+// MARK: - Configuration
+
+/// Tri-state privacy signals. `nil` means "unspecified" — the SDK leaves the vendor default (or the
+/// CMP-read IAB string) untouched, which is a different state from an explicit `false`.
+/// https://napmx.github.io/#/ios/native/getting-started
+struct NapSspPrivacyConsent {
+  var childDirected: Bool?
+  var gdprConsent: Bool?
+  var usSaleConsent: Bool?
+  var underAgeOfConsent: Bool?
+
+  init(
+    childDirected: Bool? = nil,
+    gdprConsent: Bool? = nil,
+    usSaleConsent: Bool? = nil,
+    underAgeOfConsent: Bool? = nil
+  ) {
+    self.childDirected = childDirected
+    self.gdprConsent = gdprConsent
+    self.usSaleConsent = usSaleConsent
+    self.underAgeOfConsent = underAgeOfConsent
+  }
+
+  init(dictionary: NSDictionary?) {
+    self.init(
+      childDirected: dictionary?["childDirected"] as? Bool,
+      gdprConsent: dictionary?["gdprConsent"] as? Bool,
+      // `ccpaDoNotSell` is the cross-platform spelling; the iOS SDK calls it usSaleConsent, and a
+      // do-not-sell opt-out means consent was denied.
+      usSaleConsent: (dictionary?["ccpaDoNotSell"] as? Bool).map { !$0 } ?? dictionary?["usSaleConsent"] as? Bool,
+      underAgeOfConsent: dictionary?["underAgeOfConsent"] as? Bool
+    )
+  }
+
+  func merging(_ other: NapSspPrivacyConsent) -> NapSspPrivacyConsent {
+    NapSspPrivacyConsent(
+      childDirected: other.childDirected ?? childDirected,
+      gdprConsent: other.gdprConsent ?? gdprConsent,
+      usSaleConsent: other.usSaleConsent ?? usSaleConsent,
+      underAgeOfConsent: other.underAgeOfConsent ?? underAgeOfConsent
+    )
+  }
+
+  var dictionaryRepresentation: [String: Any] {
+    var payload: [String: Any] = [:]
+    payload["childDirected"] = childDirected as Any?
+    payload["gdprConsent"] = gdprConsent as Any?
+    payload["usSaleConsent"] = usSaleConsent as Any?
+    payload["underAgeOfConsent"] = underAgeOfConsent as Any?
+    return payload.compactMapValues { $0 }
+  }
+
+  var isEmpty: Bool {
+    childDirected == nil && gdprConsent == nil && usSaleConsent == nil && underAgeOfConsent == nil
+  }
 }
 
 struct NapSspConfiguration {
@@ -41,7 +97,7 @@ struct NapSspConfiguration {
   let adUnitIds: [String]
   let mediations: [String: Any]
   let logLevel: String
-  let coppa: Bool
+  let privacy: NapSspPrivacyConsent
 
   init(dictionary: NSDictionary) throws {
     guard let mediaKey = dictionary["mediaKey"] as? String,
@@ -54,93 +110,75 @@ struct NapSspConfiguration {
       throw NapSspError.invalidConfiguration("Missing required field 'adUnitIds'.")
     }
 
-    let mediations = Self.normalizeMediationConfiguration(dictionary["mediations"])
-    let logLevel = (dictionary["logLevel"] as? String)?.lowercased() ?? "info"
-    let coppa = dictionary["coppa"] as? Bool ?? false
-
     self.mediaKey = mediaKey.trimmingCharacters(in: .whitespacesAndNewlines)
     self.adUnitIds = rawAdUnitIds
       .compactMap { $0 as? String }
       .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
       .filter { !$0.isEmpty }
-    self.mediations = mediations
-    self.logLevel = logLevel
-    self.coppa = coppa
+    self.mediations = Self.normalizeMediationConfiguration(dictionary["mediations"])
+    self.logLevel = (dictionary["logLevel"] as? String)?.lowercased() ?? "info"
+
+    var privacy = NapSspPrivacyConsent(dictionary: dictionary["privacy"] as? NSDictionary)
+    // `coppa` on the root config is the 0.4.x spelling of `privacy.childDirected`.
+    if privacy.childDirected == nil, let coppa = dictionary["coppa"] as? Bool {
+      privacy.childDirected = coppa
+    }
+    self.privacy = privacy
 
     if self.adUnitIds.isEmpty {
       throw NapSspError.invalidConfiguration("'adUnitIds' must contain at least one non-empty ad unit id.")
     }
-  }
-
-  var dictionaryRepresentation: [String: Any] {
-    [
-      "mediaKey": mediaKey,
-      "adUnitIds": adUnitIds,
-      "mediations": mediations,
-      "logLevel": logLevel,
-      "coppa": coppa,
-    ]
+    guard Int(self.mediaKey) != nil else {
+      throw NapSspError.invalidConfiguration("'mediaKey' must be numeric on iOS (received \"\(self.mediaKey)\").")
+    }
   }
 
   private static func normalizeMediationConfiguration(_ value: Any?) -> [String: Any] {
     guard let dictionary = value as? [String: Any] else { return [:] }
 
     var result: [String: Any] = [:]
-    for (key, rawValue) in dictionary {
+    for (key, rawValue) in dictionary where !(rawValue is NSNull) {
       switch rawValue {
       case let nested as [String: Any]:
-        let sanitized = nested.reduce(into: [String: Any]()) { partialResult, element in
-          if !(element.value is NSNull) {
-            partialResult[element.key] = element.value
-          }
-        }
-        if !sanitized.isEmpty {
-          result[key] = sanitized
-        }
-      case let bool as Bool:
-        result[key] = bool
+        let sanitized = nested.filter { !($0.value is NSNull) }
+        if !sanitized.isEmpty { result[key] = sanitized }
       case let string as String:
         let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !trimmed.isEmpty {
-          result[key] = trimmed
-        }
-      case let array as [Any]:
-        let cleaned = array.compactMap { $0 as? String }.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
-        if !cleaned.isEmpty {
-          result[key] = cleaned
-        }
-      case is NSNull:
-        continue
+        if !trimmed.isEmpty { result[key] = trimmed }
       default:
         result[key] = rawValue
       }
     }
-
     return result
   }
 }
 
-// iOS SDK error codes (0~6) per official guide
+// MARK: - Errors
+
+/// nap mx iOS SDK error codes. Delivered as `NSError` whose `domain` is the ad view class name.
+/// https://napmx.github.io/#/ios/native/getting-started (Step 4)
 enum NapSspSdkErrorCode: Int {
-  case missingBaseURL = 0
-  case invalidURLString = 1
-  case invalidServerResponse = 2
-  case decodeError = 3
-  case apiResponseFail = 4
-  case vastParsingError = 5
-  case emptyAd = 6
-  case unknown = -1
+  case loadFailed = -1
+  case invalidAdUnit = -2
+  case adapterNotFound = -3
+  case invalidNetwork = -4
+  case showFailed = -5
+  case invalidAdUnitSize = -6
+  case cancelled = -7
+  case timeout = -8
+  case unknown = 0
 
   var stringCode: String {
     switch self {
-    case .missingBaseURL:      return "napssp_missing_base_url"
-    case .invalidURLString:    return "napssp_invalid_url"
-    case .invalidServerResponse: return "napssp_invalid_server_response"
-    case .decodeError:         return "napssp_decode_error"
-    case .apiResponseFail:     return "napssp_api_response_fail"
-    case .vastParsingError:    return "napssp_vast_parsing_error"
-    case .emptyAd:             return "napssp_empty_ad"
-    case .unknown:             return "napssp_unknown"
+    case .loadFailed: return "napssp_load_failed"
+    case .invalidAdUnit: return "napssp_invalid_ad_unit"
+    case .adapterNotFound: return "napssp_adapter_not_found"
+    case .invalidNetwork: return "napssp_invalid_network"
+    case .showFailed: return "napssp_show_failed"
+    case .invalidAdUnitSize: return "napssp_invalid_ad_unit_size"
+    case .cancelled: return "napssp_load_cancelled"
+    case .timeout: return "napssp_timeout"
+    case .unknown: return "napssp_error"
     }
   }
 
@@ -152,13 +190,26 @@ enum NapSspSdkErrorCode: Int {
 
 func napSspErrorPayload(adUnitId: String, format: String, error: Error?) -> [String: Any] {
   let sdkCode = NapSspSdkErrorCode.from(error)
-  return [
+  let nsError = error as NSError?
+
+  var payload: [String: Any] = [
     "adUnitId": adUnitId,
     "format": format,
     "code": sdkCode.stringCode,
-    "nativeCode": sdkCode.rawValue,
     "message": error?.localizedDescription ?? sdkCode.stringCode,
   ]
+  if let nsError {
+    payload["nativeCode"] = nsError.code
+    payload["nativeDomain"] = nsError.domain
+    if let underlying = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
+      payload["details"] = [
+        "underlyingCode": underlying.code,
+        "underlyingDomain": underlying.domain,
+        "underlyingMessage": underlying.localizedDescription,
+      ]
+    }
+  }
+  return payload
 }
 
 enum NapSspError: LocalizedError {
@@ -169,14 +220,10 @@ enum NapSspError: LocalizedError {
 
   var errorCode: String {
     switch self {
-    case .invalidConfiguration:
-      return "napssp_invalid_configuration"
-    case .notInitialized:
-      return "napssp_not_initialized"
-    case .adNotLoaded:
-      return "napssp_ad_not_loaded"
-    case .unsupported:
-      return "napssp_unsupported"
+    case .invalidConfiguration: return "napssp_invalid_configuration"
+    case .notInitialized: return "napssp_not_initialized"
+    case .adNotLoaded: return "napssp_ad_not_loaded"
+    case .unsupported: return "napssp_unsupported"
     }
   }
 
@@ -185,10 +232,12 @@ enum NapSspError: LocalizedError {
     case .invalidConfiguration(let message), .adNotLoaded(let message), .unsupported(let message):
       return message
     case .notInitialized:
-      return "NapSsp has not been initialized yet. Call initialize() first."
+      return "NapSsp has not been initialized yet. Await NapSspAd.initialize() first."
     }
   }
 }
+
+// MARK: - Banner sizing
 
 struct NapSspBannerSize {
   let width: CGFloat
@@ -197,8 +246,6 @@ struct NapSspBannerSize {
   static let banner = NapSspBannerSize(width: 320, height: 50)
   static let mediumRectangle = NapSspBannerSize(width: 300, height: 250)
   static let largeBanner = NapSspBannerSize(width: 320, height: 100)
-  static let banner320x480 = NapSspBannerSize(width: 320, height: 480)
-  static let smartBanner = NapSspBannerSize(width: 320, height: 50)
 
   static func parse(_ rawValue: String?) -> NapSspBannerSize {
     let normalized = rawValue?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() ?? ""
@@ -207,43 +254,22 @@ struct NapSspBannerSize {
       return .mediumRectangle
     case "LARGE_BANNER", "320X100", "BANNER_320X100":
       return .largeBanner
-    case "BANNER_320X480":
-      return .banner320x480
-    case "SMART_BANNER":
-      return .smartBanner
+    case "SMART_BANNER", "":
+      return .banner
     default:
-      // BANNER_WxH 패턴 동적 파싱 — 새 사이즈 추가 시 코드 수정 불필요
       let parts = normalized.components(separatedBy: "_")
       if parts.count == 2, let dims = parts.last?.components(separatedBy: "X"),
-         dims.count == 2, let w = CGFloat(dims[0]), let h = CGFloat(dims[1]),
-         w > 0, h > 0 {
-        return NapSspBannerSize(width: w, height: h)
+        dims.count == 2, let w = Double(dims[0]), let h = Double(dims[1]),
+        w > 0, h > 0
+      {
+        return NapSspBannerSize(width: CGFloat(w), height: CGFloat(h))
       }
       return .banner
     }
   }
 }
 
-struct NapSspReward {
-  let type: String
-  let amount: Double
-  let currency: String?
-
-  static let placeholder = NapSspReward(type: "placeholder-points", amount: 1, currency: "points")
-
-  var dictionaryRepresentation: [String: Any] {
-    var payload: [String: Any] = [
-      "type": type,
-      "amount": amount,
-    ]
-
-    if let currency {
-      payload["currency"] = currency
-    }
-
-    return payload
-  }
-}
+// MARK: - Runtime
 
 final class NapSspRuntime {
   static let shared = NapSspRuntime()
@@ -252,18 +278,8 @@ final class NapSspRuntime {
   private var configuration: NapSspConfiguration?
   private var initializedAt: Date?
   private var logLevel: String = "info"
-  private var coppaEnabled: Bool = false
+  private var privacy = NapSspPrivacyConsent()
   private var trackingAuthorizationStatus: String?
-  private var lastInterstitialAdUnitId: String?
-  private var loadedInterstitialAdUnitIds: Set<String> = []
-  private var lastRewardedAdUnitId: String?
-  private var loadedRewardedAdUnitIds: Set<String> = []
-  #if canImport(AdMixerMediation)
-  private var storedInterstitials: [String: AMMInterstitial] = [:]
-  private var storedRewardedAds: [String: AMMRewardVideo] = [:]
-  private var storedInterstitialVideos: [String: AMMVideoInterstitial] = [:]
-  private var storedInterstitialVideoDelegates: [String: NSObject] = [:]
-  #endif
 
   private init() {}
 
@@ -275,62 +291,26 @@ final class NapSspRuntime {
     let config = try NapSspConfiguration(dictionary: configDictionary)
 
     #if canImport(AdMixerMediation)
-    let numericMediaKey = Int(config.mediaKey) ?? 0
-    let numericAdUnitIds = Set(config.adUnitIds.compactMap(Int.init))
-    AMMediation.shared.initialize(mediaKey: numericMediaKey, adunitID: numericAdUnitIds)
-    let isDebugEnabled = config.logLevel == "debug" || config.logLevel == "verbose"
-    AMMediation.shared.setDebugEnabled(isEnabled: isDebugEnabled)
-    
-    // Initialize Google Mobile Ads only when an application ID is configured.
-    #if canImport(GoogleMobileAds)
-    if let gadAppId = Bundle.main.object(forInfoDictionaryKey: "GADApplicationIdentifier") as? String,
-       !gadAppId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-      MobileAds.shared.start(completionHandler: nil)
-    }
-    #endif
-    
-    // Initialize Pangle if appId is provided
-    if let pangleConfig = config.mediations["pangle"] as? [String: Any],
-       let appId = pangleConfig["appId"] as? String {
-      #if canImport(PAGAdSDK)
-      let pagConfig = PAGConfig.share()
-      pagConfig.appID = appId
-      PAGSdk.start(with: pagConfig) { _, _ in }
-      #endif
-    }
-    
-    // Initialize AppLovin if sdkKey is provided
-    if let alConfigDict = config.mediations["appLovin"] as? [String: Any],
-       let sdkKey = alConfigDict["sdkKey"] as? String {
-      #if canImport(AppLovinSDK)
-      let alConfig = ALSdkInitializationConfiguration(sdkKey: sdkKey)
-      ALSdk.shared().initialize(with: alConfig) { _ in }
-      #endif
-    }
-    
-    // Initialize UnityAds if appId is provided
-    if let unityConfig = config.mediations["unityAds"] as? [String: Any],
-       let appId = unityConfig["appId"] as? String {
-      #if canImport(UnityAds)
-      UnityAds.initialize(appId)
-      #endif
-    }
+    // Consent must reach the SDK before any network initialises — AppLovin, Unity Ads and Pangle
+    // only read it once, at their own start-up.
+    let mergedPrivacy = stateQueue.sync { privacy }.merging(config.privacy)
+    applyConsent(mergedPrivacy)
+
+    AMMediation.shared.setDebugEnabled(isEnabled: Self.isDebugLevel(config.logLevel))
+    AMMediation.shared.initialize(
+      mediaKey: Int(config.mediaKey) ?? 0,
+      adunitID: Set(config.adUnitIds.compactMap(Int.init))
+    )
+
+    startNetworkSdks(with: config, privacy: mergedPrivacy)
     #endif
 
-    let status = stateQueue.sync {
+    let status = stateQueue.sync { () -> [String: Any] in
       configuration = config
       initializedAt = Date()
       logLevel = config.logLevel
-      coppaEnabled = config.coppa
-      loadedInterstitialAdUnitIds.removeAll()
-      loadedRewardedAdUnitIds.removeAll()
-      lastInterstitialAdUnitId = nil
-      lastRewardedAdUnitId = nil
-
-      return currentStatusLocked(extra: [
-        "message": "NapSsp runtime initialized.",
-        "configuration": config.dictionaryRepresentation,
-      ])
+      privacy = privacy.merging(config.privacy)
+      return currentStatusLocked(extra: ["message": "NapSsp runtime initialized."])
     }
 
     DispatchQueue.main.async {
@@ -342,18 +322,20 @@ final class NapSspRuntime {
 
   func setLogLevel(_ newValue: String) {
     let normalized = newValue.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-    stateQueue.sync {
-      logLevel = normalized.isEmpty ? "info" : normalized
-    }
+    stateQueue.sync { logLevel = normalized.isEmpty ? "info" : normalized }
     #if canImport(AdMixerMediation)
-    AMMediation.shared.setDebugEnabled(isEnabled: normalized == "debug" || normalized == "verbose")
+    AMMediation.shared.setDebugEnabled(isEnabled: Self.isDebugLevel(normalized))
     #endif
   }
 
-  func setCoppa(_ enabled: Bool) {
-    stateQueue.sync {
-      coppaEnabled = enabled
+  func setPrivacyConsent(_ consent: NapSspPrivacyConsent) {
+    let merged = stateQueue.sync { () -> NapSspPrivacyConsent in
+      privacy = privacy.merging(consent)
+      return privacy
     }
+    #if canImport(AdMixerMediation)
+    applyConsent(merged)
+    #endif
   }
 
   func currentStatus() -> [String: Any] {
@@ -361,259 +343,149 @@ final class NapSspRuntime {
   }
 
   func validateInitialized() throws {
-    if !isInitialized {
-      throw NapSspError.notInitialized
-    }
+    if !isInitialized { throw NapSspError.notInitialized }
   }
-
-  func registerInterstitialLoad(adUnitId: String) throws -> [String: Any] {
-    try validateInitialized()
-    let trimmed = adUnitId.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard !trimmed.isEmpty else {
-      throw NapSspError.invalidConfiguration("Interstitial adUnitId must not be empty.")
-    }
-
-    let payload = stateQueue.sync {
-      lastInterstitialAdUnitId = trimmed
-      loadedInterstitialAdUnitIds.insert(trimmed)
-      return [
-        "adUnitId": trimmed,
-        "loaded": true,
-        "source": "placeholder",
-        "loadedAt": Self.iso8601String(from: Date()),
-      ]
-    }
-
-    NotificationCenter.default.post(name: .napSspInterstitialDidLoad, object: nil, userInfo: payload)
-    return payload
-  }
-
-  func consumeInterstitialPresentation(adUnitId: String? = nil) -> [String: Any]? {
-    let payload: [String: Any]? = stateQueue.sync {
-      let target = adUnitId?.trimmingCharacters(in: .whitespacesAndNewlines)
-      let resolvedTarget = (target?.isEmpty == false ? target : lastInterstitialAdUnitId)
-      guard let resolvedTarget, loadedInterstitialAdUnitIds.contains(resolvedTarget) else {
-        return nil
-      }
-
-      loadedInterstitialAdUnitIds.remove(resolvedTarget)
-      return [
-        "adUnitId": resolvedTarget,
-        "presented": true,
-        "source": "placeholder",
-        "presentedAt": Self.iso8601String(from: Date()),
-      ]
-    }
-
-    guard let payload else { return nil }
-
-    NotificationCenter.default.post(name: .napSspInterstitialDidPresent, object: nil, userInfo: payload)
-    return payload
-  }
-
-  func registerRewardedLoad(adUnitId: String) throws -> [String: Any] {
-    try validateInitialized()
-    let trimmed = adUnitId.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard !trimmed.isEmpty else {
-      throw NapSspError.invalidConfiguration("Rewarded adUnitId must not be empty.")
-    }
-
-    let payload = stateQueue.sync {
-      lastRewardedAdUnitId = trimmed
-      loadedRewardedAdUnitIds.insert(trimmed)
-      return [
-        "adUnitId": trimmed,
-        "loaded": true,
-        "source": "placeholder",
-        "loadedAt": Self.iso8601String(from: Date()),
-      ]
-    }
-
-    NotificationCenter.default.post(name: .napSspRewardedDidLoad, object: nil, userInfo: payload)
-    return payload
-  }
-
-  func consumeRewardedPresentation(adUnitId: String? = nil) -> [String: Any]? {
-    let payload: [String: Any]? = stateQueue.sync {
-      let target = adUnitId?.trimmingCharacters(in: .whitespacesAndNewlines)
-      let resolvedTarget = (target?.isEmpty == false ? target : lastRewardedAdUnitId)
-      guard let resolvedTarget, loadedRewardedAdUnitIds.contains(resolvedTarget) else {
-        return nil
-      }
-
-      loadedRewardedAdUnitIds.remove(resolvedTarget)
-      return [
-        "adUnitId": resolvedTarget,
-        "presented": true,
-        "reward": NapSspReward.placeholder.dictionaryRepresentation,
-        "source": "placeholder",
-        "presentedAt": Self.iso8601String(from: Date()),
-      ]
-    }
-
-    guard let payload else { return nil }
-
-    NotificationCenter.default.post(name: .napSspRewardedDidPresent, object: nil, userInfo: payload)
-    if let adUnitId = payload["adUnitId"] as? String {
-      NotificationCenter.default.post(
-        name: .napSspRewardedDidEarn,
-        object: nil,
-        userInfo: [
-          "adUnitId": adUnitId,
-          "reward": NapSspReward.placeholder.dictionaryRepresentation,
-        ]
-      )
-    }
-    return payload
-  }
-
-  func bannerSize(for rawValue: String?) -> NapSspBannerSize {
-    NapSspBannerSize.parse(rawValue)
-  }
-
-  #if canImport(AdMixerMediation)
-  func storeInterstitial(adUnitId: String, instance: AMMInterstitial) {
-    stateQueue.sync {
-      storedInterstitials[adUnitId] = instance
-      loadedInterstitialAdUnitIds.insert(adUnitId)
-    }
-  }
-
-  func peekStoredInterstitial(adUnitId: String) -> AMMInterstitial? {
-    stateQueue.sync {
-      storedInterstitials[adUnitId]
-    }
-  }
-
-  func consumeStoredInterstitial(adUnitId: String) -> AMMInterstitial? {
-    stateQueue.sync {
-      let instance = storedInterstitials[adUnitId]
-      storedInterstitials.removeValue(forKey: adUnitId)
-      loadedInterstitialAdUnitIds.remove(adUnitId)
-      return instance
-    }
-  }
-
-  func removeStoredInterstitial(adUnitId: String) {
-    stateQueue.sync {
-      storedInterstitials.removeValue(forKey: adUnitId)
-      loadedInterstitialAdUnitIds.remove(adUnitId)
-    }
-  }
-
-  func storeRewardedAd(adUnitId: String, instance: AMMRewardVideo) {
-    stateQueue.sync {
-      storedRewardedAds[adUnitId] = instance
-      loadedRewardedAdUnitIds.insert(adUnitId)
-    }
-  }
-
-  func consumeStoredRewardedAd(adUnitId: String) -> AMMRewardVideo? {
-    stateQueue.sync {
-      let instance = storedRewardedAds[adUnitId]
-      storedRewardedAds.removeValue(forKey: adUnitId)
-      loadedRewardedAdUnitIds.remove(adUnitId)
-      return instance
-    }
-  }
-
-  func removeStoredRewardedAd(adUnitId: String) {
-    stateQueue.sync {
-      storedRewardedAds.removeValue(forKey: adUnitId)
-      loadedRewardedAdUnitIds.remove(adUnitId)
-    }
-  }
-
-  func storeInterstitialVideo(adUnitId: String, instance: AMMVideoInterstitial) {
-    stateQueue.sync { storedInterstitialVideos[adUnitId] = instance }
-  }
-
-  func consumeStoredInterstitialVideo(adUnitId: String) -> AMMVideoInterstitial? {
-    stateQueue.sync {
-      let instance = storedInterstitialVideos[adUnitId]
-      storedInterstitialVideos.removeValue(forKey: adUnitId)
-      return instance
-    }
-  }
-
-  func removeStoredInterstitialVideo(adUnitId: String) {
-    stateQueue.sync {
-      storedInterstitialVideos[adUnitId]?.stop()
-      storedInterstitialVideos.removeValue(forKey: adUnitId)
-      storedInterstitialVideoDelegates.removeValue(forKey: adUnitId)
-    }
-  }
-
-  func storeInterstitialVideoDelegate(adUnitId: String, delegate: NSObject) {
-    stateQueue.sync { storedInterstitialVideoDelegates[adUnitId] = delegate }
-  }
-
-  func removeStoredInterstitialVideoDelegate(adUnitId: String) {
-    stateQueue.sync { storedInterstitialVideoDelegates.removeValue(forKey: adUnitId) }
-  }
-
-  func peekStoredInterstitialVideoDelegate(adUnitId: String) -> NSObject? {
-    stateQueue.sync { storedInterstitialVideoDelegates[adUnitId] }
-  }
-  #endif
 
   func requestTrackingAuthorization(completion: @escaping (String) -> Void) {
     #if canImport(AppTrackingTransparency)
     if #available(iOS 14.5, *) {
-      let status = ATTrackingManager.trackingAuthorizationStatus
-      guard status == .notDetermined else {
+      let finish: (ATTrackingManager.AuthorizationStatus) -> Void = { [weak self] status in
         let stringStatus = Self.string(from: status)
-        stateQueue.sync { trackingAuthorizationStatus = stringStatus }
+        self?.stateQueue.sync { self?.trackingAuthorizationStatus = stringStatus }
         DispatchQueue.main.async {
-          NotificationCenter.default.post(name: .napSspTrackingAuthorizationDidChange, object: nil, userInfo: ["status": stringStatus])
+          NotificationCenter.default.post(
+            name: .napSspTrackingAuthorizationDidChange,
+            object: nil,
+            userInfo: ["status": stringStatus]
+          )
           completion(stringStatus)
         }
-        return
       }
 
       DispatchQueue.main.async {
-        ATTrackingManager.requestTrackingAuthorization { newStatus in
-          let stringStatus = Self.string(from: newStatus)
-          self.stateQueue.sync {
-            self.trackingAuthorizationStatus = stringStatus
-          }
-          DispatchQueue.main.async {
-            NotificationCenter.default.post(name: .napSspTrackingAuthorizationDidChange, object: nil, userInfo: ["status": stringStatus])
-            completion(stringStatus)
-          }
+        let status = ATTrackingManager.trackingAuthorizationStatus
+        guard status == .notDetermined else {
+          finish(status)
+          return
         }
+        ATTrackingManager.requestTrackingAuthorization(completionHandler: finish)
       }
-    } else {
-      DispatchQueue.main.async {
-        completion("unavailable")
-      }
-    }
-    #else
-    DispatchQueue.main.async {
-      completion("unavailable")
+      return
     }
     #endif
+    DispatchQueue.main.async { completion("unavailable") }
+  }
+
+  static func activeRootViewController() -> UIViewController? {
+    let scenes = UIApplication.shared.connectedScenes
+      .compactMap { $0 as? UIWindowScene }
+      .filter { $0.activationState == .foregroundActive }
+    let window = scenes.flatMap(\.windows).first(where: \.isKeyWindow)
+      ?? UIApplication.shared.connectedScenes
+        .compactMap { $0 as? UIWindowScene }
+        .flatMap(\.windows)
+        .first(where: \.isKeyWindow)
+
+    var controller = window?.rootViewController
+    while let presented = controller?.presentedViewController {
+      controller = presented
+    }
+    return controller
+  }
+
+  // MARK: private
+
+  #if canImport(AdMixerMediation)
+  private func applyConsent(_ consent: NapSspPrivacyConsent) {
+    guard !consent.isEmpty else { return }
+
+    let ammConsent = AMMConsent()
+    ammConsent.gdprConsent = Self.status(consent.gdprConsent)
+    ammConsent.usSaleConsent = Self.status(consent.usSaleConsent)
+    ammConsent.childDirected = Self.status(consent.childDirected)
+    ammConsent.underAgeOfConsent = Self.status(consent.underAgeOfConsent)
+    AMMediation.shared.setConsent(ammConsent)
+  }
+
+  private static func status(_ value: Bool?) -> AMMConsentStatus {
+    guard let value else { return .unspecified }
+    return value ? .granted : .denied
+  }
+
+  private func startNetworkSdks(with config: NapSspConfiguration, privacy: NapSspPrivacyConsent) {
+    #if canImport(GoogleMobileAds)
+    if let gadAppId = Bundle.main.object(forInfoDictionaryKey: "GADApplicationIdentifier") as? String,
+      !gadAppId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    {
+      MobileAds.shared.start(completionHandler: nil)
+    }
+    #endif
+
+    #if canImport(PAGAdSDK)
+    if let pangle = config.mediations["pangle"] as? [String: Any],
+      let appId = pangle["appId"] as? String
+    {
+      let pagConfig = PAGConfig.share()
+      pagConfig.appID = appId
+      PAGSdk.start(with: pagConfig) { _, _ in }
+    }
+    #endif
+
+    #if canImport(AppLovinSDK)
+    if let appLovin = config.mediations["appLovin"] as? [String: Any],
+      let sdkKey = appLovin["sdkKey"] as? String
+    {
+      ALSdk.shared().initialize(with: ALSdkInitializationConfiguration(sdkKey: sdkKey)) { _ in }
+    }
+    #endif
+
+    #if canImport(UnityAds)
+    if let unity = config.mediations["unityAds"] as? [String: Any],
+      let appId = unity["appId"] as? String
+    {
+      UnityAds.initialize(appId)
+    }
+    #endif
+
+    #if canImport(GFPSDK)
+    if let nam = config.mediations["naverAdManager"] as? [String: Any],
+      let publisherCd = nam["publisherCd"] as? String
+    {
+      GFPAdManager.setup(withPublisherCd: publisherCd, target: nil) { [weak self] _ in
+        // GFPAdManager.setup can replace the shared settings object, so the consent has to be
+        // re-applied once setup finishes.
+        self?.applyConsent(privacy)
+      }
+    }
+    #endif
+  }
+  #endif
+
+  private static func isDebugLevel(_ level: String) -> Bool {
+    level == "debug" || level == "verbose"
   }
 
   private func currentStatusLocked(extra: [String: Any]) -> [String: Any] {
     var payload: [String: Any] = [
       "initialized": configuration != nil,
+      "platform": "ios",
       "logLevel": logLevel,
-      "coppa": coppaEnabled,
-      "loadedInterstitialAdUnitIds": Array(loadedInterstitialAdUnitIds),
-      "loadedRewardedAdUnitIds": Array(loadedRewardedAdUnitIds),
+      "privacy": privacy.dictionaryRepresentation,
+      // Mirrors privacy.childDirected; kept for backwards compatibility with 0.4.x.
+      "coppa": privacy.childDirected ?? false,
+      // The iOS SDK exposes no global test-mode switch — register test devices per network instead.
+      "testMode": false,
+      "testModeSupported": false,
     ]
 
     if let configuration {
       payload["mediaKey"] = Self.redactedMediaKey(configuration.mediaKey)
-      payload["adUnitIds"] = configuration.adUnitIds
+      payload["configuredAdUnitIds"] = configuration.adUnitIds
       payload["mediations"] = configuration.mediations
     }
-
     if let initializedAt {
       payload["initializedAt"] = Self.iso8601String(from: initializedAt)
     }
-
     if let trackingAuthorizationStatus {
       payload["trackingAuthorizationStatus"] = trackingAuthorizationStatus
     }
@@ -622,22 +494,9 @@ final class NapSspRuntime {
     return payload
   }
 
-  static func activeRootViewController() -> UIViewController? {
-    if #available(iOS 13.0, *) {
-      return UIApplication.shared.connectedScenes
-        .compactMap { $0 as? UIWindowScene }
-        .flatMap { $0.windows }
-        .first(where: { $0.isKeyWindow })?.rootViewController
-    } else {
-      return UIApplication.shared.keyWindow?.rootViewController
-    }
-  }
-
   private static func redactedMediaKey(_ value: String) -> String {
     guard value.count > 8 else { return String(repeating: "*", count: value.count) }
-    let prefix = value.prefix(4)
-    let suffix = value.suffix(4)
-    return "\(prefix)…\(suffix)"
+    return "\(value.prefix(4))…\(value.suffix(4))"
   }
 
   private static func iso8601String(from date: Date) -> String {
@@ -648,16 +507,11 @@ final class NapSspRuntime {
   @available(iOS 14.5, *)
   private static func string(from status: ATTrackingManager.AuthorizationStatus) -> String {
     switch status {
-    case .authorized:
-      return "authorized"
-    case .denied:
-      return "denied"
-    case .restricted:
-      return "restricted"
-    case .notDetermined:
-      return "notDetermined"
-    @unknown default:
-      return "unknown"
+    case .authorized: return "authorized"
+    case .denied: return "denied"
+    case .restricted: return "restricted"
+    case .notDetermined: return "notDetermined"
+    @unknown default: return "unknown"
     }
   }
   #endif

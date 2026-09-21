@@ -5,12 +5,19 @@ import React
 import AdMixerMediation
 #endif
 
-@objc(NapSspVideoAdViewImpl)
+/// React Native host for `AMMVideoView` (inline video).
+/// https://napmx.github.io/#/ios/native/video
+@objc(VideoAdView)
 final class VideoAdView: UIView {
   @objc dynamic var adUnitId: NSString = "" {
-    didSet { reloadIfNeeded() }
+    didSet {
+      guard adUnitId != oldValue else { return }
+      reload()
+    }
   }
-  @objc dynamic var isRetry: Bool = false
+
+  /// Retry the waterfall once when the first pass returns no fill.
+  @objc var isRetry: Bool = false
 
   @objc var onAdLoaded: RCTBubblingEventBlock?
   @objc var onAdFailedToLoad: RCTBubblingEventBlock?
@@ -21,214 +28,196 @@ final class VideoAdView: UIView {
   @objc var onAdCompleted: RCTBubblingEventBlock?
   @objc var onAdSkipped: RCTBubblingEventBlock?
 
-  private let containerView = UIView()
-  private let titleLabel = UILabel()
-  private let detailLabel = UILabel()
+  private var isLoading = false
   private var isLoaded = false
-  private var hasPresentedClick = false
+  private var hasRetried = false
+  private var didRegisterInitializeObserver = false
 
   #if canImport(AdMixerMediation)
-  private var videoAdView: AMMVideoView?
+  private var videoView: AMMVideoView?
   private var sdkDelegate: NapSspVideoDelegate?
   #endif
 
   override init(frame: CGRect) {
     super.init(frame: frame)
-    setupView()
+    backgroundColor = .clear
+    registerForInitializationNotifications()
   }
 
   required init?(coder: NSCoder) {
     super.init(coder: coder)
-    setupView()
+    backgroundColor = .clear
+    registerForInitializationNotifications()
   }
 
-  override func willMove(toWindow newWindow: UIWindow?) {
-    super.willMove(toWindow: newWindow)
-    if newWindow == nil {
-      #if canImport(AdMixerMediation)
-      videoAdView?.stop()
-      videoAdView = nil
-      sdkDelegate = nil
-      #endif
+  deinit {
+    if didRegisterInitializeObserver {
+      NotificationCenter.default.removeObserver(self, name: .napSspDidInitialize, object: nil)
     }
   }
 
   override func didMoveToWindow() {
     super.didMoveToWindow()
-    if window == nil { return }
-    reloadIfNeeded()
+    if window == nil {
+      release()
+    } else {
+      loadIfNeeded()
+    }
   }
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    containerView.frame = bounds
-    titleLabel.frame = CGRect(x: 16, y: bounds.midY - 24, width: bounds.width - 32, height: 24)
-    detailLabel.frame = CGRect(x: 16, y: bounds.midY + 4, width: bounds.width - 32, height: 18)
-    containerView.layer.cornerRadius = 8
-    
     #if canImport(AdMixerMediation)
-    videoAdView?.frame = bounds
+    videoView?.frame = bounds
     #endif
   }
 
-  private func setupView() {
-    backgroundColor = .clear
-    isUserInteractionEnabled = true
-
-    containerView.backgroundColor = UIColor(red: 255/255, green: 235/255, blue: 238/255, alpha: 1.0)
-    containerView.layer.borderColor = UIColor(red: 239/255, green: 154/255, blue: 154/255, alpha: 1.0).cgColor
-    containerView.layer.borderWidth = 1
-    addSubview(containerView)
-
-    titleLabel.font = .systemFont(ofSize: 18, weight: .bold)
-    titleLabel.textColor = UIColor(red: 198/255, green: 40/255, blue: 40/255, alpha: 1.0)
-    titleLabel.text = "NapSsp Video Ad"
-    titleLabel.textAlignment = .center
-    containerView.addSubview(titleLabel)
-
-    detailLabel.font = .systemFont(ofSize: 14)
-    detailLabel.textColor = UIColor(red: 211/255, green: 47/255, blue: 47/255, alpha: 1.0)
-    detailLabel.textAlignment = .center
-    detailLabel.text = "adUnitId: <unset>"
-    containerView.addSubview(detailLabel)
-
-    let recognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap))
-    addGestureRecognizer(recognizer)
+  @objc func reload() {
+    hasRetried = false
+    release()
+    loadIfNeeded()
   }
 
-  private func reloadIfNeeded() {
-    let currentAdUnitId = adUnitId as String
-    if currentAdUnitId.isEmpty { return }
-    
-    detailLabel.text = "adUnitId: \(currentAdUnitId)"
-    
-    if isLoaded { return }
-    
-    #if canImport(AdMixerMediation)
-    loadWithSdk(adUnitId: currentAdUnitId)
-    #else
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-      guard let self = self else { return }
-      self.isLoaded = true
-      self.onAdLoaded?(self.eventPayload(adUnitId: currentAdUnitId, source: "placeholder", message: "Video ad loaded"))
-      self.onAdImpression?(self.eventPayload(adUnitId: currentAdUnitId, source: "placeholder", message: "Video ad impression"))
-    }
-    #endif
+  @objc func destroyVideoAd() {
+    release()
   }
 
-  #if canImport(AdMixerMediation)
-  private func loadWithSdk(adUnitId: String) {
-    guard let rootVC = NapSspRuntime.activeRootViewController() else { return }
-    guard let numericAdUnitId = Int(adUnitId) else {
-      emitSdkFailure(adUnitId: adUnitId, code: "napssp_invalid_ad_unit", message: "Video adUnitId must be numeric on iOS.")
+  // MARK: - internals
+
+  private func loadIfNeeded() {
+    guard window != nil, !isLoading, !isLoaded else { return }
+
+    let unit = (adUnitId as String).trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !unit.isEmpty else { return }
+
+    guard NapSspRuntime.shared.isInitialized else {
+      emitFailure(adUnitId: unit, code: NapSspError.notInitialized.errorCode, message: NapSspError.notInitialized.errorDescription ?? "")
       return
     }
 
-    videoAdView?.stop()
-    videoAdView?.removeFromSuperview()
-    videoAdView = nil
-    
-    let delegate = NapSspVideoDelegate(view: self, adUnitId: adUnitId)
+    #if canImport(AdMixerMediation)
+    guard let rootVC = NapSspRuntime.activeRootViewController() else {
+      emitFailure(adUnitId: unit, code: "napssp_no_view_controller", message: "No root view controller is available yet.")
+      return
+    }
+    guard let numericAdUnitId = Int(unit) else {
+      emitFailure(adUnitId: unit, code: "napssp_invalid_ad_unit", message: "Video adUnitId must be numeric on iOS.")
+      return
+    }
+
+    isLoading = true
+    let delegate = NapSspVideoDelegate(view: self, adUnitId: unit)
     sdkDelegate = delegate
 
-    let view = AMMVideoView(rootViewController: rootVC)
-    view.adUnitID = numericAdUnitId
-    view.delegate = delegate
-    
-    videoAdView = view
-    addSubview(view)
-    view.load()
-  }
+    AMMVideoView.loadAd(adUnitID: numericAdUnitId, rootViewController: rootVC) { [weak self] video, adapterType, error in
+      guard let self else { return }
+      self.isLoading = false
 
-  func attachSdkView() {
-    containerView.isHidden = true
-    if let view = videoAdView {
-      view.frame = bounds
-      view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      if view.superview == nil {
-        addSubview(view)
+      if let error {
+        if self.isRetry, !self.hasRetried, NapSspSdkErrorCode.from(error) == .loadFailed {
+          self.hasRetried = true
+          self.loadIfNeeded()
+          return
+        }
+        self.emitFailure(adUnitId: unit, error: error)
+        return
       }
-      setNeedsLayout()
-      layoutIfNeeded()
-    }
-    isLoaded = true
-  }
-
-  func emitSdkFailure(adUnitId: String, code: String, message: String) {
-    onAdFailedToLoad?([
-      "adUnitId": adUnitId,
-      "format": "video",
-      "code": code,
-      "message": message
-    ])
-  }
-  #endif
-
-  @objc private func handleTap() {
-    guard isLoaded else { return }
-    let payload = eventPayload(adUnitId: adUnitId as String, source: "placeholder", message: "Video ad tapped")
-    onAdClicked?(payload)
-
-    if !hasPresentedClick {
-      hasPresentedClick = true
-      onAdOpened?(payload)
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-        guard let self else { return }
-        self.onAdClosed?(self.eventPayload(adUnitId: self.adUnitId as String, source: "placeholder", message: "Video ad dismissed"))
+      guard let video else {
+        self.emitFailure(adUnitId: unit, code: "napssp_empty_ad", message: "The SDK returned no video ad and no error.")
+        return
       }
+
+      video.delegate = delegate
+      self.videoView = video
+      video.frame = self.bounds
+      video.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      self.addSubview(video)
+      self.isLoaded = true
+      self.setNeedsLayout()
+
+      self.onAdLoaded?(self.eventPayload(adUnitId: unit, extra: ["network": adapterType.adapterName]))
     }
+    #else
+    emitFailure(
+      adUnitId: unit,
+      code: "napssp_sdk_not_linked",
+      message: "AdMixerMediation is not linked. Run `pod install` (or add the Swift package) and rebuild."
+    )
+    #endif
   }
 
-  func eventPayload(adUnitId: String, source: String, message: String) -> [String: Any] {
-    return [
-      "adUnitId": adUnitId,
-      "format": "video",
-      "source": source,
-      "message": message
-    ]
+  private func release() {
+    #if canImport(AdMixerMediation)
+    videoView?.stop()
+    videoView?.removeFromSuperview()
+    videoView = nil
+    sdkDelegate = nil
+    #endif
+    isLoading = false
+    isLoaded = false
   }
+
+  private func registerForInitializationNotifications() {
+    guard !didRegisterInitializeObserver else { return }
+    didRegisterInitializeObserver = true
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleRuntimeInitialized),
+      name: .napSspDidInitialize,
+      object: nil
+    )
+  }
+
+  @objc private func handleRuntimeInitialized() {
+    DispatchQueue.main.async { [weak self] in self?.loadIfNeeded() }
+  }
+
+  fileprivate func emitFailure(adUnitId: String, error: Error) {
+    isLoaded = false
+    onAdFailedToLoad?(napSspErrorPayload(adUnitId: adUnitId, format: "video", error: error))
+  }
+
+  fileprivate func emitFailure(adUnitId: String, code: String, message: String) {
+    isLoaded = false
+    onAdFailedToLoad?(["adUnitId": adUnitId, "format": "video", "code": code, "message": message])
+  }
+
+  fileprivate func eventPayload(adUnitId: String, extra: [String: Any] = [:]) -> [String: Any] {
+    var payload: [String: Any] = ["adUnitId": adUnitId, "format": "video"]
+    extra.forEach { payload[$0.key] = $0.value }
+    return payload
+  }
+
+  fileprivate func emitImpression(adUnitId: String) { onAdImpression?(eventPayload(adUnitId: adUnitId)) }
+  fileprivate func emitClick(adUnitId: String) { onAdClicked?(eventPayload(adUnitId: adUnitId)) }
+  fileprivate func emitCompleted(adUnitId: String) { onAdCompleted?(eventPayload(adUnitId: adUnitId)) }
+  fileprivate func emitSkipped(adUnitId: String) { onAdSkipped?(eventPayload(adUnitId: adUnitId)) }
 }
 
 #if canImport(AdMixerMediation)
 private final class NapSspVideoDelegate: NSObject, AMMVideoViewDelegate {
-  private weak var videoView: VideoAdView?
+  private weak var host: VideoAdView?
   private let adUnitId: String
 
   init(view: VideoAdView, adUnitId: String) {
-    self.videoView = view
+    self.host = view
     self.adUnitId = adUnitId
   }
 
-  func onSuccessVideo() {
-    guard let view = videoView else { return }
-    view.attachSdkView()
-    view.onAdLoaded?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Video loaded"))
-    view.onAdImpression?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Video impression"))
+  func onSuccessShowVideo() {
+    host?.emitImpression(adUnitId: adUnitId)
   }
 
-  func onFailVideo() {
-    guard let view = videoView else { return }
-    view.emitSdkFailure(adUnitId: adUnitId, code: "napssp_video_load_failed", message: "unknown")
+  func onClickVideo() {
+    host?.emitClick(adUnitId: adUnitId)
   }
 
-  func onTapVideoViewMore() {
-    guard let view = videoView else { return }
-    view.onAdClicked?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Video tapped"))
-    view.onAdOpened?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Video opened"))
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-      guard let self, let view = self.videoView else { return }
-      view.onAdClosed?(view.eventPayload(adUnitId: self.adUnitId, source: "sdk", message: "Video dismissed"))
-    }
-  }
-  
   func onCompleteVideo() {
-    guard let view = videoView else { return }
-    view.onAdCompleted?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Video completed"))
+    host?.emitCompleted(adUnitId: adUnitId)
   }
 
   func onSkipVideo() {
-    guard let view = videoView else { return }
-    view.onAdSkipped?(view.eventPayload(adUnitId: adUnitId, source: "sdk", message: "Video skipped"))
+    host?.emitSkipped(adUnitId: adUnitId)
   }
 }
 #endif

@@ -1,115 +1,114 @@
 # Example app
 
-This folder contains a minimal React Native app that demonstrates the public JS/TS API exposed by the sample package.
+`ExampleHostApp` is a runnable integration reference, not a toy. Each panel walks the full
+lifecycle a media app needs for one format:
 
-## What it shows
-- `NapSspAd.initialize()` usage plus status checks
-- `NapSspAd.getStatus()` status checks and placeholder-mode visibility
-- `BannerAd`, `NativeAd`, and `VideoAd` rendering with placeholder fallback
-- `InterstitialAd` and `InterstitialVideoAd` load/show calls with safe error handling
-- `RewardedAd` load/show calls with safe error handling and `onRewarded` callbacks without payloads
-- Native availability checks via `isNativeModuleAvailable()`
+```
+initialize → load → callback → show / render → success or failure → reload → cleanup
+```
 
-## 💡 Pro-tip: Understanding Placeholder Mode
+Every SDK callback is written to an on-screen event log, so you can see exactly which events fire —
+and which do not — on each platform.
 
-The example app is designed to run **even without the Nap SSP native SDKs installed**. This is called "Placeholder Mode".
+| File | What to copy from it |
+| :--- | :--- |
+| [`App.tsx`](./ExampleHostApp/App.tsx) | Initialization order, per-format panels, listener cleanup on unmount. |
+| [`adConfig.ts`](./ExampleHostApp/adConfig.ts) | Where the media key and ad unit IDs belong. |
+| [`android/gradle.properties`](./ExampleHostApp/android/gradle.properties) | `napSsp.mediations` adapter selection. |
+| [`android/settings.gradle`](./ExampleHostApp/android/settings.gradle) | The extra Maven repositories the adapters need. |
 
-- **Why?**: It allows frontend developers to build and test ad placement logic, event handlers, and screen layouts without worrying about complex native environment setups.
-- **How it works**: If the native bridge detects that the SDK is missing, it renders a visual placeholder and simulates basic ad events (loaded, clicked, etc.).
-- **Transitioning to Real Ads**: Once your layout is ready, follow the [Native Setup Guide](../../README.md#⚙️-2-네이티브-필수-설정) to link the real SDKs. The JS code remains exactly the same!
+---
 
-## Structure
-- `ExampleHostApp/`: standalone React Native test app inside this repository
-- `ExampleHostApp/scripts/run-android-emulator.sh`: Android build, install, launch helper
-- `ExampleHostApp/scripts/run-ios-sim.sh`: iOS CocoaPods + simulator helper
+## What it covers
+
+| Format | Load | Show | Reload | Cleanup |
+| :--- | :---: | :---: | :---: | :---: |
+| Banner | on mount | automatic | `ref.reload()` | unmount |
+| Native | on mount | automatic | `ref.reload()` | unmount |
+| Inline video | on mount | automatic | `ref.reload()` | unmount |
+| Interstitial | `load()` | `show()` / `start()` | `load()` again | `destroy()` |
+| Interstitial video | `load()` | `show()` / `start()` | `load()` again | `destroy()` |
+| Rewarded | `load()` | `show()` / `start()` | `load()` again | `destroy()` |
+
+It also exercises `cancelLoad()`, `isReady()` and `getStatus()`.
+
+---
 
 ## Prerequisites
 
-### Android
-- Java/JDK installed and `java -version` works
-- Android SDK + platform-tools installed
-- `adb` available on `PATH`
-- Running emulator or connected Android device
+* Node 20+
+* **Android** — JDK 17, Android SDK with API 36, `adb` on `PATH`, an emulator or device
+* **iOS** — macOS, Xcode 16+, CocoaPods
 
-### iOS
-- macOS
-- Xcode and command line tools (`xcodebuild` available)
-- CocoaPods installed (`pod` available)
+Replace the values in `adConfig.ts` with the media key and ad unit IDs issued for your own app on
+the [partner site](https://publisher.admixer.co.kr). The values committed here are nap mx test
+inventory and will not serve your ads.
 
-## Quick start for beginners
+---
 
-If you just want to see the sample app run, use this order:
+## Run it
 
-1. From repo root, install packages and build the package.
-2. Run the example host app on Android or iOS.
-3. If Android fails first, check Java/JDK.
-4. If iOS fails first, check CocoaPods.
+From the repository root, build the package first — the example consumes `lib/`, not `src/`:
 
 ```bash
-npm ci
+npm install
 npm run build
-cd example/ExampleHostApp
 ```
 
-## Run notes
-
-The example is intentionally lightweight and should be treated as a host verification app, not as proof that every native dependency is already installed on your machine.
-
-### Android emulator (recommended for local testing)
-
-From repo root:
-
-```bash
-npm ci
-npm run build
-cd example/ExampleHostApp
-./scripts/run-android-emulator.sh
-```
-
-If you want to test vendor SDK mode in the Android host app build:
-
-```bash
-cd example/ExampleHostApp/android
-./gradlew assembleDebug -PnapSsp.enableVendorSdk=true -PnapSsp.mediations=admanager,adfit
-```
-
-### iOS simulator
-
-From repo root:
-
-```bash
-npm ci
-npm run build
-cd example/ExampleHostApp
-./scripts/run-ios-sim.sh
-```
-
-## Testing
-
-Run the example app Jest smoke test:
+Then:
 
 ```bash
 cd example/ExampleHostApp
-npm test -- --runInBand
+npm install
+
+npm run start        # Metro
+npm run android      # or
+npm run ios          # macOS only
 ```
 
-Note: the Jest test uses lightweight mocks for the plugin exports so the example UI can render without a native bridge in CI or local Node-only environments, and it now checks the initialize call covers all sample ad unit IDs.
+---
 
-## Current verification status
-- Android example host app: build verified, emulator install verified, app launch verified, screenshot capture verified.
-- iOS example host app: `pod install` verified, simulator build verified, simulator launch and screenshot capture verified.
-- Real ad delivery: requires valid server-side test inventory and native module registration on each platform.
-- Current direct API spot-check: Android 320x50 and iOS 320x50 test endpoints returned HTTP 200 with `ads` length `0`, so real fill is not yet confirmed.
+## Notes on this app's configuration
 
-## Feature checklist
-- App initialization flow: verified
-- Banner / Native / Video placeholder-safe rendering: verified
-- Interstitial / Interstitial Video / Rewarded JS flow: wired in sample app
-- Android local build/install/run: verified
-- iOS local pod install/build/run: verified
-- Real ad fill from provided test endpoints: not yet verified, server response currently empty in spot-check
+### `newArchEnabled=false`
 
-## Notes
-- The example app uses placeholder/native-safe behavior by default. To exercise real vendor SDK flows, enable vendor SDK in the host Android build and add the required iOS pods/packages.
-- If you do not have real `mediaKey` or `adUnitId` values, placeholder mode is still useful for verifying JS event paths and UI behavior.
-- If Android fails immediately, check JDK setup first. If iOS fails immediately, check CocoaPods first.
+React Native 0.76+ enables the New Architecture by default. This plugin ships legacy
+`ReactPackage` modules and `SimpleViewManager` views; New Architecture support has **not** been
+verified, so the example pins the legacy architecture rather than claiming something untested.
+
+### Kotlin
+
+The app is generated from the React Native 0.81 template, whose Kotlin default (2.1.20) already
+satisfies the plugin's requirement. On React Native 0.76–0.80 you must raise `kotlinVersion` to
+`2.1.21` yourself — see [Setup](../docs/SETUP.md#kotlin-요구사항).
+
+### `metro.config.js`
+
+This app links the plugin from the repository root (`file:../..`), which Metro sees as a symlink
+pointing outside the project. `metro.config.js` therefore sets `watchFolders`, blocks the
+repository's own `node_modules` (otherwise the plugin gets a second copy of React and every hook
+throws `Cannot read property 'useRef' of null`) and points `nodeModulesPaths` at this app.
+
+**An app that installs `react-native-nap-ssp` from npm needs none of this** — the default Metro
+config is enough.
+
+### Mediation repositories
+
+`android/settings.gradle` declares the Kakao, ByteDance, Teads and Huawei Maven repositories. These
+have to live in the **app**, not the library: Gradle resolves a library's transitive dependencies
+using the consuming project's repositories.
+
+---
+
+## Verification status
+
+| Check | Result |
+| :--- | :--- |
+| Android — plugin AAR assembles against nap mx core 2.3.0 with all 7 adapters | ✅ verified |
+| Android — host app assembles, merges and dexes the plugin + adapters | ✅ verified (standalone harness, AGP 8.7.2 / Kotlin 2.1.21 / compileSdk 35) |
+| Android — this app builds and runs on a device | ✅ verified (Galaxy SM-S947N, Android 16) |
+| Real ad delivery on a device | ✅ banner and inline video served and reported impressions; native returned a genuine no-fill (`nap_ssp_no_ads`) |
+| iOS — build | ⛔ not measured; no macOS/Xcode available in the development environment |
+| New Architecture | ⛔ not measured |
+
+Treat anything marked "not measured" as unverified — do your own smoke test before shipping.

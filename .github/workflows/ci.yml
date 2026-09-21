@@ -7,39 +7,69 @@ on:
     branches: [main]
 
 jobs:
-  verify-js:
+  package:
+    name: Package (typecheck, build, contract tests)
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18, 20]
+        node-version: [20, 22]
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
-      - name: Install dependencies
-        run: npm install
-      - name: Typecheck
-        run: npm run typecheck
-      - name: Build package
-        run: npm run build
-      - name: Run smoke test
-        run: npm run smoke:test
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run smoke:test
+      - name: Verify the published file list
+        run: |
+          npm pack --dry-run --json > pack.json
+          node -e "
+            const files = require('./pack.json')[0].files.map(f => f.path);
+            const forbidden = /^(example|scripts|node_modules)\/|(^|\/)(\.npmrc|\.env|.*\.log|.*\.keystore|.*\.tgz)$|(^|\/)(build|\.gradle|Pods)\//;
+            const hits = files.filter(f => forbidden.test(f));
+            if (hits.length) { console.error('Forbidden files in package:\n' + hits.join('\n')); process.exit(1); }
+            console.log('package file list clean (' + files.length + ' files)');
+          "
 
-  verify-example:
+  android:
+    name: Android library build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 18
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
-      - name: Install example dependencies
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - run: npm install
+      - run: npm run build
+      - name: Install example host app dependencies
         run: npm install
         working-directory: example/ExampleHostApp
-      - name: Run example tests
-        run: npm test -- --runInBand
+      - name: Assemble the plugin against the nap mx SDK
+        run: ./gradlew :react-native-nap-ssp:assembleDebug --no-daemon
+        working-directory: example/ExampleHostApp/android
+
+  example:
+    name: Example app tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm install
+      - run: npm run build
+      - run: npm install
+        working-directory: example/ExampleHostApp
+      - run: npx tsc --noEmit
+        working-directory: example/ExampleHostApp
+      - run: npm test -- --ci
         working-directory: example/ExampleHostApp

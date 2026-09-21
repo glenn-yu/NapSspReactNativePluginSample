@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlinVersion = project.findProperty('NapSsp.kotlinVersion') ?: '1.8.22'
+    ext.kotlinVersion = project.findProperty('napSsp.kotlinVersion') ?: '2.1.21'
     repositories {
         google()
         mavenCentral()
@@ -12,57 +12,76 @@ buildscript {
 apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
 
-def enableVendorSdk = (project.findProperty('napSsp.enableVendorSdk') ?: 'false').toString().toBoolean()
-def enabledMediations = ((project.findProperty('napSsp.mediations') ?: '') as String)
-    .split(',')
-    .collect { it.trim() }
-    .findAll { !it.isEmpty() }
-    .toSet()
+// Mediation adapters are opt-in: the host app lists only the networks it actually sells.
+//   android/gradle.properties → napSsp.mediations=admanager,adfit
+//   napSsp.mediations=all      adds every adapter (see the repository note below)
+// Unset (the default) links the core SDK only, matching the official nap mx guide.
+def rawMediations = ((project.findProperty('napSsp.mediations') ?: '') as String).trim()
+def allMediations = ['admanager', 'adfit', 'pangle', 'applovin', 'unity', 'naveradmanager', 'teads'] as Set
+def enabledMediations = rawMediations.equalsIgnoreCase('all')
+    ? allMediations
+    : rawMediations.split(',').collect { it.trim().toLowerCase() }.findAll { !it.isEmpty() }.toSet()
 
-def mediationEnabled = { String name -> enabledMediations.isEmpty() || enabledMediations.contains(name) }
+def unknownMediations = enabledMediations - allMediations
+if (!unknownMediations.isEmpty()) {
+    throw new GradleException(
+        "napSsp.mediations contains unknown network(s): ${unknownMediations.join(', ')}. " +
+        "Supported: ${allMediations.sort().join(', ')} (or 'all')."
+    )
+}
 
-// Keep Android vendor SDK dependencies pinned to the latest published Maven artifacts.
+def mediationEnabled = { String name -> enabledMediations.contains(name) }
+
+// Removed in 0.5.0 — the core SDK is now always linked, so the plugin can no longer
+// silently fall back to simulated ads. Fail loudly instead of changing behaviour silently.
+if (project.hasProperty('napSsp.enableVendorSdk')) {
+    logger.warn(
+        "[react-native-nap-ssp] 'napSsp.enableVendorSdk' was removed in 0.5.0 and is ignored — " +
+        "the nap mx SDK is always linked. Use 'napSsp.mediations' to pick mediation adapters."
+    )
+}
+
+// Keep pinned to the latest published Maven artifacts (verified against Maven Central).
+// https://napmx.github.io/#/android/native/getting-started
 def napSspSdkCoordinates = [
-    bom: 'io.github.nasmedia-tech:admixer-bom:2026.07.06',
-    core: 'io.github.nasmedia-tech:admixer-ssp:2.1.3',
-    adManager: 'io.github.nasmedia-tech:admixer-admanager:2.0.4',
-    adFit: 'io.github.nasmedia-tech:admixer-adfit:2.0.3',
-    pangle: 'io.github.nasmedia-tech:admixer-pangle:2.0.2',
-    appLovin: 'io.github.nasmedia-tech:admixer-applovin:2.0.2',
-    unity: 'io.github.nasmedia-tech:admixer-unity:2.0.2',
-    naveradmanager: 'io.github.nasmedia-tech:admixer-naveradmanager:2.0.2',
-    teads: 'io.github.nasmedia-tech:admixer-teads:2.1.0',
+    bom: 'io.github.nasmedia-tech:admixer-bom:2026.09.03',
+    core: 'io.github.nasmedia-tech:admixer-ssp:2.3.0',
+    adManager: 'io.github.nasmedia-tech:admixer-admanager:2.1.3',
+    adFit: 'io.github.nasmedia-tech:admixer-adfit:2.0.6',
+    pangle: 'io.github.nasmedia-tech:admixer-pangle:2.1.2',
+    appLovin: 'io.github.nasmedia-tech:admixer-applovin:2.0.5',
+    unity: 'io.github.nasmedia-tech:admixer-unity:2.0.6',
+    naveradmanager: 'io.github.nasmedia-tech:admixer-naveradmanager:2.1.3',
+    teads: 'io.github.nasmedia-tech:admixer-teads:2.1.2',
     adsIdentifier: 'com.google.android.gms:play-services-ads-identifier:18.2.0',
 ]
 
+def napSspJavaVersion = JavaVersion.toVersion((project.findProperty('napSsp.javaVersion') ?: '17') as String)
+
 android {
-    namespace 'com.nasmedia.admixerssp'
-    compileSdk 34
+    namespace 'com.nasmedia.admixerssp.reactnative'
+    // nap mx core 2.3.0 publishes AAR metadata requiring API 35, so every consumer must compile
+    // against 35 or newer (React Native 0.76+ already does).
+    compileSdk 35
 
     defaultConfig {
         minSdk 21
-        targetSdk 34
         consumerProguardFiles 'consumer-rules.pro'
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
-        buildConfigField 'boolean', 'NAP_SSP_VENDOR_SDK_ENABLED', enableVendorSdk.toString()
         buildConfigField 'String', 'NAP_SSP_CORE_COORDINATE', "\"${napSspSdkCoordinates.core}\""
-        buildConfigField 'String', 'NAP_SSP_AD_MANAGER_COORDINATE', "\"${napSspSdkCoordinates.adManager}\""
-        buildConfigField 'String', 'NAP_SSP_ADFIT_COORDINATE', "\"${napSspSdkCoordinates.adFit}\""
-        buildConfigField 'String', 'NAP_SSP_PANGLE_COORDINATE', "\"${napSspSdkCoordinates.pangle}\""
-        buildConfigField 'String', 'NAP_SSP_APP_LOVIN_COORDINATE', "\"${napSspSdkCoordinates.appLovin}\""
-        buildConfigField 'String', 'NAP_SSP_UNITY_COORDINATE', "\"${napSspSdkCoordinates.unity}\""
-        buildConfigField 'String', 'NAP_SSP_NAVER_AD_MANAGER_COORDINATE', "\"${napSspSdkCoordinates.naveradmanager}\""
-        buildConfigField 'String', 'NAP_SSP_TEADS_COORDINATE', "\"${napSspSdkCoordinates.teads}\""
-        buildConfigField 'String', 'NAP_SSP_ADS_IDENTIFIER_COORDINATE', "\"${napSspSdkCoordinates.adsIdentifier}\""
+        buildConfigField 'String', 'NAP_SSP_BOM_COORDINATE', "\"${napSspSdkCoordinates.bom}\""
+        buildConfigField 'String', 'NAP_SSP_MEDIATIONS', "\"${enabledMediations.sort().join(',')}\""
     }
 
+    // Java and Kotlin must target the same JVM level or AGP fails the build. React Native 0.73+
+    // requires JDK 17, so that is the default; override with napSsp.javaVersion if your host app
+    // compiles its modules at a different level.
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility napSspJavaVersion
+        targetCompatibility napSspJavaVersion
     }
 
     kotlinOptions {
-        jvmTarget = '11'
+        jvmTarget = napSspJavaVersion.toString()
     }
 
     buildFeatures {
@@ -77,49 +96,68 @@ android {
 repositories {
     google()
     mavenCentral()
-    // Required once the host app opts into the real vendor SDK dependencies.
-    maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }
-    maven { url 'https://artifact.bytedance.com/repository/pangle/' }
-    // Teads 사용 시 필수
-    maven { url "https://sdk.teads.tv/android/repo" }
-    maven { url "https://teads.jfrog.io/artifactory/SDKAndroid-maven-prod" }
-    // Teads 공식 설치 가이드가 Huawei 단말 호환을 위해 필수로 안내
-    maven { url "https://developer.huawei.com/repo/" }
+}
+
+// Some network SDKs live outside Maven Central. Gradle resolves a library's *transitive*
+// dependencies with the consuming project's repositories, so declaring them here would not help
+// the host app — the app has to declare them itself, exactly as the official guide says.
+// https://napmx.github.io/#/android/native/getting-started
+def extraRepositories = [
+    adfit  : ["maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }"],
+    pangle : ["maven { url 'https://artifact.bytedance.com/repository/pangle/' }"],
+    teads  : [
+        "maven { url 'https://sdk.teads.tv/android/repo' }",
+        "maven { url 'https://teads.jfrog.io/artifactory/SDKAndroid-maven-prod' }",
+        "maven { url 'https://developer.huawei.com/repo/' }  // Teads: Huawei device compatibility",
+    ],
+]
+
+def requiredRepositories = enabledMediations
+    .findAll { extraRepositories.containsKey(it) }
+    .collectMany { extraRepositories[it] }
+    .unique()
+
+if (!requiredRepositories.isEmpty()) {
+    logger.lifecycle(
+        "[react-native-nap-ssp] The '${enabledMediations.intersect(extraRepositories.keySet()).join(', ')}' " +
+        "adapter(s) need extra Maven repositories. Add these to your app's settings.gradle " +
+        "(dependencyResolutionManagement) or top-level build.gradle (allprojects):" +
+        System.lineSeparator() + "  " +
+        requiredRepositories.join(System.lineSeparator() + "  ")
+    )
 }
 
 dependencies {
     compileOnly 'com.facebook.react:react-android'
-    // compileOnly core to allow compile-time subclassing of AdListener
-    compileOnly napSspSdkCoordinates.core
 
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
 
-    if (enableVendorSdk) {
-        implementation platform(napSspSdkCoordinates.bom)
-        implementation napSspSdkCoordinates.adsIdentifier
-        implementation napSspSdkCoordinates.core
+    // The nap mx core SDK is a hard dependency — the bridge calls its API directly so that
+    // a signature change breaks the build instead of failing silently at runtime.
+    api platform(napSspSdkCoordinates.bom)
+    api napSspSdkCoordinates.core
+    implementation napSspSdkCoordinates.adsIdentifier
 
-        if (mediationEnabled('admanager')) {
-            implementation napSspSdkCoordinates.adManager
-        }
-        if (mediationEnabled('adfit')) {
-            implementation napSspSdkCoordinates.adFit
-        }
-        if (mediationEnabled('pangle')) {
-            implementation napSspSdkCoordinates.pangle
-        }
-        if (mediationEnabled('applovin')) {
-            implementation napSspSdkCoordinates.appLovin
-        }
-        if (mediationEnabled('unity')) {
-            implementation napSspSdkCoordinates.unity
-        }
-        if (mediationEnabled('naveradmanager')) {
-            implementation napSspSdkCoordinates.naveradmanager
-        }
-        if (mediationEnabled('teads')) {
-            implementation napSspSdkCoordinates.teads
-        }
+    if (mediationEnabled('admanager')) {
+        implementation napSspSdkCoordinates.adManager
+    }
+    if (mediationEnabled('adfit')) {
+        implementation napSspSdkCoordinates.adFit
+    }
+    if (mediationEnabled('pangle')) {
+        implementation napSspSdkCoordinates.pangle
+    }
+    if (mediationEnabled('applovin')) {
+        implementation napSspSdkCoordinates.appLovin
+    }
+    if (mediationEnabled('unity')) {
+        implementation napSspSdkCoordinates.unity
+    }
+    if (mediationEnabled('naveradmanager')) {
+        implementation napSspSdkCoordinates.naveradmanager
+    }
+    if (mediationEnabled('teads')) {
+        implementation napSspSdkCoordinates.teads
     }
 }

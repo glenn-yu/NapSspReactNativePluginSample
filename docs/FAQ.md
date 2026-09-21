@@ -1,131 +1,234 @@
-# ❓ FAQ, Troubleshooting & Privacy Guide
+# FAQ & troubleshooting
 
-Frequently asked questions, fixes for known build and runtime issues, privacy compliance notes, and an ad-tech glossary.
+## Build
 
----
+### `Class 'kotlin.Unit' was compiled with an incompatible version of Kotlin`
 
-## 📋 Table of Contents
-1. [Frequently Asked Questions](#1-frequently-asked-questions)
-2. [Troubleshooting](#2-troubleshooting)
-3. [Privacy & Compliance](#3-privacy--compliance)
-4. [Ad-Tech Glossary](#4-ad-tech-glossary)
+nap mx core 2.3.0 ships `kotlin-stdlib:2.2.10`. Build the host app with **Kotlin 2.1 or newer** —
+see [Setup](./SETUP.md#kotlin-요구사항). React Native 0.81+ already defaults to 2.1.20.
 
----
+### `requires libraries and applications that depend on it to compile against version 35 or later`
 
-## 1. Frequently Asked Questions
+Raise the app's `compileSdkVersion` to 35 (or 36). React Native 0.76+ already does; older templates
+compile against 34 and cannot consume this version.
 
-### Q1. No ads appear and everything reports success. What's wrong?
-Check whether the vendor SDK is actually linked:
+### `Could not find tv.teads.sdk.android:sdk` / `com.kakao.adfit:ads-base` / `com.pangle.global:pag-sdk`
 
-```typescript
-const status = await NapSspAd.getStatus();
-console.log(status.placeholderMode);   // true → vendor SDK is NOT linked
+Those SDKs are not on Maven Central. Add the repositories **to your app** — Gradle resolves a
+library's transitive dependencies with the consuming project's repositories, so declaring them
+inside the plugin would not help:
+
+```groovy
+// android/settings.gradle
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://devrepo.kakao.com/nexus/content/groups/public/' }   // AdFit
+        maven { url 'https://artifact.bytedance.com/repository/pangle/' }         // Pangle
+        maven { url 'https://sdk.teads.tv/android/repo' }                         // Teads
+        maven { url 'https://teads.jfrog.io/artifactory/SDKAndroid-maven-prod' }  // Teads
+        maven { url 'https://developer.huawei.com/repo/' }                        // Teads: Huawei
+    }
+}
 ```
 
-On Android, set `napSsp.enableVendorSdk=true` in `android/gradle.properties` and re-sync. On iOS, confirm the `NapSspPlugin` pod (and its subspecs) is in your Podfile. See [Setup §3①](./SETUP.md#-vendor-sdk-opt-in).
+The Gradle build prints the exact list for the adapters you enabled.
 
-### Q2. Why do I get a no-fill error?
-No-fill means the request reached the exchange but nothing matched your targeting or floor price. It is normal for new ad units and in test environments. On Android the code is **`AX_ERR_NO_ADS`** — do not branch on `AX_ERR_NO_FILL`, which core v2.1.3 deprecated because the SDK never emits it.
+### `Manifest merger failed: android:networkSecurityConfig`
 
-### Q3. Does this support the New Architecture (TurboModules / Fabric)?
-Yes. The bridge layer (`NativeNapSspModuleSpec`, `NativeNapSspInterstitialSpec`) works under both the legacy bridge and the New Architecture.
+The core SDK declares its own network security config. If your app declares one too, let yours win:
 
-### Q4. How do I cancel a load when the user navigates away?
-Use `cancelLoad()` in your cleanup path. It is a no-op if nothing is in flight and never disturbs an ad that is already displaying:
-
-```typescript
-return () => {
-  interstitial.cancelLoad();
-  interstitial.destroy();
-};
+```xml
+<application
+    android:networkSecurityConfig="@xml/your_network_security_config"
+    tools:replace="android:networkSecurityConfig">
 ```
 
-### Q5. My event listener never fires.
-Listener names are the short form — `'loaded'`, `'loadFailed'`, `'opened'`, `'closed'`, `'clicked'`, `'impression'` (plus `'rewarded'`, `'completed'`, `'skipped'`) — **not** the native `onAdLoaded` style names. The one exception is `'onRewarded'`, kept as an alias for `'rewarded'`. See the [event table](./API.md#event-names).
+### `uses-sdk:minSdkVersion N cannot be smaller than version 24`
 
-### Q6. Do I need to list every ad unit in `adUnitIds`?
-Yes. `NapSspAd.initialize()` registers the ad units up front; loading a unit that was not registered fails. Since core v2.1.1 that failure is reported deterministically through `loadFailed` instead of silently hanging.
+The AppLovin adapter requires API 24, Google Ad Manager and Naver Ad Manager require 23. Raise the
+app's `minSdkVersion` or drop that adapter from `napSsp.mediations`.
 
-### Q7. Is the user rewarded twice if I listen on both channels?
-No. Android core v2.1.1 made the reward channels mutually exclusive — exactly one notification per grant. If you previously guarded against double-granting, that workaround can be removed.
+### `pod install` fails on the Teads subspec
+
+`AdMixerMediationTeads` requires **Xcode 26 or newer**. Remove `pod 'NapSspPlugin/Teads'` if you
+are on an older toolchain.
+
+### `Duplicate class com.google.android.gms.ads...`
+
+You already ship the Google Mobile Ads SDK. Exclude it from the adapter:
+
+```groovy
+implementation("io.github.nasmedia-tech:admixer-admanager:2.1.3") {
+    exclude group: "com.google.android.gms", module: "play-services-ads"
+}
+```
+
+Keep `play-services-ads` at 25.2.0 or below — 25.3.0+ is incompatible.
 
 ---
 
-## 2. Troubleshooting
+## Runtime
 
-### Android: `NullPointerException` when unmounting a banner (#100)
-* **Symptom**: `java.lang.NullPointerException: Attempt to read from field '...AdInfo...' on a null object reference` when closing or unmounting a banner screen on SDK v2.0.0.
-* **Fix**: Resolved since v0.3.0 by moving to core v2.1.1+. The plugin's view managers also run three unmount defenses (`onDropViewInstance`, `onDetachedFromWindow`, `onHostDestroy`) so `destroy()` always runs.
+### No ads at all
 
-### Android: `Failed to resolve: io.github.nasmedia-tech:...`
-* **Fix**: Confirm `napSsp.enableVendorSdk=true` and that `google()` / `mavenCentral()` are present in your root `build.gradle`. The plugin declares the Kakao, Pangle, Teads and Huawei repositories itself. If your project uses `RepositoriesMode.FAIL_ON_PROJECT_REPOS` in `settings.gradle`, module-level repositories are ignored — declare them in `dependencyResolutionManagement` instead. See [Setup §3②](./SETUP.md#-bundled-artifact-versions).
+1. Confirm `await NapSspAd.initialize(...)` **resolved** — every ad call rejects with
+   `nap_ssp_not_initialized` until it does.
+2. `NapSspAd.setLogLevel('verbose')`, then `adb logcat | grep AdMixerSDK`.
+3. Check the media key and ad unit IDs against the partner site. Both must be numeric.
+4. Confirm the ad unit is enabled and provisioned on the partner site.
 
-### Android: duplicate class / `play-services-ads` conflicts
-* **Symptom**: Build failure or runtime crashes in the AdManager adapter after another library upgrades Google Play Services Ads.
-* **Fix**: `play-services-ads` **25.3.0+ is incompatible**. Force the supported version:
-  ```gradle
-  configurations.all {
-      resolutionStrategy { force 'com.google.android.gms:play-services-ads:25.2.0' }
-  }
-  ```
+### Everything returns `nap_ssp_no_ads`
 
-### Android: `Module was compiled with an incompatible version of Kotlin`
-* **Fix**: AdManager and Naver Ad Manager require the host app to build with **Kotlin 2.1+**, Kakao AdFit with **2.0+**. See [Setup §3④](./SETUP.md#-kotlin-toolchain).
+That is the waterfall reporting no fill — every network was tried and none had inventory. It is
+also the code you get when the ad unit has no networks assigned. Check the ad unit's configuration
+first, then retry after a delay.
 
-### Android: manifest merger fails on `networkSecurityConfig`
-* **Symptom**: `Attribute application@networkSecurityConfig value=(...) is also present at [admixer-ssp]`.
-* **Fix**: The core SDK declares its own network security config. Add `tools:replace="android:networkSecurityConfig"` to your `<application>` — see [Setup §3⑤](./SETUP.md#-androidmanifestxml).
+Do not branch on `AX_ERR_NO_FILL`: the SDK never sends it, so that branch never runs.
 
-### Android: `minSdkVersion` conflict after adding an adapter
-* **Fix**: Adapters raise the floor above the core's API 21 — AppLovin needs **24**, and AdManager / Pangle / Unity / Naver Ad Manager need **23**. Either raise your `minSdk` or drop the adapter from `napSsp.mediations`.
+### It used to work in debug and now reports failures
 
-### iOS: low fill rate or missing ads on iOS 14.5+
-* **Fix**: Implement App Tracking Transparency. Add `NSUserTrackingUsageDescription` to `Info.plist` and call `NapSspAd.requestTrackingAuthorization()` before requesting ads. Without consent the IDFA is zeroed and personalized inventory is unavailable.
+Versions up to 0.4.x replaced the SDK with a simulation in debug builds and reported load failures
+as successes. 0.5.0 removed that. The failures you see now were always happening — they were being
+hidden. See the [migration notes](./MIGRATION.md#placeholder-simulation-is-gone).
 
-### iOS: app will not launch in the simulator
-* **Fix**: A simulator launch bug in SDK 2.4.0 was fixed in 2.4.1. Plugin v0.4.0 ships 2.4.2. Run `pod install --repo-update`, or re-resolve SPM packages.
+### One network never serves
 
-### iOS: Teads adapter fails to build
-* **Fix**: `AdMixerMediationTeads` requires **TeadsSDK 6.2+** as of SDK 2.4.2. Add the `Teads` subspec (or SPM package) rather than linking TeadsSDK directly.
+Look for these in the log:
 
----
+| Log line | Cause |
+| :--- | :--- |
+| `[SKIP] configuration is invalid (Missing Keys).` | A required key is missing. Pangle needs `placement_id` (and `app_id` if its SDK is not yet started); AppLovin needs `zone_id`. |
+| `[SKIP] Adapter instantiation failed for:` | The adapter module is not in the build — add it to `napSsp.mediations`. |
 
-## 3. Privacy & Compliance
+You can inject a missing key yourself; the server value always wins:
 
-### App Tracking Transparency (iOS)
-```typescript
-import { NapSspAd } from 'react-native-nap-ssp';
-
-const status = await NapSspAd.requestTrackingAuthorization();
-// 'authorized' | 'denied' | 'restricted' | 'notDetermined' | 'unavailable' (Android)
-```
-Prompt **before** your first ad request. `NSUserTrackingUsageDescription` is mandatory or the prompt never shows.
-
-### COPPA / child-directed treatment
-```typescript
+```ts
 await NapSspAd.initialize({
-  mediaKey: 'YOUR_MEDIA_KEY',
-  adUnitIds: [...],
-  coppa: true,
+  mediaKey, adUnitIds,
+  mediations: {
+    pangle: {appId: 'YOUR_PANGLE_APP_ID'},
+    appLovin: {sdkKey: 'YOUR_APPLOVIN_SDK_KEY'},
+  },
 });
-
-// or at runtime
-NapSspAd.setCoppa(true);
 ```
-With COPPA on, reward SSV postbacks omit the `ifa` field.
 
-### Android advertising ID
-Android 13+ (API 33+) requires the `com.google.android.gms.permission.AD_ID` permission for the advertising ID. Declare it in your manifest — see [Setup §3⑤](./SETUP.md#-androidmanifestxml). Omit it deliberately if your app must not access the advertising ID; expect reduced fill.
+### The banner is invisible or clipped
+
+The served size comes from the ad unit's server configuration, not from the `size` prop. Give the
+container a full width and let the height follow the creative; do not lock a height that disagrees
+with the served size.
+
+### `nap_ssp_activity_required`
+
+Android full-screen ads need a foreground Activity. Do not call `show()` from a background task or
+while the app is backgrounded.
+
+### `nap_ssp_view_not_linked` / `napssp_sdk_not_linked`
+
+The native side is not in the build. Rebuild the app after installing the package — Metro's cache
+alone is not enough. On iOS, run `pod install` again.
+
+### Rewarded ads pay out twice / not at all
+
+Grant from the `rewarded` event only, and deduplicate on `transactionId`. Do not also grant from
+`completed` — playback completion and reward accrual are separate signals, and `completed` can fire
+without a reward.
+
+### `skipped` never fires on iOS
+
+Correct, and not fixable from this plugin: `AMMRewardVideoDelegate` and
+`AMMVideoInterstitialDelegate` have no skip callback. Android delivers it through
+`AdListener.onAdSkipped()`. Do not build reward logic on `skipped`.
 
 ---
 
-## 4. Ad-Tech Glossary
-* **SSP (Supply-Side Platform)** — Software publishers use to sell ad impressions programmatically.
-* **CPM (Cost Per Mille)** — Price paid per 1,000 impressions.
-* **Mediation** — Calling multiple networks in sequence (a waterfall) to find the best-paying ad for an impression.
-* **Fill Rate** — Share of ad requests answered with an ad (`Impressions / Requests × 100`).
-* **No-fill** — A successful request that returned no ad.
-* **BOM (Bill of Materials)** — A Gradle artifact that aligns versions across a family of libraries.
-* **SSV (Server-Side Verification)** — A server-to-server postback confirming a reward was earned, so the grant cannot be spoofed by the client.
-* **IDFA / GAID** — Per-device advertising identifiers on iOS and Android.
-* **AdChoices** — The regulatory icon marking an ad and linking to its privacy disclosure.
+## Privacy & compliance
+
+### Is my app child-directed?
+
+If it targets children, Google Play's Families policy requires the flag regardless of country:
+
+```ts
+await NapSspAd.initialize({
+  mediaKey, adUnitIds,
+  privacy: {childDirected: true},
+});
+```
+
+Consequences, by design: **AppLovin is skipped entirely** (their policy forbids SDK use for child
+users), **Pangle is downgraded** to non-personalised (their COPPA API was removed — a mitigation,
+not compliance), and Google Ad Manager / Naver Ad Manager / AdFit / Unity Ads receive the flag.
+
+Unity Ads also needs the app-level age setting in the Unity Monetization dashboard.
+
+### Why call `setPrivacyConsent()` before `initialize()`?
+
+AppLovin, Unity Ads and Pangle read consent when their SDK starts, which happens lazily inside the
+waterfall. Pass `privacy` to `initialize()` so the value is in place first. A later change may not
+take effect until the next app launch.
+
+### `childDirected: false` vs. not setting it
+
+They are different states. Unset leaves each network's own default (or a value an IAB TCF CMP
+wrote) untouched. Once you have set `true`, switch back with an explicit `false` — Unity's metadata
+API has no clear operation, so unsetting cannot undo it.
+
+### GDPR / CCPA
+
+`gdprConsent`, `ccpaDoNotSell` and `usPrivacy` are propagated where a network exposes an API.
+Collecting consent is your responsibility — the SDK does not present a CMP. If you use an IAB TCF
+CMP, Google, Pangle, Teads and Naver read the stored strings directly, independently of these
+settings.
+
+### ATT on iOS
+
+The SDK does not prompt. Your app calls `NapSspAd.requestTrackingAuthorization()` and waits for the
+result before the first ad request. Add `NSUserTrackingUsageDescription` to `Info.plist`.
+
+---
+
+## Testing
+
+### How do I get test ads?
+
+Android only:
+
+```ts
+await NapSspAd.setTestMode(true);
+await NapSspAd.setTestDeviceIds(['YOUR-GAID']);
+```
+
+Test device IDs are Google Advertising IDs — sensitive identifiers. Keep them out of logs, tickets
+and support mail.
+
+iOS has no global test switch; register test devices in each network's own dashboard. `setTestMode()`
+resolves `false` there so you can branch on it.
+
+### Can I run the example app without real ad units?
+
+It will run, but every request will fail with `nap_ssp_no_ads` or `nap_ssp_config_failed` — which is
+exactly what the event log is for. Replace `adConfig.ts` with your own IDs to see fills.
+
+---
+
+## Compatibility
+
+### Does this support the New Architecture?
+
+**Not verified, and therefore not claimed.** The plugin ships legacy `ReactPackage` modules and
+`SimpleViewManager` views. React Native's interop layer is expected to handle them, but no build or
+runtime check has been run against Fabric/TurboModules. The example app pins
+`newArchEnabled=false` for that reason. If you need New Architecture support, test it in your own
+app before shipping.
+
+### Does it work with Expo?
+
+Only with a development build or a prebuild — it contains native code, so Expo Go cannot load it.
+Add it as a plugin-free native dependency and run `expo prebuild`.
+
+### Which React Native versions?
+
+0.76 and newer (`compileSdk 35` is required by the native SDK). 0.81+ needs no extra Kotlin
+configuration; 0.76–0.80 need `kotlinVersion = "2.1.21"`.

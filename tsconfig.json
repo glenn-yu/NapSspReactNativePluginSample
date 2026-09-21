@@ -16,7 +16,7 @@
     "resolveJsonModule": true,
     "noEmitOnError": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["react", "react-native"]
+    "types": ["react"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["example", "android", "ios", "lib", "node_modules"]

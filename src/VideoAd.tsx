@@ -1,110 +1,72 @@
 import React from 'react';
+import { Platform, View, type StyleProp, type ViewStyle } from 'react-native';
+import { NativeModuleNames } from './nativeBridge';
 import {
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-  requireNativeComponent,
-  type StyleProp,
-  type ViewStyle,
-} from 'react-native';
-import { NativeModuleNames, isNativeViewAvailable } from './nativeBridge';
-import type { AdError, VideoAdProps } from './types';
+  dispatchReload,
+  notLinkedError,
+  resolveNativeAdComponent,
+  type NativeInlineAdProps,
+} from './inlineAdView';
+import type { AdViewHandle, VideoAdProps } from './types';
 
-type NativeVideoAdComponentProps = Omit<
-  VideoAdProps,
-  'onAdLoaded' | 'onAdFailedToLoad' | 'onAdClicked' | 'onAdOpened' | 'onAdClosed' | 'onAdImpression' | 'onAdCompleted' | 'onAdSkipped'
-> & {
-  onAdLoaded?: () => void;
-  onAdFailedToLoad?: (event: { nativeEvent: AdError }) => void;
-  onAdClicked?: () => void;
-  onAdOpened?: () => void;
-  onAdClosed?: () => void;
-  onAdImpression?: () => void;
+interface NativeVideoProps extends NativeInlineAdProps {
+  isRetry?: boolean;
   onAdCompleted?: () => void;
   onAdSkipped?: () => void;
-  style?: StyleProp<ViewStyle>;
-};
-
-function resolveNativeVideoAdComponent(): React.ComponentType<NativeVideoAdComponentProps> | null {
-  for (const componentName of NativeModuleNames.videoAd) {
-    if (!isNativeViewAvailable(componentName)) {
-      continue;
-    }
-
-    return requireNativeComponent<NativeVideoAdComponentProps>(componentName);
-  }
-
-  return null;
 }
 
-const NativeVideoAdComponent = resolveNativeVideoAdComponent();
+const nativeVideo = resolveNativeAdComponent<NativeVideoProps>(NativeModuleNames.videoAd);
 
-export default function VideoAd(props: VideoAdProps) {
-  const containerStyle: StyleProp<ViewStyle> = [
-    { minHeight: 200, minWidth: 300, width: '100%' as const },
-    props.style,
-  ];
+/** Inline (in-feed) video ad. */
+const VideoAd = React.forwardRef<AdViewHandle, VideoAdProps>(function VideoAd(props, ref) {
+  const nativeRef = React.useRef<unknown>(null);
+  const containerStyle: StyleProp<ViewStyle> = [{ width: '100%', minHeight: 200 }, props.style];
 
-  if (NativeVideoAdComponent) {
-    return (
-      <NativeVideoAdComponent
-        adUnitId={props.adUnitId}
-        isRetry={props.isRetry ?? false}
-        style={containerStyle}
-        testID={props.testID}
-        onAdLoaded={props.onAdLoaded}
-        onAdFailedToLoad={
-          props.onAdFailedToLoad ? (event) => props.onAdFailedToLoad?.(event.nativeEvent) : undefined
+  React.useImperativeHandle(
+    ref,
+    () => ({
+      reload: () => {
+        if (nativeVideo) {
+          dispatchReload(nativeRef.current, nativeVideo.name);
         }
-        onAdClicked={props.onAdClicked}
-        onAdOpened={props.onAdOpened}
-        onAdClosed={props.onAdClosed}
-        onAdImpression={props.onAdImpression}
-        onAdCompleted={props.onAdCompleted}
-        onAdSkipped={props.onAdSkipped}
-      />
-    );
+      },
+    }),
+    [],
+  );
+
+  const { onAdFailedToLoad, adUnitId } = props;
+
+  React.useEffect(() => {
+    if (!nativeVideo) {
+      onAdFailedToLoad?.(notLinkedError(adUnitId, 'video', Platform.OS));
+    }
+  }, [onAdFailedToLoad, adUnitId]);
+
+  if (!nativeVideo) {
+    return <View style={containerStyle} testID={props.testID} />;
   }
+
+  const NativeComponent = nativeVideo.component;
 
   return (
-    <View
-      accessibilityRole="image"
-      style={[
-        styles.placeholder,
-        containerStyle,
-      ]}
-    >
-      <Text style={styles.title}>NapSsp Video Ad</Text>
-      <Text style={styles.subtitle}>{props.adUnitId}</Text>
-      <Text style={styles.note}>{Platform.OS} native view not linked yet</Text>
-    </View>
+    <NativeComponent
+      ref={nativeRef as never}
+      adUnitId={props.adUnitId}
+      isRetry={props.isRetry ?? false}
+      style={containerStyle}
+      testID={props.testID}
+      onAdLoaded={props.onAdLoaded}
+      onAdFailedToLoad={
+        props.onAdFailedToLoad ? (event) => props.onAdFailedToLoad?.(event.nativeEvent) : undefined
+      }
+      onAdClicked={props.onAdClicked}
+      onAdOpened={props.onAdOpened}
+      onAdClosed={props.onAdClosed}
+      onAdImpression={props.onAdImpression}
+      onAdCompleted={props.onAdCompleted}
+      onAdSkipped={props.onAdSkipped}
+    />
   );
-}
-
-const styles = StyleSheet.create({
-  placeholder: {
-    alignItems: 'center',
-    backgroundColor: '#FFF1F2', // Light red background to distinguish
-    borderColor: '#FDA4AF',
-    borderRadius: 8,
-    borderWidth: StyleSheet.hairlineWidth,
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  title: {
-    color: '#9F1239',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  subtitle: {
-    color: '#BE123C',
-    fontSize: 12,
-    marginTop: 2,
-  },
-  note: {
-    color: '#E11D48',
-    fontSize: 10,
-    marginTop: 4,
-  },
 });
+
+export default VideoAd;
