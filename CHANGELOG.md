@@ -21,15 +21,9 @@
 - **React Native 0.76 이상이 필요합니다** / **React Native 0.76+** is now required.
   - `admixer-ssp:2.3.0` 의 AAR 메타데이터가 **compileSdk 35 이상**을 요구합니다. 34 로 빌드하면
     `requires libraries and applications that depend on it to compile against version 35 or later`
-    오류로 실패합니다. RN 0.76 부터 템플릿이 35(0.81 부터 36)로 컴파일합니다.
+    오류로 실패합니다. 호스트 앱의 실제 compileSdk 설정을 확인하세요.
   - `peerDependencies.react-native` 를 `>=0.72.0` → `>=0.76.0` 으로 정정했습니다.
-- **호스트 앱에 Kotlin 2.1 이상이 필요합니다** / The host app must build with **Kotlin 2.1+**.
-  - nap mx core `admixer-ssp:2.3.0` 이 `kotlin-stdlib:2.2.10`(metadata 2.2.0)을 전이 의존으로 포함합니다.
-    Kotlin 2.0 이하 컴파일러는 이 메타데이터를 읽지 못해 `Class 'kotlin.Unit' was compiled with an
-    incompatible version of Kotlin` 오류로 빌드가 실패합니다.
-  - React Native **0.79 이상은 기본값이 Kotlin 2.1.x** 라 추가 설정이 필요 없습니다.
-    RN 0.72~0.78 은 앱의 최상위 `android/build.gradle` 에 `kotlinVersion = "2.1.21"` 을 지정하세요
-    ([SETUP](./docs/SETUP.md#kotlin-요구사항)).
+- **Kotlin compatibility** — the plugin defaults to 2.1.21. Earlier claims about a universal host minimum and React Native template defaults have not been reverified; check the actual host settings and build. See [Setup](./docs/SETUP.md#3-3-kotlin-compatibility).
 - **`napSsp.enableVendorSdk` 제거** / Removed the `napSsp.enableVendorSdk` Gradle flag.
   - 코어 SDK 가 항상 링크됩니다. 이 값이 남아 있으면 빌드 경고만 출력하고 무시합니다.
   - 미디에이션 어댑터는 `napSsp.mediations` 로 선택합니다(미지정 시 **코어만** 링크 — 종전에는

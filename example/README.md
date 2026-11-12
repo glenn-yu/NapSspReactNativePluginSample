@@ -36,7 +36,7 @@ It also exercises `cancelLoad()`, `isReady()` and `getStatus()`.
 
 ## Prerequisites
 
-* Node 20+
+* Node 20.19.4 or newer
 * **Android** — JDK 17, Android SDK with API 36, `adb` on `PATH`, an emulator or device
 * **iOS** — macOS, Xcode 16+, CocoaPods
 
@@ -78,9 +78,8 @@ verified, so the example pins the legacy architecture rather than claiming somet
 
 ### Kotlin
 
-The app is generated from the React Native 0.81 template, whose Kotlin default (2.1.20) already
-satisfies the plugin's requirement. On React Native 0.76–0.80 you must raise `kotlinVersion` to
-`2.1.21` yourself — see [Setup](../docs/SETUP.md#kotlin-요구사항).
+This app sets `kotlinVersion` to `2.1.20` in `ExampleHostApp/android/build.gradle`. Check your
+host's actual Kotlin configuration and build against the SDK; see [Setup](../docs/SETUP.md#3-3-kotlin-compatibility).
 
 ### `metro.config.js`
 

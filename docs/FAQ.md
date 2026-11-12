@@ -4,12 +4,12 @@
 
 ### `Class 'kotlin.Unit' was compiled with an incompatible version of Kotlin`
 
-nap mx core 2.5.1 ships `kotlin-stdlib:2.2.10`. Build the host app with **Kotlin 2.1 or newer** —
-see [Setup](./SETUP.md#kotlin-요구사항). React Native 0.81+ already defaults to 2.1.20.
+Check the host app's actual Kotlin plugin and resolved dependencies, then update Kotlin as needed
+for the reported metadata version. The plugin defaults to 2.1.21; see [Setup](./SETUP.md#3-3-kotlin-compatibility).
 
 ### `requires libraries and applications that depend on it to compile against version 35 or later`
 
-Raise the app's `compileSdkVersion` to 35 (or 36). React Native 0.76+ already does; older templates
+Raise the app's `compileSdkVersion` to 35 (or 36). Check your host app setting; older templates
 compile against 34 and cannot consume this version.
 
 ### `Could not find tv.teads.sdk.android:sdk` / `com.kakao.adfit:ads-base` / `com.pangle.global:pag-sdk`
@@ -52,7 +52,7 @@ app's `minSdkVersion` or drop that adapter from `napSsp.mediations`.
 
 ### `pod install` fails on the Teads subspec
 
-`AdMixerMediationTeads` requires **Xcode 26 or newer**. Remove `pod 'NapSspPlugin/Teads'` if you
+`AdMixerMediationTeads` requires **Xcode 26 or newer**. Remove `Teads` from the `:subspecs` list if you
 are on an older toolchain.
 
 ### `Duplicate class com.google.android.gms.ads...`
@@ -117,8 +117,8 @@ await NapSspAd.initialize({
 ### The banner is invisible or clipped
 
 The served size comes from the ad unit's server configuration, not from the `size` prop. Give the
-container a full width and let the height follow the creative; do not lock a height that disagrees
-with the served size.
+container dimensions that match the configured creative. The `size` prop sets the wrapper's initial
+default dimensions and `style` overrides them; the wrapper does not automatically resize to the creative.
 
 ### `nap_ssp_activity_required`
 
@@ -230,5 +230,5 @@ Add it as a plugin-free native dependency and run `expo prebuild`.
 
 ### Which React Native versions?
 
-0.76 and newer (`compileSdk 35` is required by the native SDK). 0.81+ needs no extra Kotlin
-configuration; 0.76–0.80 need `kotlinVersion = "2.1.21"`.
+The package declares React Native 0.76 and newer as a peer dependency. Set Android `compileSdk` to
+35 or newer and check your host Kotlin configuration; see [Setup](./SETUP.md#3-3-kotlin-compatibility).

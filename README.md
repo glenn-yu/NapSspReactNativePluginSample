@@ -32,7 +32,7 @@ Official native guides: [Android](https://napmx.github.io/#/android/) · [iOS](h
   `AdMixer.setTagForChildDirectedTreatment` on Android and `AMMConsent` on iOS.
 * **Test mode** — `setTestMode()` / `setTestDeviceIds()` (Android; the iOS SDK has no equivalent).
 * **Native SDKs refreshed** — Android core `2.1.3 → 2.3.0` (BOM `2026.09.03`), iOS `2.4.2 → 2.5.0`.
-* **Kotlin 2.1+ is now required** in the host app — see [Setup](./docs/SETUP.md#kotlin-요구사항).
+* **Android Kotlin compatibility** — check your host configuration against [Setup](./docs/SETUP.md#3-3-kotlin-compatibility).
 
 Full details in the [CHANGELOG](./CHANGELOG.md).
 
@@ -44,10 +44,10 @@ Full details in the [CHANGELOG](./CHANGELOG.md).
 | :--- | :--- |
 | 🚀 **[Setup](./docs/SETUP.md)** | Install, Android Gradle & mediation adapters, iOS CocoaPods, Kotlin and minSdk requirements, ATT. |
 | 📖 **[API reference](./docs/API.md)** | Every export, option, event and error code. |
-| 🔄 **[Migration](./docs/MIGRATION.md)** | 0.4.x → 0.5.0 upgrade steps and the verified version matrix. |
+| 🔄 **[Migration](./docs/MIGRATION.md)** | 0.5.0 → 0.6.0 and 0.4.x → 0.5.0 upgrade steps and validation limits. |
 | ❓ **[FAQ](./docs/FAQ.md)** | Build and runtime troubleshooting, privacy compliance, known platform gaps. |
 
-A runnable integration reference lives in [`example/ExampleHostApp`](./example) — it exercises
+A runnable integration reference lives in [`example/ExampleHostApp`](./example/ExampleHostApp) — it exercises
 initialize → load → callback → show → reload → cleanup for all six formats with a live event log.
 
 ---
@@ -67,27 +67,18 @@ npm install react-native-nap-ssp
 napSsp.mediations=admanager,adfit
 ```
 
-and make sure the app builds with Kotlin 2.1 or newer (React Native 0.79+ already does). On older
-React Native, set it in the top-level `android/build.gradle`:
+Check your host app’s Kotlin and Android build settings as described in [Setup](./docs/SETUP.md#3-3-kotlin-compatibility).
 
-```groovy
-buildscript {
-    ext {
-        kotlinVersion = "2.1.21"
-    }
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-    }
-}
-```
-
-**iOS** — add the subspecs for the adapters you use, then install:
+**iOS** — in the existing Podfile target, declare the local plugin and selected adapters before
+`use_native_modules!`, then install pods (adjust the path for hoisted dependencies):
 
 ```ruby
-# ios/Podfile
-pod 'NapSspPlugin/GAM'
-pod 'NapSspPlugin/AdFit'
+pod 'NapSspPlugin', :path => '../node_modules/react-native-nap-ssp',
+    :subspecs => ['GAM', 'AdFit']
+config = use_native_modules!
 ```
+
+See [Setup](./docs/SETUP.md#4-1-cocoapods) for details and validation limits.
 
 ```bash
 cd ios && pod install
@@ -99,12 +90,15 @@ Call this once, before requesting any ad. Every ad unit you will use must be reg
 privacy signals belong in this call — several networks read consent only when they start up.
 
 ```tsx
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform} from 'react-native';
 import {NapSspAd} from 'react-native-nap-ssp';
 
 export default function App() {
+  const [ready, setReady] = useState(false);
+
   useEffect(() => {
+    let active = true;
     (async () => {
       // iOS: resolve tracking permission before the first ad request.
       if (Platform.OS === 'ios') {
@@ -118,10 +112,13 @@ export default function App() {
         privacy: {childDirected: false},
         testMode: __DEV__, // Android only
       });
+      if (active) setReady(true);
     })().catch((error) => console.warn('nap mx init failed', error));
+    return () => { active = false; };
   }, []);
 
-  return <YourAppRoot />;
+  // YourAppRoot may render ads only after initialization succeeds.
+  return ready ? <YourAppRoot /> : null;
 }
 ```
 
@@ -130,7 +127,7 @@ export default function App() {
 
 ### 3. Show a banner
 
-The served size comes from the ad unit's server configuration; `size` is only a layout hint.
+Render this component only inside the initialized app tree above. The served size comes from the ad unit's server configuration; `size` is only a layout hint.
 
 ```tsx
 import {useRef} from 'react';
@@ -154,13 +151,16 @@ function Footer() {
 
 ### 4. Load and show an interstitial
 
+Render this screen only after initialization succeeds. This example loads one ad; load another after it closes to show again.
+
 ```tsx
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {Button} from 'react-native';
 import {InterstitialAd} from 'react-native-nap-ssp';
 
 function GameScreen() {
-  const adRef = useRef<InterstitialAd>();
+  const adRef = useRef<InterstitialAd | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const ad = new InterstitialAd('104703');
@@ -170,15 +170,25 @@ function GameScreen() {
       console.warn(error.code, error.message),
     );
 
-    ad.load().catch((error) => console.warn('load rejected', error.code));
+    let active = true;
+    ad.load().then(() => {
+      if (active) setReady(true);
+    }).catch((error) => console.warn('load rejected', error.code));
 
     return () => {
+      active = false;
+      adRef.current = null;
       unsubscribe();
       ad.destroy(); // cancels an in-flight load and releases the native ad
     };
   }, []);
 
-  return <Button title="Show ad" onPress={() => adRef.current?.show()} />;
+  return <Button title="Show ad" disabled={!ready} onPress={() => {
+    const ad = adRef.current;
+    if (!ad || !ready) return;
+    setReady(false);
+    ad.show().catch((error) => console.warn('show rejected', error.code));
+  }} />;
 }
 ```
 
@@ -188,14 +198,38 @@ when the whole waterfall fails. Event names are the short form — `loaded`, `lo
 
 ### 5. Reward a user
 
-Grant the reward from the `rewarded` event and reconcile it with your server using
-`transactionId`, which matches `transaction_id` on the S2S reward callback.
+After initialization succeeds, grant the reward from the `rewarded` event and reconcile it with your
+server using `transactionId`, which matches `transaction_id` on the S2S reward callback. Handle
+rejections and release the listener and ad when the owning screen unmounts. `show()` does not
+wait for the ad to close, so keep the listener active until cleanup:
 
 ```tsx
-const ad = new RewardedAd('103722', {customParams: {userId}});
-ad.addAdEventListener('rewarded', ({transactionId}) => grantReward(userId, transactionId));
-await ad.load();
-await ad.show();
+import {RewardedAd} from 'react-native-nap-ssp';
+
+// Call after initialization; userId and grantReward come from your app.
+function prepareRewardedAd(userId: string) {
+  const ad = new RewardedAd('103722', {customParams: {userId}});
+  const unsubscribe = ad.addAdEventListener('rewarded', ({transactionId}) =>
+    grantReward(userId, transactionId),
+  );
+
+  return {
+    async show() {
+      try {
+        await ad.load();
+        await ad.show();
+      } catch (error) {
+        console.warn('Rewarded ad failed', error);
+      }
+    },
+    // Call from the owning screen's unmount cleanup, not immediately after show().
+    cleanup() {
+      unsubscribe();
+      ad.destroy();
+    },
+  };
+}
+
 ```
 
 ---

@@ -1,5 +1,13 @@
 # Migration
 
+## 0.5.0 → 0.6.0
+
+- Android core moves to 2.5.1 and BOM to 2026.11.02; iOS Mediation moves to 2.6.1 or later within 2.x. Rebuild the native app after updating the package and dependencies.
+- On iOS, the base CocoaPod no longer selects mediation adapters. Declare the local plugin and selected subspecs before `use_native_modules!` in the Podfile and run `pod install`; see [Setup](./SETUP.md#4-1-cocoapods).
+- The unsupported standalone SPM manifest for this React Native bridge was removed. Install the bridge via CocoaPods.
+- Android native SDK error numbers changed. Avoid hard-coded numeric comparisons and use the documented string codes; inspect `nativeCode` only for diagnostics.
+- Validation for 0.6.0 covers TypeScript and JavaScript smoke tests. Android native compilation did not complete because the React Native AAR was unavailable during dependency download; iOS builds and device testing were not run. Verify your own native builds and ad flows.
+
 ## 0.4.x → 0.5.0
 
 0.5.0 fixes defects that changed behaviour, so the upgrade is not a drop-in. Work through the four
@@ -7,32 +15,11 @@ required steps below; everything after them is optional cleanup.
 
 ---
 
-### Required 1 — Kotlin 2.1+ in the host app
+### Required 1 — check Kotlin compatibility
 
-nap mx core `admixer-ssp:2.3.0` ships `kotlin-stdlib:2.2.10` (metadata 2.2.0). Kotlin 2.0 and older
-compilers cannot read it:
-
-```
-Class 'kotlin.Unit' was compiled with an incompatible version of Kotlin.
-The actual metadata version is 2.2.0, but the compiler version 2.0.21 can read versions up to 2.1.0.
-```
-
-| React Native | Template Kotlin | Action |
-| :--- | :--- | :--- |
-| 0.81+ | 2.1.20 | none |
-| 0.76 – 0.80 | 2.0.21 | set `kotlinVersion = "2.1.21"` |
-
-```groovy
-// android/build.gradle
-buildscript {
-    ext {
-        kotlinVersion = "2.1.21"
-    }
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-    }
-}
-```
+The plugin defaults to Kotlin 2.1.21. Check your host application's actual Kotlin and Gradle settings
+and resolved dependencies, then build the complete app. Earlier version-specific template claims have
+not been reverified; see [Kotlin compatibility](./SETUP.md#3-3-kotlin-compatibility).
 
 ### Required 2 — `compileSdk 35` and React Native 0.76+
 
@@ -43,7 +30,7 @@ Dependency 'io.github.nasmedia-tech:admixer-ssp:2.3.0' requires libraries and ap
 depend on it to compile against version 35 or later of the Android APIs.
 ```
 
-React Native 0.76 and newer already compile against 35 or 36. The package's
+Set the host app to compile against 35 or newer. The package's
 `peerDependencies` now require `react-native >= 0.76.0` for this reason.
 
 ### Required 3 — replace `napSsp.enableVendorSdk`
@@ -198,7 +185,7 @@ several SDK releases and the field was a no-op.
 | React Native | `>= 0.72` | **`>= 0.76`** |
 | React | `^18.2` | **`>= 18.2`** (React 19 supported) |
 | Android `compileSdk` | 34 | **35** |
-| Android Kotlin | 1.8+ | **2.1+** |
+| Android Kotlin | 1.8+ | Plugin default **2.1.21**; check host compatibility |
 | iOS deployment target | 14.0 | 14.0 |
 
 Every Android coordinate was checked against Maven Central and the
@@ -222,7 +209,7 @@ React Native 0.76+ already sets `minSdkVersion = 24`.
 
 ---
 
-## What was verified for this release
+## What was verified for 0.5.0
 
 | Check | Result |
 | :--- | :--- |

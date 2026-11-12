@@ -15,18 +15,10 @@ if linkage != nil
 end
 
 target 'ExampleHostApp' do
+  # Declare the local plugin before autolinking and select only the adapters in use.
+  pod 'NapSspPlugin', :path => '../node_modules/react-native-nap-ssp',
+      :subspecs => ['GAM', 'AdFit']
   config = use_native_modules!
-
-  # Autolinking adds the base `NapSspPlugin` pod. Mediation adapters are opt-in subspecs - add the
-  # ones your ad units actually sell, mirroring napSsp.mediations on Android.
-  # https://napmx.github.io/#/ios/native/getting-started
-  pod 'NapSspPlugin/GAM'     # Google Ad Manager
-  pod 'NapSspPlugin/AdFit'   # Kakao AdFit
-  # pod 'NapSspPlugin/Pangle'
-  # pod 'NapSspPlugin/AppLovin'
-  # pod 'NapSspPlugin/UnityAds'
-  # pod 'NapSspPlugin/NAM'   # Naver Ad Manager
-  # pod 'NapSspPlugin/Teads' # requires Xcode 26+
 
   use_react_native!(
     :path => config[:reactNativePath],

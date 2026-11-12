@@ -32,10 +32,11 @@ Autolinking picks the plugin up on both platforms. No manual registration is nee
 
 | Requirement | Version |
 | :--- | :--- |
-| React Native | 0.72 or newer |
+| React Native | 0.76 or newer (package peer dependency) |
 | React | 18.2 or newer |
 | Android `minSdk` | 21 (higher for some adapters — see below) |
-| Android Kotlin | **2.1 or newer** (see [Kotlin 요구사항](#kotlin-요구사항)) |
+| Android `compileSdk` | 35 or newer |
+| Android Kotlin | Plugin defaults to 2.1.21; check host compatibility (see [Kotlin compatibility](#3-3-kotlin-compatibility)) |
 | iOS deployment target | 14.0 |
 | Xcode | 16+ (26+ when using the Teads adapter) |
 
@@ -92,39 +93,38 @@ equivalent). The Gradle build prints the exact list for the adapters you enabled
 Google Ad Manager, AppLovin, Unity Ads and Naver Ad Manager resolve from `google()` and
 `mavenCentral()` alone.
 
-### 3-3. Kotlin 요구사항
+### 3-3. Kotlin compatibility
 
-**The host app must build with Kotlin 2.1 or newer.**
+The plugin's Gradle configuration defaults to Kotlin `2.1.21`; `napSsp.kotlinVersion` can
+override that version. Host projects can use different Gradle and Kotlin configurations, so inspect
+your actual host settings and resolved dependencies and build the complete app after upgrading. An
+incompatible Kotlin metadata error may require updating the host Kotlin plugin to a compatible version.
+For reference, the official React Native community templates specify Kotlin [2.0.21 for 0.79](https://raw.githubusercontent.com/react-native-community/template/0.79-stable/template/android/build.gradle) and [2.1.20 for 0.80](https://raw.githubusercontent.com/react-native-community/template/0.80-stable/template/android/build.gradle). Your project may differ.
 
-nap mx core `admixer-ssp:2.5.1` ships `kotlin-stdlib:2.2.10`, whose metadata version is 2.2.0. A
-Kotlin 2.0 or older compiler cannot read it and the build fails with:
+The previously documented React Native template version ranges and a universal minimum Kotlin version
+have not been verified for this SDK update; do not rely on them as a compatibility matrix.
 
-```
-Class 'kotlin.Unit' was compiled with an incompatible version of Kotlin.
-The actual metadata version is 2.2.0, but the compiler version 2.0.21 can read versions up to 2.1.0.
-```
-
-| React Native | Default Kotlin | Action |
-| :--- | :--- | :--- |
-| 0.79 and newer | 2.1.x | nothing to do |
-| 0.72 – 0.78 | 1.8 – 2.0 | pin Kotlin 2.1+ as below |
+The [official SDK guide](https://napmx.github.io/#/android/native/getting-started) reports testing
+Kotlin 2.1.0 and 2.2.10 with a Flutter host (AGP 8.10.1, Java 17, debug and release with R8) and
+recommends 2.2.10. This is not React Native validation. For a host using the Groovy `buildscript`
+pattern, update its existing `kotlinVersion` if compatibility requires it, for example:
 
 ```groovy
-// android/build.gradle (top level)
+// android/build.gradle (top level); retain the rest of your existing configuration
 buildscript {
     ext {
-        kotlinVersion = "2.1.21"
-        // ...existing ext values
+        kotlinVersion = "2.2.10"
     }
     dependencies {
-        classpath("com.android.tools.build:gradle")
-        classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
 }
 ```
 
-The plugin's own Kotlin version can be overridden with `napSsp.kotlinVersion` if you need to.
+Adapt this to your project's Gradle plugin configuration rather than adding a duplicate declaration.
+A previous 0.5.0 build reported `Class 'kotlin.Unit' was compiled with an incompatible version of
+Kotlin` using Kotlin 2.0.21 against metadata 2.2.0. That report is specific to that configuration;
+the 0.6.0 native build was not completed, so it does not establish a universal minimum for this release.
 
 The plugin compiles Java and Kotlin at **17** by default, matching React Native's JDK requirement.
 If your app compiles its modules at a different level, align the plugin with
@@ -195,23 +195,22 @@ over the plugin's copy at merge time.
 
 ### 4-1. CocoaPods
 
-Autolinking adds the base pod. Add a subspec per adapter you use. CocoaPods AdFit uses the 1.1.x
-adapter; its 2.x releases are SPM-only and require iOS 15 or later:
+The base pod has no adapters by default. For adapters, declare the local plugin once before
+`use_native_modules!` in your existing target so autolinking sees the same pod source. Choose only
+the subspecs you use. CocoaPods AdFit uses the 1.1.x adapter; its 2.x releases are SPM-only and
+require iOS 15 or later.
 
 ```ruby
-# ios/Podfile
-target 'YourApp' do
-  use_frameworks!
-
-  pod 'NapSspPlugin/GAM'        # Google Ad Manager
-  pod 'NapSspPlugin/AdFit'      # Kakao AdFit
-  pod 'NapSspPlugin/Pangle'
-  pod 'NapSspPlugin/AppLovin'
-  pod 'NapSspPlugin/UnityAds'
-  pod 'NapSspPlugin/NAM'        # Naver Ad Manager
-  pod 'NapSspPlugin/Teads'      # requires Xcode 26+
-end
+# ios/Podfile, inside your existing target, before use_native_modules!
+pod 'NapSspPlugin', :path => '../node_modules/react-native-nap-ssp',
+    :subspecs => ['GAM', 'AdFit']
+config = use_native_modules!
+# Keep the rest of your React Native Podfile configuration.
 ```
+
+Other adapter subspecs are `Pangle`, `AppLovin`, `UnityAds`, `NAM` and `Teads` (Teads requires
+Xcode 26+). Adjust the path if your dependency is hoisted. This Podfile pattern has not been
+validated with an iOS build for 0.6.0; verify `pod install` and the host build.
 
 ```bash
 cd ios && pod install --repo-update

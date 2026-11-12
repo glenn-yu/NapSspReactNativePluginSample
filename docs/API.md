@@ -44,8 +44,9 @@ interface NapSspConfig {
 }
 ```
 
-`mediaKey` and `adUnitIds` must be numeric strings — the plugin validates this in JS and rejects
-with the offending values named, because the native SDKs parse them as integers.
+`mediaKey` and `adUnitIds` should be numeric strings issued by the partner site. JavaScript checks
+that `mediaKey` is nonempty and validates the numeric `adUnitIds`; native validation may reject
+invalid configuration as well.
 
 Privacy and test settings passed here are applied **before** the SDK starts, which is what the
 network adapters require.
@@ -346,8 +347,9 @@ When a network SDK supplied the underlying error, it is in `details.underlyingCo
 
 ### `normalizeAdError(error, fallbackCode?): AdError`
 
-Coerces anything thrown by the bridge into an `AdError`. Applied automatically to the promises and
-events above; exported for your own error paths.
+Coerces an error into an `AdError`. SDK load/show failures and ad events use normalization; other
+paths, including initialization and unavailable-module errors, may reject with a different error.
+The helper is exported for your own error paths.
 
 ---
 

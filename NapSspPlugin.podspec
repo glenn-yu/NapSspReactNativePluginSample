@@ -31,7 +31,8 @@ Pod::Spec.new do |s|
   s.dependency 'AdMixerMediation', '>= 2.6.1', '< 3.0'
 
   # Mediation adapters are opt-in. Add the matching subspec to your Podfile, e.g.
-  #   pod 'NapSspPlugin/GAM'
+  #   pod 'NapSspPlugin', :path => '../node_modules/react-native-nap-ssp', :subspecs => ['GAM']
+  # Place this declaration before use_native_modules! in the target.
   # https://napmx.github.io/#/ios/native/getting-started
   s.default_subspecs = :none
   s.subspec 'GAM' do |ss|
