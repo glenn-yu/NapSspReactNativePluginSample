@@ -465,6 +465,14 @@ async function testNormalizeAdError() {
     message: 'boom',
   });
 
+  const nativeError = lib.normalizeAdError({
+    code: 'napssp_show_failed', message: 'show failed', phase: 'show',
+    details: { underlyingCode: 17, underlyingDomain: 'network' },
+  });
+  assert.strictEqual(nativeError.phase, 'show');
+  assert.strictEqual(nativeError.details.underlyingCode, 17);
+  assert.strictEqual(nativeError.details.underlyingDomain, 'network');
+
   const normalized = lib.normalizeAdError({ code: 'x', message: 'm', nativeCode: 7 });
   assert.strictEqual(normalized.code, 'x');
   assert.strictEqual(normalized.nativeCode, 7);

@@ -19,7 +19,7 @@ export function normalizeAdError(error: unknown, fallbackCode = 'nap_ssp_error')
 
     const details: Record<string, unknown> = {};
     if (maybeError.details && typeof maybeError.details === 'object') {
-      details.details = maybeError.details as Record<string, unknown>;
+      Object.assign(details, maybeError.details);
     }
     if (maybeError.userInfo && typeof maybeError.userInfo === 'object') {
       details.userInfo = maybeError.userInfo as Record<string, unknown>;

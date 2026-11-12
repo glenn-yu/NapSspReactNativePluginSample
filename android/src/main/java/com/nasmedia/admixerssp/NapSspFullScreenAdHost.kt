@@ -248,10 +248,11 @@ internal class NapSspFullScreenAdHost(
         ads[adUnitId]?.showing = false
         val payload = NapSspAdErrors.payload(adUnitId, format, code, message)
         showPromises.remove(adUnitId)?.reject(payload["code"] as String, payload["message"] as String)
-        markState(adUnitId, NapSspLoadState.FAILED)
+        val isReady = ads[adUnitId]?.ad?.isReady == true
+        markState(adUnitId, if (isReady) NapSspLoadState.LOADED else NapSspLoadState.FAILED)
         emitPayload(
             NapSspContracts.EVENT_AD_FAILED,
-            payload + mapOf("phase" to "show", "isReady" to (ads[adUnitId]?.ad?.isReady == true)),
+            payload + mapOf("phase" to "show", "isReady" to isReady),
         )
     }
 

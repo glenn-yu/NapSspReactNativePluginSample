@@ -1,7 +1,6 @@
 name: iOS validation
 on:
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
 jobs:
   ios:
     runs-on: macos-15

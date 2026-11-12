@@ -10,7 +10,6 @@ ios/Pods/
 ios/DerivedData/
 ios/*.xcresult
 ios/.build/
-ios/tests/
 
 # Security
 .npmrc

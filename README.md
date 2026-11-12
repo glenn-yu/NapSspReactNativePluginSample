@@ -15,6 +15,12 @@ Official native guides: [Android](https://napmx.github.io/#/android/) · [iOS](h
 
 ---
 
+## What's new in 0.6.2
+
+* Fix duplicate and cross-format full-screen events and harden ad load, cancellation and view lifecycles.
+* Surface Android inline presentation failures and track iOS full-screen loading state.
+* Device ad flows still require validation with your own app and configured ad units.
+
 ## What's new in 0.6.1
 
 * Correct CocoaPods adapter installation guidance and improve the initialization and upgrade examples.

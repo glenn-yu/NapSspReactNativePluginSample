@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.2 - 2026-11-12
+
+- Fix duplicate full-screen events and isolate events by ad format and ad unit.
+- Track iOS full-screen loads through cancel, destroy and replacement; discard late results and expose `isLoading()`.
+- Suppress stale inline callbacks, recover after reattachment, and allow explicit banner reload with `autoLoad=false`.
+- Forward Android inline presentation failures, preserve readiness information on full-screen failures and refresh per-request options.
+- Add regression checks for event routing and lifecycle handling.
+
+Validation: JavaScript smoke tests and request/listener regression tests passed. [Android library CI](https://github.com/glenn-yu/NapSspReactNativePluginSample/actions/runs/43156117080) and [iOS simulator app CI](https://github.com/glenn-yu/NapSspReactNativePluginSample/actions/runs/43156117120) passed for the native changes. Live ad delivery and reward flows still require device verification.
+
 ## 0.6.1 - 2026-11-12
 
 - Correct CocoaPods adapter setup and improve initialization, migration and troubleshooting documentation.
