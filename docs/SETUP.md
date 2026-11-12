@@ -124,7 +124,8 @@ buildscript {
 Adapt this to your project's Gradle plugin configuration rather than adding a duplicate declaration.
 A previous 0.5.0 build reported `Class 'kotlin.Unit' was compiled with an incompatible version of
 Kotlin` using Kotlin 2.0.21 against metadata 2.2.0. That report is specific to that configuration;
-the 0.6.0 native build was not completed, so it does not establish a universal minimum for this release.
+the local 0.6.0 native build did not complete because dependency download failed. A subsequent
+[CI run](https://github.com/glenn-yu/NapSspReactNativePluginSample/actions/runs/43151333114) built the Android library with GAM and AdFit at commit `3b02149`; it did not verify all adapters, a host APK or device flows. Neither result establishes a universal minimum for this release.
 
 The plugin compiles Java and Kotlin at **17** by default, matching React Native's JDK requirement.
 If your app compiles its modules at a different level, align the plugin with

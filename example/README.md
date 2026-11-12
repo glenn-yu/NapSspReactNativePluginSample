@@ -113,3 +113,5 @@ The Android results below refer to the previous SDK 2.3.0 integration, not the c
 | New Architecture | ⛔ not measured |
 
 Treat anything marked "not measured" as unverified — do your own smoke test before shipping.
+
+For 0.6.0, local Android compilation was blocked by a React Native AAR download failure. A subsequent [CI run](https://github.com/glenn-yu/NapSspReactNativePluginSample/actions/runs/43151333114) passed Android library `assembleDebug` at commit `3b02149` with GAM and AdFit. That run did not verify all seven adapters, a host APK or device flows; iOS builds and device flows were not tested for 0.6.0. The table above records the earlier 0.5.0 validation.

@@ -6,7 +6,7 @@
 - On iOS, the base CocoaPod no longer selects mediation adapters. Declare the local plugin and selected subspecs before `use_native_modules!` in the Podfile and run `pod install`; see [Setup](./SETUP.md#4-1-cocoapods).
 - The unsupported standalone SPM manifest for this React Native bridge was removed. Install the bridge via CocoaPods.
 - Android native SDK error numbers changed. Avoid hard-coded numeric comparisons and use the documented string codes; inspect `nativeCode` only for diagnostics.
-- Validation for 0.6.0 covers TypeScript and JavaScript smoke tests. Android native compilation did not complete because the React Native AAR was unavailable during dependency download; iOS builds and device testing were not run. Verify your own native builds and ad flows.
+- Validation for 0.6.0 covers TypeScript and JavaScript smoke tests. Local Android compilation did not complete because the React Native AAR was unavailable during dependency download. Subsequently, [CI](https://github.com/glenn-yu/NapSspReactNativePluginSample/actions/runs/43151333114) passed Android library `assembleDebug` at commit `3b02149` with the example GAM and AdFit configuration. That run did not verify all seven adapters, a host APK or device flows; iOS builds and device testing were not run. Verify your own native builds and ad flows.
 
 ## 0.4.x → 0.5.0
 

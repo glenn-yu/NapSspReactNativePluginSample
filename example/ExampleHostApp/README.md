@@ -29,4 +29,4 @@ cd ..
 npm run ios
 ```
 
-After changing plugin source, rebuild it with `npm run build` at the repository root and refresh the example's local dependency if necessary. Reinstall pods after native dependency changes and rebuild the native app. SDK initialization and ad delivery require valid configuration and network access; a no-fill response is possible. The 0.6.0 native builds and device flows have not been verified in this update.
+After changing plugin source, rebuild it with `npm run build` at the repository root and refresh the example's local dependency if necessary. Reinstall pods after native dependency changes and rebuild the native app. SDK initialization and ad delivery require valid configuration and network access; a no-fill response is possible. For 0.6.0, local Android compilation was blocked by a React Native AAR download failure; a subsequent [CI run](https://github.com/glenn-yu/NapSspReactNativePluginSample/actions/runs/43151333114) passed Android library `assembleDebug` at commit `3b02149` with GAM and AdFit. It did not verify all seven adapters, a host APK or device flows; iOS builds and device flows were not tested.

@@ -2,7 +2,7 @@
 
 ## 0.6.0 - 2026-11-12
 
-> Validation: TypeScript and JavaScript smoke tests pass. Android native compilation could not complete because the React Native AAR was unavailable during dependency download; iOS build and device testing were not run.
+> Validation: TypeScript and JavaScript smoke tests pass. Local Android native compilation could not complete because the React Native AAR was unavailable during dependency download. Subsequently, [CI](https://github.com/glenn-yu/NapSspReactNativePluginSample/actions/runs/43151333114) built the Android library with `assembleDebug` at commit `3b02149` using the example configuration (GAM and AdFit). The full seven-adapter configuration, host APK and device flows were not verified by that run; iOS build and device testing were not run.
 
 - Update Android core to 2.5.1 and BOM to 2026.11.02, with matching mediation adapters. Use the SDK-provided advertising identifier dependency. Android SDK native error numbers changed; rebuild and avoid hard-coded numeric comparisons.
 - Update iOS Mediation to 2.6.1 or later within the 2.x series, and make mediation adapters opt-in for the base pod.
