@@ -1,6 +1,8 @@
 name: iOS validation
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
 jobs:
   ios:
     runs-on: macos-15
@@ -24,6 +26,12 @@ jobs:
         working-directory: example/ExampleHostApp/ios
         env:
           RCT_NEW_ARCH_ENABLED: '0'
+      - name: Verify plugin bridge sources are in the Pods project
+        run: |
+          test -f ../node_modules/react-native-nap-ssp/ios/NapSspFullScreenRegistry.swift
+          grep -F 'NapSspFullScreenRegistry.swift' Pods/Pods.xcodeproj/project.pbxproj
+          grep -F 'NapSspBridge.m' Pods/Pods.xcodeproj/project.pbxproj
+        working-directory: example/ExampleHostApp/ios
       - name: Build iOS simulator app
         run: xcodebuild -workspace ExampleHostApp.xcworkspace -scheme ExampleHostApp -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
         working-directory: example/ExampleHostApp/ios
