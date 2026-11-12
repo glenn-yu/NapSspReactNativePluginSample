@@ -26,11 +26,10 @@ jobs:
         working-directory: example/ExampleHostApp/ios
         env:
           RCT_NEW_ARCH_ENABLED: '0'
-      - name: Verify plugin bridge sources are in the Pods project
+      - name: Verify plugin bridge sources are in the Pods target
         run: |
           test -f ../node_modules/react-native-nap-ssp/ios/NapSspFullScreenRegistry.swift
-          grep -F 'NapSspFullScreenRegistry.swift' Pods/Pods.xcodeproj/project.pbxproj
-          grep -F 'NapSspBridge.m' Pods/Pods.xcodeproj/project.pbxproj
+          bundle exec ruby -rxcodeproj -e 'p=Xcodeproj::Project.open("Pods/Pods.xcodeproj"); t=p.targets.find { |x| x.name == "NapSspPlugin" }; abort "Missing NapSspPlugin target" unless t; files=t.source_build_phase.files_references.map(&:path).compact; %w[NapSspFullScreenRegistry.swift NapSspBridge.m].each { |name| abort "Missing bridge source: #{name}" unless files.any? { |f| f.end_with?(name) } }; puts "NapSspPlugin bridge sources included"'
         working-directory: example/ExampleHostApp/ios
       - name: Build iOS simulator app
         run: xcodebuild -workspace ExampleHostApp.xcworkspace -scheme ExampleHostApp -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build

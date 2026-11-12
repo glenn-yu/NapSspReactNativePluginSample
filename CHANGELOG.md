@@ -3,7 +3,7 @@
 ## 0.6.2 - 2026-11-12
 
 - Fix duplicate full-screen events and isolate events by ad format and ad unit.
-- Track iOS full-screen loads through cancel, destroy and replacement; discard late results and expose `isLoading()`.
+- Ensure CocoaPods builds the iOS bridge for both core-only and adapter configurations. Track full-screen loads through cancel, destroy and replacement; discard late results and expose `isLoading()`.
 - Suppress stale inline callbacks, recover after reattachment, and allow explicit banner reload with `autoLoad=false`.
 - Forward Android inline presentation failures, preserve readiness information on full-screen failures and refresh per-request options.
 - Add regression checks for event routing and lifecycle handling.
