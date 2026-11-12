@@ -1,6 +1,7 @@
 package com.nasmedia.admixerssp
 
 import android.content.Context
+import com.facebook.react.bridge.UiThreadUtil
 import android.widget.FrameLayout
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.uimanager.ThemedReactContext
@@ -18,6 +19,7 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
     private var adListener: NapAdListener? = null
     private var currentState: NapSspLoadState = NapSspLoadState.IDLE
     private var attachedToWindow = false
+    private var generation = 0
 
     private val measureAndLayout = Runnable {
         measure(
@@ -93,9 +95,13 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
         val activityContext = (context as? ThemedReactContext)?.currentActivity ?: context
         val view = AMMVideoView(activityContext)
 
+        val listenerGeneration = generation
         val listener = NapAdListener(
+            dispatch = { callback -> UiThreadUtil.runOnUiThread { callback() } },
+            isActive = { generation == listenerGeneration && adView === view },
             onReceived = { _, _ -> handleReceived(unit) },
             onLoadFailed = { code, message -> handleFailure(unit, code, message) },
+            onShowFailed = { code, message -> handleFailure(unit, code, message, "show") },
             onDisplayed = { emitViewEvent(NapSspContracts.VIEW_EVENT_AD_IMPRESSION, unit) },
             onClicked = { emitViewEvent(NapSspContracts.VIEW_EVENT_AD_CLICKED, unit) },
             onCompleted = { emitViewEvent(NapSspContracts.VIEW_EVENT_AD_COMPLETED, unit) },
@@ -118,11 +124,12 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
         emitViewEvent(NapSspContracts.VIEW_EVENT_AD_LOADED, unit)
     }
 
-    private fun handleFailure(unit: String, code: Int, message: String?) {
-        if (isRetry && currentState == NapSspLoadState.LOADING && code == AdMixer.AX_ERR_NO_ADS) {
+    private fun handleFailure(unit: String, code: Int, message: String?, phase: String = "load") {
+        if (phase == "load" && isRetry && currentState == NapSspLoadState.LOADING && code == AdMixer.AX_ERR_NO_ADS) {
             currentState = NapSspLoadState.IDLE
             isRetry = false
-            post { reload() }
+            val retryGeneration = generation
+            post { if (generation == retryGeneration && attachedToWindow) reload() }
             return
         }
 
@@ -130,7 +137,7 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
         NapSspEventEmitter.emitViewEvent(
             this,
             NapSspContracts.VIEW_EVENT_AD_FAILED,
-            NapSspAdErrors.payload(unit, NapSspContracts.FORMAT_VIDEO, code, message),
+            NapSspAdErrors.payload(unit, NapSspContracts.FORMAT_VIDEO, code, message) + ("phase" to phase),
         )
     }
 
@@ -157,6 +164,9 @@ class NapSspVideoAdView(context: Context) : FrameLayout(context), LifecycleEvent
     }
 
     private fun release() {
+        generation++
+        removeCallbacks(measureAndLayout)
+        currentState = NapSspLoadState.IDLE
         adView?.let { view ->
             runCatching { view.setAdViewListener(null) }
             runCatching { view.onPause() }

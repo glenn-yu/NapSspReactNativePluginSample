@@ -33,6 +33,7 @@ internal object NapSspSdkBridge {
 
     private val bannerStates = ConcurrentHashMap<String, NapSspLoadState>()
     private val interstitialStates = ConcurrentHashMap<String, NapSspLoadState>()
+    private val interstitialVideoStates = ConcurrentHashMap<String, NapSspLoadState>()
     private val rewardedStates = ConcurrentHashMap<String, NapSspLoadState>()
 
     fun initialize(context: Context, rawConfig: NapSspConfig) {
@@ -127,6 +128,14 @@ internal object NapSspSdkBridge {
         interstitialStates.remove(adUnitId)
     }
 
+    fun markInterstitialVideoState(adUnitId: String, state: NapSspLoadState) {
+        interstitialVideoStates[adUnitId] = state
+    }
+
+    fun clearInterstitialVideo(adUnitId: String) {
+        interstitialVideoStates.remove(adUnitId)
+    }
+
     fun markRewardedState(adUnitId: String, state: NapSspLoadState) {
         rewardedStates[adUnitId] = state
     }
@@ -140,6 +149,7 @@ internal object NapSspSdkBridge {
         val runtime = linkedMapOf<String, Any?>(
             "bannerStates" to bannerStates.mapValues { it.value.name },
             "interstitialStates" to interstitialStates.mapValues { it.value.name },
+            "interstitialVideoStates" to interstitialVideoStates.mapValues { it.value.name },
             "rewardedStates" to rewardedStates.mapValues { it.value.name },
         )
 
@@ -168,6 +178,7 @@ internal object NapSspSdkBridge {
         testDeviceIds = emptyList()
         bannerStates.clear()
         interstitialStates.clear()
+        interstitialVideoStates.clear()
         rewardedStates.clear()
     }
 }

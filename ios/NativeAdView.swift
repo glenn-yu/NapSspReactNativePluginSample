@@ -26,6 +26,7 @@ final class NativeAdView: UIView {
   @objc var onAdClosed: RCTBubblingEventBlock?
   @objc var onAdImpression: RCTBubblingEventBlock?
 
+  private var loadGeneration: UInt64 = 0
   private var isLoading = false
   private var isLoaded = false
   private var didRegisterInitializeObserver = false
@@ -95,7 +96,10 @@ final class NativeAdView: UIView {
     }
 
     isLoading = true
-    let delegate = NapSspNativeDelegate(view: self, adUnitId: unit)
+    // Each SDK attempt has its own generation, including automatic retry.
+    loadGeneration &+= 1
+    let generation = loadGeneration
+    let delegate = NapSspNativeDelegate(view: self, adUnitId: unit, generation: generation)
     sdkDelegate = delegate
 
     let template = loadNativeAdViewFromNib() ?? makeProgrammaticNativeAdView()
@@ -106,24 +110,33 @@ final class NativeAdView: UIView {
       rootViewController: rootVC,
       nativeAdView: template
     ) { [weak self] container, adapterType, error in
-      guard let self else { return }
-      self.isLoading = false
+      DispatchQueue.main.async { [weak self] in
+        guard let self else {
+          container?.stop()
+          return
+        }
+        guard self.isActiveRequest(generation), self.isLoading else {
+          if let container, self.nativeAdContainer !== container { container.stop() }
+          return
+        }
+        self.isLoading = false
 
-      if let error {
-        self.emitFailure(adUnitId: unit, error: error)
-        return
+        if let error {
+          self.emitFailure(adUnitId: unit, error: error)
+          return
+        }
+        guard let container else {
+          self.emitFailure(adUnitId: unit, code: "napssp_empty_ad", message: "The SDK returned no native ad and no error.")
+          return
+        }
+
+        container.delegate = delegate
+        self.nativeAdContainer = container
+        self.attach(container)
+        self.isLoaded = true
+
+        self.onAdLoaded?(self.eventPayload(adUnitId: unit, extra: ["network": adapterType.adapterName]))
       }
-      guard let container else {
-        self.emitFailure(adUnitId: unit, code: "napssp_empty_ad", message: "The SDK returned no native ad and no error.")
-        return
-      }
-
-      container.delegate = delegate
-      self.nativeAdContainer = container
-      self.attach(container)
-      self.isLoaded = true
-
-      self.onAdLoaded?(self.eventPayload(adUnitId: unit, extra: ["network": adapterType.adapterName]))
     }
     #else
     emitFailure(
@@ -229,6 +242,8 @@ final class NativeAdView: UIView {
   #endif
 
   private func release() {
+    // Invalidate in-flight loads and delegate callbacks before detaching the old view.
+    loadGeneration &+= 1
     #if canImport(AdMixerMediation)
     nativeAdContainer?.stop()
     nativeAdContainer?.removeFromSuperview()
@@ -238,6 +253,10 @@ final class NativeAdView: UIView {
     subviews.forEach { $0.removeFromSuperview() }
     isLoading = false
     isLoaded = false
+  }
+
+  fileprivate func isActiveRequest(_ generation: UInt64) -> Bool {
+    loadGeneration == generation && window != nil
   }
 
   private func registerForInitializationNotifications() {
@@ -284,18 +303,26 @@ final class NativeAdView: UIView {
 private final class NapSspNativeDelegate: NSObject, AMMNativeDelegate {
   private weak var host: NativeAdView?
   private let adUnitId: String
+  private let generation: UInt64
 
-  init(view: NativeAdView, adUnitId: String) {
+  init(view: NativeAdView, adUnitId: String, generation: UInt64) {
     self.host = view
     self.adUnitId = adUnitId
+    self.generation = generation
   }
 
   func onSuccessShowNative() {
-    host?.emitImpression(adUnitId: adUnitId)
+    DispatchQueue.main.async { [weak self] in
+      guard let self, let host = self.host, host.isActiveRequest(self.generation) else { return }
+      host.emitImpression(adUnitId: self.adUnitId)
+    }
   }
 
   func onClickNative() {
-    host?.emitClick(adUnitId: adUnitId)
+    DispatchQueue.main.async { [weak self] in
+      guard let self, let host = self.host, host.isActiveRequest(self.generation) else { return }
+      host.emitClick(adUnitId: self.adUnitId)
+    }
   }
 }
 #endif

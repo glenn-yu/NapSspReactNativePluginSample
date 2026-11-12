@@ -47,60 +47,47 @@ export class TypedEventEmitter<TEvents extends Record<string, any>> {
  * Global event emitter to handle native events from RCTDeviceEventEmitter.
  */
 class GlobalEventEmitter extends TypedEventEmitter<any> {
-  private nativeEmitters = new Map<string, NativeEventEmitter>();
-  // One nativeEmitter subscription per module+event pair
-  private nativeSubscriptions = new Map<string, ReturnType<NativeEventEmitter['addListener']>>();
-  // Tracks event names registered before setup() was called, for retroactive subscription
+  // NativeEventEmitter listeners all share RCTDeviceEventEmitter, regardless of the module
+  // passed to its constructor. Keep one subscription per event, not per module.
+  private nativeEmitter?: NativeEventEmitter;
+  private readonly nativeSubscriptions = new Map<string, ReturnType<NativeEventEmitter['addListener']>>();
   private readonly registeredEventNames = new Set<string>();
 
   setup(nativeModuleName: string): void {
-    if (this.nativeEmitters.has(nativeModuleName)) {
+    if (this.nativeEmitter) {
       return;
     }
-
     const nativeModule = NativeModules[nativeModuleName];
     if (!nativeModule || typeof nativeModule.addListener !== 'function') {
       return;
     }
-
-    const emitter = new NativeEventEmitter(nativeModule);
-    this.nativeEmitters.set(nativeModuleName, emitter);
-
-    // Retroactively subscribe for events registered before this setup() call
+    this.nativeEmitter = new NativeEventEmitter(nativeModule);
     for (const eventName of this.registeredEventNames) {
-      const key = `${nativeModuleName}:${eventName}`;
-      if (!this.nativeSubscriptions.has(key)) {
-        const sub = emitter.addListener(eventName, (payload: any) => {
-          this.emit(eventName, payload);
-        });
-        this.nativeSubscriptions.set(key, sub);
-      }
+      this.subscribeNative(eventName);
     }
+  }
+
+  private subscribeNative(eventName: string): void {
+    if (!this.nativeEmitter || this.nativeSubscriptions.has(eventName)) {
+      return;
+    }
+    const subscription = this.nativeEmitter.addListener(eventName, (payload: any) => {
+      this.emit(eventName, payload);
+    });
+    this.nativeSubscriptions.set(eventName, subscription);
   }
 
   addListener(eventName: string, handler: EventHandler<any>): () => void {
     this.registeredEventNames.add(eventName);
     const cleanup = this.on(eventName, handler);
-
-    for (const [moduleName, emitter] of this.nativeEmitters.entries()) {
-      const key = `${moduleName}:${eventName}`;
-      if (!this.nativeSubscriptions.has(key)) {
-        const sub = emitter.addListener(eventName, (payload: any) => {
-          this.emit(eventName, payload);
-        });
-        this.nativeSubscriptions.set(key, sub);
-      }
-    }
+    this.subscribeNative(eventName);
 
     return () => {
       cleanup();
       if (!this.hasListeners(eventName)) {
-        for (const [key, sub] of this.nativeSubscriptions.entries()) {
-          if (key.endsWith(`:${eventName}`)) {
-            sub.remove();
-            this.nativeSubscriptions.delete(key);
-          }
-        }
+        this.registeredEventNames.delete(eventName);
+        this.nativeSubscriptions.get(eventName)?.remove();
+        this.nativeSubscriptions.delete(eventName);
       }
     };
   }

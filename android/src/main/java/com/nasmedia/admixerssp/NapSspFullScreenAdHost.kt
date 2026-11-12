@@ -29,8 +29,12 @@ internal class NapSspFullScreenAdHost(
         // AMMBannerView-style weak listener retention does not apply here, but keeping the strong
         // reference makes the teardown path explicit.
         var listener: NapAdListener?,
+        var showing: Boolean = false,
     )
 
+    @Volatile private var invalidated = false
+    // Only retained during the synchronous SDK show invocation; later failures remain events.
+    private val showPromises = ConcurrentHashMap<String, Promise>()
     private val ads = ConcurrentHashMap<String, Entry>()
     private val loadPromises = ConcurrentHashMap<String, Promise>()
     private val startPromises = ConcurrentHashMap<String, Promise>()
@@ -49,6 +53,11 @@ internal class NapSspFullScreenAdHost(
         runOnUi(promise) {
             val activity = requireActivity(promise) ?: return@runOnUi
 
+            if (ads[adUnitId]?.showing == true) {
+                promise.reject(NapSspAdErrors.NOT_READY, "An ad is already being presented for this adUnitId.")
+                return@runOnUi
+            }
+
             val reason = if (autoShow) "Superseded by start()" else "Superseded by load()"
             loadPromises.remove(adUnitId)?.reject(NapSspAdErrors.LOAD_CANCELLED, reason)
             startPromises.remove(adUnitId)?.reject(NapSspAdErrors.LOAD_CANCELLED, reason)
@@ -65,8 +74,8 @@ internal class NapSspFullScreenAdHost(
                 pending.remove(adUnitId)
                 markState(adUnitId, NapSspLoadState.LOADED)
                 if (autoShow) {
-                    markState(adUnitId, NapSspLoadState.SHOWN)
-                    ad.show(activity)
+                    present(adUnitId, ad, activity, promise)
+                    return@runOnUi
                 }
                 promise.resolve(null)
                 return@runOnUi
@@ -87,25 +96,23 @@ internal class NapSspFullScreenAdHost(
         runOnUi(promise) {
             val activity = requireActivity(promise) ?: return@runOnUi
             val ad = ads[adUnitId]?.ad
-            if (ad == null || !ad.isReady) {
+            if (ad == null || !ad.isReady || ads[adUnitId]?.showing == true) {
                 promise.reject(
                     NapSspAdErrors.NOT_READY,
                     "No ${format.replace('_', ' ')} ad is ready for adUnitId \"$adUnitId\". Await load() first.",
                 )
                 return@runOnUi
             }
-            markState(adUnitId, NapSspLoadState.SHOWN)
-            ad.show(activity)
-            promise.resolve(null)
+            present(adUnitId, ad, activity, promise)
         }
     }
 
     fun isLoaded(rawAdUnitId: String, promise: Promise) {
-        promise.resolve(ads[rawAdUnitId.trim()]?.ad?.isReady == true)
+        runOnUi(promise) { promise.resolve(ads[rawAdUnitId.trim()]?.ad?.isReady == true) }
     }
 
     fun isLoading(rawAdUnitId: String, promise: Promise) {
-        promise.resolve(ads[rawAdUnitId.trim()]?.ad?.isLoading == true)
+        runOnUi(promise) { promise.resolve(ads[rawAdUnitId.trim()]?.ad?.isLoading == true) }
     }
 
     /** Cancels an in-flight load. A showing ad is preserved (SDK no-ops when not loading). */
@@ -128,9 +135,9 @@ internal class NapSspFullScreenAdHost(
 
     fun destroy(rawAdUnitId: String, promise: Promise) {
         val adUnitId = rawAdUnitId.trim()
-        loadPromises.remove(adUnitId)?.reject(NapSspAdErrors.DESTROYED, "Destroyed before the load completed")
-        startPromises.remove(adUnitId)?.reject(NapSspAdErrors.DESTROYED, "Destroyed before the ad was shown")
         runOnUi(promise) {
+            loadPromises.remove(adUnitId)?.reject(NapSspAdErrors.DESTROYED, "Destroyed before the load completed")
+            startPromises.remove(adUnitId)?.reject(NapSspAdErrors.DESTROYED, "Destroyed before the ad was shown")
             release(ads.remove(adUnitId))
             clearState(adUnitId)
             promise.resolve(null)
@@ -138,20 +145,27 @@ internal class NapSspFullScreenAdHost(
     }
 
     fun invalidate() {
-        loadPromises.values.toList().forEach { it.reject(NapSspAdErrors.LOAD_CANCELLED, "React context invalidated") }
-        startPromises.values.toList().forEach { it.reject(NapSspAdErrors.LOAD_CANCELLED, "React context invalidated") }
-        loadPromises.clear()
-        startPromises.clear()
-
-        val pending = ads.values.toList()
-        ads.clear()
-        UiThreadUtil.runOnUiThread { pending.forEach(::release) }
+        invalidated = true
+        UiThreadUtil.runOnUiThread {
+            loadPromises.values.toList().forEach { it.reject(NapSspAdErrors.LOAD_CANCELLED, "React context invalidated") }
+            startPromises.values.toList().forEach { it.reject(NapSspAdErrors.LOAD_CANCELLED, "React context invalidated") }
+            loadPromises.clear()
+            startPromises.clear()
+            val pending = ads.values.toList()
+            ads.keys.toList().forEach(::clearState)
+            ads.clear()
+            pending.forEach(::release)
+        }
     }
 
     // ── internals ─────────────────────────────────────────────────────────────
 
     private fun obtain(adUnitId: String, activity: Activity, options: ReadableMap?): BaseInterstitialManager<*> {
-        ads[adUnitId]?.let { return it.ad }
+        ads[adUnitId]?.let {
+            if (it.ad.isReady || it.ad.isLoading || it.showing) return it.ad
+            // A fresh request must pick up its own options and current Activity.
+            release(ads.remove(adUnitId))
+        }
 
         val ad = createAd(activity)
         val builder = AdInfo.Builder(adUnitId)
@@ -160,15 +174,19 @@ internal class NapSspFullScreenAdHost(
         ad.setAdInfo(builder.build())
 
         val listener = NapAdListener(
-            onReceived = { _, _ -> handleReceived(adUnitId, activity) },
+            dispatch = { callback -> UiThreadUtil.runOnUiThread { callback() } },
+            isActive = { !invalidated && ads[adUnitId]?.ad === ad },
+            onReceived = { _, _ -> handleReceived(adUnitId) },
             onLoadFailed = { code, message -> handleLoadFailed(adUnitId, code, message) },
             onShowFailed = { code, message -> handleShowFailed(adUnitId, code, message) },
             onDisplayed = {
+                markState(adUnitId, NapSspLoadState.SHOWN)
                 emit(NapSspContracts.EVENT_AD_OPENED, adUnitId)
                 emit(NapSspContracts.EVENT_AD_IMPRESSION, adUnitId)
             },
             onClicked = { emit(NapSspContracts.EVENT_AD_CLICKED, adUnitId) },
             onClosed = {
+                ads[adUnitId]?.showing = false
                 markState(adUnitId, NapSspLoadState.IDLE)
                 emit(NapSspContracts.EVENT_AD_CLOSED, adUnitId)
             },
@@ -195,9 +213,9 @@ internal class NapSspFullScreenAdHost(
         return ad
     }
 
-    private fun handleReceived(adUnitId: String, activity: Activity) {
-        val entry = ads[adUnitId]
-        if (entry != null && !entry.ad.hasInterstitial) {
+    private fun handleReceived(adUnitId: String) {
+        val entry = ads[adUnitId] ?: return
+        if (!entry.ad.hasInterstitial) {
             // The waterfall completed but nothing was filled.
             handleLoadFailed(adUnitId, com.nasmedia.admixerssp.common.AdMixer.AX_ERR_NO_ADS, "No fill")
             return
@@ -208,9 +226,8 @@ internal class NapSspFullScreenAdHost(
 
         val startPromise = startPromises.remove(adUnitId)
         if (startPromise != null) {
-            markState(adUnitId, NapSspLoadState.SHOWN)
-            entry?.ad?.show(activity)
-            startPromise.resolve(null)
+            val activity = requireActivity(startPromise) ?: return
+            present(adUnitId, entry.ad, activity, startPromise)
             return
         }
         loadPromises.remove(adUnitId)?.resolve(null)
@@ -228,11 +245,26 @@ internal class NapSspFullScreenAdHost(
     }
 
     private fun handleShowFailed(adUnitId: String, code: Int, message: String?) {
+        ads[adUnitId]?.showing = false
+        val payload = NapSspAdErrors.payload(adUnitId, format, code, message)
+        showPromises.remove(adUnitId)?.reject(payload["code"] as String, payload["message"] as String)
         markState(adUnitId, NapSspLoadState.FAILED)
         emitPayload(
             NapSspContracts.EVENT_AD_FAILED,
-            NapSspAdErrors.payload(adUnitId, format, code, message) + ("phase" to "show"),
+            payload + mapOf("phase" to "show", "isReady" to (ads[adUnitId]?.ad?.isReady == true)),
         )
+    }
+
+    private fun present(adUnitId: String, ad: BaseInterstitialManager<*>, activity: Activity, promise: Promise) {
+        showPromises[adUnitId] = promise
+        ads[adUnitId]?.showing = true
+        try {
+            ad.show(activity)
+            // Preserve the public invocation-complete contract while honoring synchronous failure.
+            showPromises.remove(adUnitId)?.resolve(null)
+        } catch (error: Throwable) {
+            handleShowFailed(adUnitId, AdMixer.AX_ERR_SHOW_FAILED, error.message ?: error.toString())
+        }
     }
 
     private fun release(entry: Entry?) {
@@ -260,11 +292,12 @@ internal class NapSspFullScreenAdHost(
 
     private fun requireActivity(promise: Promise): Activity? {
         val activity = reactContext.currentActivity
-        if (activity == null) {
+        if (activity == null || activity.isFinishing || activity.isDestroyed) {
             promise.reject(
                 NapSspAdErrors.ACTIVITY_REQUIRED,
                 "Full-screen ads need a foreground Activity. Retry once the app is resumed.",
             )
+            return null
         }
         return activity
     }
@@ -272,8 +305,14 @@ internal class NapSspFullScreenAdHost(
     private inline fun runOnUi(promise: Promise, crossinline block: () -> Unit) {
         UiThreadUtil.runOnUiThread {
             try {
+                if (invalidated) {
+                    promise.reject(NapSspAdErrors.DESTROYED, "React context invalidated")
+                    return@runOnUiThread
+                }
                 block()
             } catch (error: Throwable) {
+                loadPromises.entries.removeAll { it.value === promise }
+                startPromises.entries.removeAll { it.value === promise }
                 promise.reject(NapSspAdErrors.LOAD_FAILED, error.message ?: error.toString(), error)
             }
         }
@@ -289,6 +328,7 @@ internal class NapSspFullScreenAdHost(
 
     private fun markState(adUnitId: String, state: NapSspLoadState) {
         when (format) {
+            NapSspContracts.FORMAT_INTERSTITIAL_VIDEO -> NapSspSdkBridge.markInterstitialVideoState(adUnitId, state)
             NapSspContracts.FORMAT_REWARDED -> NapSspSdkBridge.markRewardedState(adUnitId, state)
             else -> NapSspSdkBridge.markInterstitialState(adUnitId, state)
         }
@@ -296,6 +336,7 @@ internal class NapSspFullScreenAdHost(
 
     private fun clearState(adUnitId: String) {
         when (format) {
+            NapSspContracts.FORMAT_INTERSTITIAL_VIDEO -> NapSspSdkBridge.clearInterstitialVideo(adUnitId)
             NapSspContracts.FORMAT_REWARDED -> NapSspSdkBridge.clearRewarded(adUnitId)
             else -> NapSspSdkBridge.clearInterstitial(adUnitId)
         }

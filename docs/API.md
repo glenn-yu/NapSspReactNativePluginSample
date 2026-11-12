@@ -182,19 +182,20 @@ const ad = new InterstitialAd(adUnitId, options?);
 | Method | Description |
 | :--- | :--- |
 | `load(): Promise<void>` | Requests an ad. Resolves on fill, rejects with an `AdError` when the waterfall is exhausted. |
-| `show(): Promise<void>` | Presents a loaded ad. Rejects when nothing is ready. |
+| `show(): Promise<void>` | Requests presentation. The promise does not wait for the ad to close; later presentation failures arrive as `loadFailed` with `phase: "show"`. |
 | `start(): Promise<void>` | `load()` then present as soon as the ad arrives. |
 | `isLoaded(): boolean` | Last known readiness from the native events. Synchronous, safe during render. |
 | `isReady(): Promise<boolean>` | Asks the SDK directly. |
 | `isLoading(): Promise<boolean>` | Whether a load is still in flight. |
-| `cancelLoad(): Promise<void>` | Cancels an in-flight load. A showing ad is left alone. |
+| `cancelLoad(): Promise<void>` | Invalidates an in-flight load. A ready or showing ad is left alone. On iOS the SDK has no cancellation handle before completion, so late results are discarded. |
 | `addAdEventListener(event, handler): () => void` | Subscribe. Returns an unsubscribe function. |
 | `destroy(): void` | Releases the native ad and every listener. The instance cannot be reused. |
 
 Always `destroy()` on unmount — that is what releases the native ad and the server config listener.
 
-> The native side keeps **one ad per ad unit ID**. Two JS instances built for the same ad unit share
-> it: both receive the events, and `destroy()` on either releases it. Use one instance per ad unit.
+> The native side keeps **one ad per format and ad unit ID**. Two JS instances of the same format
+> and ad unit share it: both receive events, and `destroy()` on either releases it. Use one instance
+> per format and ad unit. Older native payloads without a format cannot be disambiguated when IDs are reused.
 
 ```ts
 useEffect(() => {
@@ -252,10 +253,11 @@ Inline views deliver these through props (`onAdLoaded`, `onAdFailedToLoad`, …)
 > `skipped` never fires on iOS for the two full-screen video formats —
 > `AMMRewardVideoDelegate` and `AMMVideoInterstitialDelegate` have no skip callback.
 
-A **show-phase** failure (the ad loaded but could not be presented) also arrives as `loadFailed`,
-but it does not clear `isLoaded()` — the loaded ad is still there. Android reports it with
-an SDK-specific error code such as `nap_ssp_show_failed` / `AX_ERR_SHOW_FAILED`; iOS uses
-`napssp_show_failed` (`-5`).
+A **show-phase** failure also arrives as `loadFailed`, with `phase: "show"`. Readiness depends on
+the SDK and platform: `isLoaded()` follows the native readiness reported with that event. On iOS
+the failed ad is removed; use `isReady()` when you need to query the SDK directly. A failure may
+arrive after the `show()` promise resolves. Android reports an SDK-specific code such as
+`nap_ssp_show_failed` / `AX_ERR_SHOW_FAILED`; iOS uses `napssp_show_failed` (`-5`).
 
 ### `RewardPayload`
 
@@ -282,6 +284,7 @@ on your own server.
 interface AdError {
   code: string;                    // stable cross-platform code
   message: string;
+  phase?: 'load' | 'show';         // when supplied by native code
   nativeCode?: number | string;    // raw SDK code
   nativeDomain?: string;           // iOS: the ad view class that failed
   details?: Record<string, unknown>;

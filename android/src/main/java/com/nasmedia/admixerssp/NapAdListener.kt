@@ -16,6 +16,8 @@ import com.nasmedia.admixerssp.common.core.AdNetworkType
  * as long as the ad view lives.
  */
 internal open class NapAdListener(
+    private val dispatch: (() -> Unit) -> Unit = { it() },
+    private val isActive: () -> Boolean = { true },
     private val onReceived: (network: AdNetworkType, ad: Any) -> Unit = { _, _ -> },
     private val onLoadFailed: (code: Int, message: String?) -> Unit = { _, _ -> },
     private val onShowFailed: (code: Int, message: String?) -> Unit = { _, _ -> },
@@ -28,30 +30,30 @@ internal open class NapAdListener(
 ) : AdListener() {
 
     override fun onReceivedAd(networkType: AdNetworkType, adView: Any) {
-        onReceived(networkType, adView)
+        dispatch { if (isActive()) onReceived(networkType, adView) }
     }
 
     override fun onFailedToReceiveAd(errorCode: Int, errorMsg: String?) {
-        onLoadFailed(errorCode, errorMsg)
+        dispatch { if (isActive()) onLoadFailed(errorCode, errorMsg) }
     }
 
     override fun onAdShowFailed(adView: Any?, networkType: AdNetworkType, errorCode: Int, errorMsg: String?) {
-        onShowFailed(errorCode, errorMsg)
+        dispatch { if (isActive()) onShowFailed(errorCode, errorMsg) }
     }
 
-    override fun onAdDisplayed() = onDisplayed()
+    override fun onAdDisplayed() { dispatch { if (isActive()) onDisplayed() } }
 
-    override fun onAdClicked() = onClicked()
+    override fun onAdClicked() { dispatch { if (isActive()) onClicked() } }
 
-    override fun onAdClosed() = onClosed()
+    override fun onAdClosed() { dispatch { if (isActive()) onClosed() } }
 
-    override fun onAdCompleted() = onCompleted()
+    override fun onAdCompleted() { dispatch { if (isActive()) onCompleted() } }
 
-    override fun onAdSkipped() = onSkipped()
+    override fun onAdSkipped() { dispatch { if (isActive()) onSkipped() } }
 
     // The SDK only calls the RewardInfo overload (its default impl delegates to the no-arg one),
     // so overriding this single method guarantees exactly one reward notification.
     override fun onAdRewarded(info: RewardInfo) {
-        onRewarded(info.transactionId)
+        dispatch { if (isActive()) onRewarded(info.transactionId) }
     }
 }

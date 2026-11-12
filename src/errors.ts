@@ -5,6 +5,7 @@ export function normalizeAdError(error: unknown, fallbackCode = 'nap_ssp_error')
     const maybeError = error as {
       code?: unknown;
       message?: unknown;
+      phase?: unknown;
       nativeCode?: unknown;
       nativeDomain?: unknown;
       details?: unknown;
@@ -27,6 +28,7 @@ export function normalizeAdError(error: unknown, fallbackCode = 'nap_ssp_error')
     return {
       code: typeof maybeError.code === 'string' ? maybeError.code : fallbackCode,
       message,
+      phase: maybeError.phase === 'load' || maybeError.phase === 'show' ? maybeError.phase : undefined,
       nativeCode: typeof maybeError.nativeCode === 'string' || typeof maybeError.nativeCode === 'number' ? maybeError.nativeCode : undefined,
       nativeDomain: typeof maybeError.nativeDomain === 'string' ? maybeError.nativeDomain : undefined,
       details: Object.keys(details).length > 0 ? details : undefined,

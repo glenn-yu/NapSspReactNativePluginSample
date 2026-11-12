@@ -11,7 +11,7 @@ const originalLoad = Module._load;
 
 // ── react-native mock ────────────────────────────────────────────────────────
 
-/** Native event listeners, keyed by `moduleName:eventName`. */
+/** NativeEventEmitter listeners share one global RCTDeviceEventEmitter bus. */
 const nativeListeners = new Map();
 /** Every native method call, so the test can assert on what reached the bridge. */
 const calls = [];
@@ -25,7 +25,7 @@ function callsTo(moduleName, method) {
 }
 
 function emitNative(moduleName, eventName, payload) {
-  const handlers = nativeListeners.get(`${moduleName}:${eventName}`) ?? [];
+  const handlers = nativeListeners.get(eventName) ?? [];
   handlers.forEach((handler) => handler(payload));
 }
 
@@ -98,7 +98,7 @@ const mockReactNative = {
     }
 
     addListener(eventName, handler) {
-      const key = `${this.moduleName}:${eventName}`;
+      const key = eventName;
       const handlers = nativeListeners.get(key) ?? [];
       handlers.push(handler);
       nativeListeners.set(key, handlers);
@@ -172,6 +172,54 @@ async function testInitializeValidation() {
   );
 }
 
+async function testListenersBeforeSetup() {
+  const { globalEvents } = require('../lib/events');
+  const removed = globalEvents.addListener('unusedBeforeSetup', () => assert.fail('removed listener fired'));
+  removed();
+  const ad = new lib.RewardedAd('before-setup');
+  let count = 0;
+  ad.addAdEventListener('rewarded', () => count++);
+  globalEvents.setup('missingModule');
+  assert.strictEqual(nativeListeners.get('onRewarded')?.length ?? 0, 0);
+  globalEvents.setup('NapSspModule');
+  globalEvents.setup('NapSspRewarded');
+  assert.strictEqual(nativeListeners.get('unusedBeforeSetup')?.length ?? 0, 0);
+  assert.strictEqual(nativeListeners.get('onRewarded').length, 1);
+  emitNative('NapSspRewarded', 'onRewarded', { adUnitId: 'before-setup', format: 'rewarded' });
+  assert.strictEqual(count, 1);
+  ad.destroy();
+  assert.strictEqual(nativeListeners.get('onRewarded').length, 0);
+}
+
+async function testGlobalEventRouting() {
+  const interstitial = new lib.InterstitialAd('shared');
+  const rewarded = new lib.RewardedAd('shared');
+  const video = new lib.InterstitialVideoAd('shared');
+  const counts = { interstitial: 0, rewarded: 0, video: 0, reward: 0 };
+  interstitial.addAdEventListener('loaded', () => counts.interstitial++);
+  rewarded.addAdEventListener('loaded', () => counts.rewarded++);
+  video.addAdEventListener('loaded', () => counts.video++);
+  rewarded.addAdEventListener('rewarded', () => counts.reward++);
+  assert.strictEqual(nativeListeners.get('onAdLoaded').length, 1);
+  for (const format of ['interstitial', 'rewarded', 'interstitial_video']) {
+    emitNative('ignored', 'onAdLoaded', { adUnitId: 'shared', format });
+  }
+  emitNative('ignored', 'onRewarded', { adUnitId: 'shared', format: 'rewarded' });
+  assert.deepStrictEqual(counts, { interstitial: 1, rewarded: 1, video: 1, reward: 1 });
+  interstitial.destroy();
+  rewarded.destroy();
+  video.destroy();
+  assert.strictEqual(nativeListeners.get('onAdLoaded').length, 0);
+  const again = new lib.InterstitialAd('shared');
+  let seen = 0;
+  again.addAdEventListener('loaded', () => seen++);
+  // Older native versions may omit format; retain delivery for those payloads.
+  emitNative('ignored', 'onAdLoaded', { adUnitId: 'shared' });
+  assert.strictEqual(seen, 1);
+  again.destroy();
+  assert.strictEqual(nativeListeners.get('onAdLoaded').length, 0);
+}
+
 async function testInitialize() {
   const status = await lib.NapSspAd.initialize({
     mediaKey: '9001',
@@ -239,6 +287,7 @@ async function testInterstitialLifecycle() {
 
   await ad.show();
   emitNative('NapSspInterstitial', 'onAdOpened', { adUnitId: '1000001' });
+  assert.strictEqual(ad.isLoaded(), false);
   emitNative('NapSspInterstitial', 'onAdClosed', { adUnitId: '1000001' });
   assert.strictEqual(ad.isLoaded(), false);
   assert.deepStrictEqual(seen, ['loaded', 'opened', 'closed']);
@@ -277,6 +326,20 @@ async function testShowPhaseFailureKeepsLoadedState() {
   assert.strictEqual(errors.length, 1);
   assert.strictEqual(errors[0].code, 'nap_ssp_show_failed');
   assert.strictEqual(errors[0].nativeCode, -5);
+
+  // If native discarded the ad on show failure, JS readiness must follow native state.
+  emitNative('NapSspInterstitial', 'onAdFailedToLoad', {
+    adUnitId: '1000003', format: 'interstitial', phase: 'show', isReady: false,
+    code: 'nap_ssp_show_failed', message: 'ad discarded',
+  });
+  assert.strictEqual(ad.isLoaded(), false);
+  assert.strictEqual(errors.at(-1).phase, 'show');
+  emitNative('NapSspInterstitial', 'onAdLoaded', { adUnitId: '1000003', format: 'interstitial' });
+  emitNative('NapSspInterstitial', 'onAdFailedToLoad', {
+    adUnitId: '1000003', format: 'interstitial', phase: 'show', isReady: true,
+    code: 'nap_ssp_show_failed', message: 'ad still ready',
+  });
+  assert.strictEqual(ad.isLoaded(), true);
 
   // A load failure does clear it.
   emitNative('NapSspInterstitial', 'onAdFailedToLoad', {
@@ -341,6 +404,43 @@ async function testCancelKeepsReadyAd() {
   }
 }
 
+async function testDestroyedAdDoesNotRegainReadiness() {
+  const ad = new lib.InterstitialAd('1000011');
+  const native = mockReactNative.NativeModules.NapSspInterstitial;
+  const original = native.isLoaded;
+  let resolveReady;
+  native.isLoaded = () => new Promise((resolve) => { resolveReady = resolve; });
+  try {
+    const pending = ad.isReady();
+    ad.destroy();
+    resolveReady(true);
+    assert.strictEqual(await pending, false);
+    assert.strictEqual(ad.isLoaded(), false);
+  } finally {
+    native.isLoaded = original;
+    ad.destroy();
+  }
+}
+
+async function testCancelReadinessDoesNotResurrectDestroyedAd() {
+  const ad = new lib.InterstitialAd('1000012');
+  const native = mockReactNative.NativeModules.NapSspInterstitial;
+  const original = native.isLoaded;
+  let resolveReady;
+  native.isLoaded = () => new Promise((resolve) => { resolveReady = resolve; });
+  try {
+    const pending = ad.cancelLoad();
+    await Promise.resolve(); // Let cancellation reach the deferred readiness query.
+    ad.destroy();
+    resolveReady(true);
+    await pending;
+    assert.strictEqual(ad.isLoaded(), false);
+  } finally {
+    native.isLoaded = original;
+    ad.destroy();
+  }
+}
+
 async function testAdUnitIdValidation() {
   assert.throws(() => new lib.InterstitialAd(''), /non-empty adUnitId/);
   assert.throws(() => new lib.RewardedAd('   '), /non-empty adUnitId/);
@@ -374,13 +474,17 @@ async function main() {
   const tests = [
     testExports,
     testInitializeValidation,
+    testListenersBeforeSetup,
     testInitialize,
+    testGlobalEventRouting,
     testPrivacyAndTestMode,
     testInterstitialLifecycle,
     testShowPhaseFailureKeepsLoadedState,
     testRewardedPayload,
     testCancelLoad,
     testCancelKeepsReadyAd,
+    testDestroyedAdDoesNotRegainReadiness,
+    testCancelReadinessDoesNotResurrectDestroyedAd,
     testAdUnitIdValidation,
     testInlineViews,
     testNormalizeAdError,

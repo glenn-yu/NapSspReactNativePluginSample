@@ -1,0 +1,32 @@
+name: iOS validation
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.4
+          cache: npm
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: example/ExampleHostApp
+      - run: npm install && npm run build
+      - run: npm install
+        working-directory: example/ExampleHostApp
+      - name: Install CocoaPods
+        run: bundle exec pod install
+        working-directory: example/ExampleHostApp/ios
+        env:
+          RCT_NEW_ARCH_ENABLED: '0'
+      - name: Build iOS simulator app
+        run: xcodebuild -workspace ExampleHostApp.xcworkspace -scheme ExampleHostApp -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+        working-directory: example/ExampleHostApp/ios
+        env:
+          RCT_NEW_ARCH_ENABLED: '0'

@@ -16,7 +16,7 @@ export interface NativeFullScreenAdModule<TOptions> {
 /**
  * Shared behaviour for the three full-screen formats.
  *
- * Native events are broadcast per module, so every instance filters on its own `adUnitId`.
+ * Native events share a global bus, so instances filter by ad unit and format.
  */
 export abstract class FullScreenAd<
   TEventMap extends InterstitialAdEventMap,
@@ -83,7 +83,8 @@ export abstract class FullScreenAd<
     eventNames.forEach((eventName) => {
       const cleanup = globalEvents.addListener(eventName, (raw: unknown) => {
         const payload = (raw ?? {}) as Record<string, unknown>;
-        if (payload.adUnitId !== this.adUnitId) {
+        if (payload.adUnitId !== this.adUnitId ||
+            (payload.format != null && payload.format !== this.errorPrefix)) {
           return;
         }
 
@@ -93,13 +94,17 @@ export abstract class FullScreenAd<
             this.emitter.emit('loaded' as keyof TEventMap, undefined as never);
             return;
           case 'onAdFailedToLoad':
-            // A show-phase failure does not invalidate a still-loaded ad.
+            // A show failure may leave the ad ready on one platform and discard it on another.
+            // Native includes its current readiness when available; preserve legacy behavior if absent.
             if (payload.phase !== 'show') {
               this._loaded = false;
+            } else if (typeof payload.isReady === 'boolean') {
+              this._loaded = payload.isReady;
             }
             this.emitter.emit('loadFailed' as keyof TEventMap, normalizeAdError(payload) as never);
             return;
           case 'onAdOpened':
+            this._loaded = false;
             this.emitter.emit('opened' as keyof TEventMap, undefined as never);
             return;
           case 'onAdClosed':
@@ -195,6 +200,9 @@ export abstract class FullScreenAd<
       return false;
     }
     const ready = await this.module().isLoaded?.(this.adUnitId);
+    if (this._destroyed) {
+      return false;
+    }
     if (typeof ready === 'boolean') {
       this._loaded = ready;
       return ready;
@@ -220,7 +228,7 @@ export abstract class FullScreenAd<
       await nativeModule?.cancelLoad?.(this.adUnitId);
       // A completed ad may survive cancellation; synchronize with the native SDK.
       const ready = await nativeModule?.isLoaded?.(this.adUnitId);
-      if (typeof ready === 'boolean') {
+      if (!this._destroyed && typeof ready === 'boolean') {
         this._loaded = ready;
       }
     } catch {

@@ -18,6 +18,7 @@ RCT_EXTERN_METHOD(load:(NSString *)adUnitId options:(NSDictionary *)options reso
 RCT_EXTERN_METHOD(start:(NSString *)adUnitId options:(NSDictionary *)options resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(show:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(isLoaded:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(isLoading:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(cancelLoad:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(destroy:(NSString *)adUnitId)
 @end
@@ -27,6 +28,7 @@ RCT_EXTERN_METHOD(load:(NSString *)adUnitId options:(NSDictionary *)options reso
 RCT_EXTERN_METHOD(start:(NSString *)adUnitId options:(NSDictionary *)options resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(show:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(isLoaded:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(isLoading:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(cancelLoad:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(destroy:(NSString *)adUnitId)
 @end
@@ -36,6 +38,7 @@ RCT_EXTERN_METHOD(load:(NSString *)adUnitId options:(NSDictionary *)options reso
 RCT_EXTERN_METHOD(start:(NSString *)adUnitId options:(NSDictionary *)options resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(show:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(isLoaded:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(isLoading:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(cancelLoad:(NSString *)adUnitId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(destroy:(NSString *)adUnitId)
 @end
