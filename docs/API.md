@@ -253,7 +253,8 @@ Inline views deliver these through props (`onAdLoaded`, `onAdFailedToLoad`, …)
 
 A **show-phase** failure (the ad loaded but could not be presented) also arrives as `loadFailed`,
 but it does not clear `isLoaded()` — the loaded ad is still there. Android reports it with
-`nap_ssp_show_failed` / `AX_ERR_ADAPTER`, iOS with `napssp_show_failed` (`-5`).
+an SDK-specific error code such as `nap_ssp_show_failed` / `AX_ERR_SHOW_FAILED`; iOS uses
+`napssp_show_failed` (`-5`).
 
 ### `RewardPayload`
 
@@ -288,7 +289,8 @@ interface AdError {
 
 ### Android codes
 
-`nativeCode` is an `AdMixer.AX_ERR_*` integer.
+`nativeCode` is an `AdMixer.AX_ERR_*` integer. Android SDK 2.5 changed several numeric
+values: rebuild the app and use the string `code` instead of hard-coded native numbers.
 
 | `code` | Native | Meaning |
 | :--- | :--- | :--- |
@@ -299,13 +301,17 @@ interface AdError {
 | `nap_ssp_no_adapter` | `AX_ERR_NO_ADAPTER` | The selected adapter cannot serve this format. |
 | `nap_ssp_adapter_error` | `AX_ERR_ADAPTER` | Adapter-internal failure — read `message`. |
 | `nap_ssp_timeout` | `AX_ERR_TIMEOUT` | Load or show timed out. |
-| `nap_ssp_invalid_request` | `AX_ERR_INVALID_REQUEST` | Malformed request parameter. |
-| `nap_ssp_network_error` | `AX_ERR_NETWORK` | Network failure. |
+| `nap_ssp_ad_not_ready` | `AX_ERR_NOT_READY` | The ad is not ready to show. |
+| `nap_ssp_activity_required` | `AX_ERR_PRESENTER_UNAVAILABLE` | No presenter is available. |
+| `nap_ssp_show_failed` | `AX_ERR_SHOW_FAILED` | Presentation failed. |
+| `nap_ssp_background` | `AX_ERR_BACKGROUND` | The app is in the background. |
+| `nap_ssp_load_cancelled` | `AX_ERR_CANCELLED` | The load was cancelled. |
 
 Mediation absorbs per-network failures, so a single `nap_ssp_no_ads` usually stands in for several
 adapter errors. The network's own code and message are in `message`, not `nativeCode`.
 
-Do not branch on `AX_ERR_NO_FILL` — the SDK never sends it.
+The SDK documents `AX_ERR_NO_FILL`, `AX_ERR_INVALID_REQUEST`, and `AX_ERR_NETWORK` as internal
+constants that are not sent to app callbacks.
 
 ### iOS codes
 

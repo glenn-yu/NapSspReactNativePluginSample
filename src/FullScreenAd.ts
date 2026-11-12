@@ -218,10 +218,14 @@ export abstract class FullScreenAd<
     const nativeModule = getNativeModuleFromNames<NativeFullScreenAdModule<TOptions>>(this.moduleNames);
     try {
       await nativeModule?.cancelLoad?.(this.adUnitId);
+      // A completed ad may survive cancellation; synchronize with the native SDK.
+      const ready = await nativeModule?.isLoaded?.(this.adUnitId);
+      if (typeof ready === 'boolean') {
+        this._loaded = ready;
+      }
     } catch {
       // A cancel that races the load completing is not an error worth surfacing.
     }
-    this._loaded = false;
   }
 
   addAdEventListener<K extends keyof TEventMap>(

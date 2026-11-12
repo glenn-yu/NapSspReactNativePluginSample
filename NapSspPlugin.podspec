@@ -17,7 +17,6 @@ Pod::Spec.new do |s|
   s.preserve_paths = 'ios/**/*', 'LICENSE', 'README.md'
   s.source_files = 'ios/**/*.{h,m,swift}'
   s.resources    = 'ios/**/*.xib'
-  s.exclude_files = 'ios/Package.swift'
   s.swift_version = '5.9'
   s.frameworks = 'Foundation', 'UIKit', 'AdSupport', 'StoreKit'
   s.weak_frameworks = 'AppTrackingTransparency'
@@ -28,12 +27,13 @@ Pod::Spec.new do |s|
   }
 
   s.dependency 'React-Core'
-  # Core SDK — unpinned so `pod update` picks up the latest 2.x. Verified against 2.5.0.
-  s.dependency 'AdMixerMediation'
+  # Mediation 2.6.1 pulls in AdMixer Core >= 1.5.1.
+  s.dependency 'AdMixerMediation', '>= 2.6.1', '< 3.0'
 
   # Mediation adapters are opt-in. Add the matching subspec to your Podfile, e.g.
   #   pod 'NapSspPlugin/GAM'
   # https://napmx.github.io/#/ios/native/getting-started
+  s.default_subspecs = :none
   s.subspec 'GAM' do |ss|
     ss.dependency 'AdMixerMediationGAM'
   end

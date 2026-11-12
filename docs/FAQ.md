@@ -4,7 +4,7 @@
 
 ### `Class 'kotlin.Unit' was compiled with an incompatible version of Kotlin`
 
-nap mx core 2.3.0 ships `kotlin-stdlib:2.2.10`. Build the host app with **Kotlin 2.1 or newer** —
+nap mx core 2.5.1 ships `kotlin-stdlib:2.2.10`. Build the host app with **Kotlin 2.1 or newer** —
 see [Setup](./SETUP.md#kotlin-요구사항). React Native 0.81+ already defaults to 2.1.20.
 
 ### `requires libraries and applications that depend on it to compile against version 35 or later`
@@ -60,7 +60,7 @@ are on an older toolchain.
 You already ship the Google Mobile Ads SDK. Exclude it from the adapter:
 
 ```groovy
-implementation("io.github.nasmedia-tech:admixer-admanager:2.1.3") {
+implementation("io.github.nasmedia-tech:admixer-admanager:2.2.1") {
     exclude group: "com.google.android.gms", module: "play-services-ads"
 }
 ```

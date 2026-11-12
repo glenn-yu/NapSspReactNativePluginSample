@@ -24,6 +24,11 @@ internal object NapSspAdErrors {
         AdMixer.AX_ERR_NO_ADAPTER -> "nap_ssp_no_adapter"
         AdMixer.AX_ERR_ADAPTER -> "nap_ssp_adapter_error"
         AdMixer.AX_ERR_CONFIG_FAIL -> "nap_ssp_config_failed"
+        AdMixer.AX_ERR_NOT_READY -> NOT_READY
+        AdMixer.AX_ERR_PRESENTER_UNAVAILABLE -> ACTIVITY_REQUIRED
+        AdMixer.AX_ERR_SHOW_FAILED -> SHOW_FAILED
+        AdMixer.AX_ERR_BACKGROUND -> "nap_ssp_background"
+        AdMixer.AX_ERR_CANCELLED -> LOAD_CANCELLED
         // Every no-fill in the waterfall is reported as AX_ERR_NO_ADS; AX_ERR_NO_FILL is never sent.
         AdMixer.AX_ERR_NO_ADS -> "nap_ssp_no_ads"
         AdMixer.AX_ERR_INVALID_REQUEST -> "nap_ssp_invalid_request"

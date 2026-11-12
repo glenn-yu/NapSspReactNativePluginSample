@@ -8,6 +8,7 @@ import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.UiThreadUtil
 import com.nasmedia.admixerssp.ads.AdInfo
 import com.nasmedia.admixerssp.ads.BaseInterstitialManager
+import com.nasmedia.admixerssp.common.AdMixer
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -111,10 +112,16 @@ internal class NapSspFullScreenAdHost(
     fun cancelLoad(rawAdUnitId: String, promise: Promise) {
         val adUnitId = rawAdUnitId.trim()
         runOnUi(promise) {
-            ads[adUnitId]?.ad?.cancelLoad()
-            loadPromises.remove(adUnitId)?.reject(NapSspAdErrors.LOAD_CANCELLED, "Cancelled by cancelLoad()")
-            startPromises.remove(adUnitId)?.reject(NapSspAdErrors.LOAD_CANCELLED, "Cancelled by cancelLoad()")
-            clearState(adUnitId)
+            val ad = ads[adUnitId]?.ad
+            if (ad?.isLoading == true) {
+                // SDK 2.5.1 synchronously reports AX_ERR_CANCELLED through onLoadFailed.
+                // That callback owns the event and the pending load/start rejection.
+                ad.cancelLoad()
+                // Settle defensively if the SDK completed without delivering its callback.
+                if (loadPromises.containsKey(adUnitId) || startPromises.containsKey(adUnitId)) {
+                    handleLoadFailed(adUnitId, AdMixer.AX_ERR_CANCELLED, "Load cancelled.")
+                }
+            }
             promise.resolve(null)
         }
     }
@@ -210,7 +217,7 @@ internal class NapSspFullScreenAdHost(
     }
 
     private fun handleLoadFailed(adUnitId: String, code: Int, message: String?) {
-        markState(adUnitId, NapSspLoadState.FAILED)
+        markState(adUnitId, if (code == AdMixer.AX_ERR_CANCELLED) NapSspLoadState.IDLE else NapSspLoadState.FAILED)
         val payload = NapSspAdErrors.payload(adUnitId, format, code, message)
         emitPayload(NapSspContracts.EVENT_AD_FAILED, payload)
 

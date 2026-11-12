@@ -96,7 +96,7 @@ Google Ad Manager, AppLovin, Unity Ads and Naver Ad Manager resolve from `google
 
 **The host app must build with Kotlin 2.1 or newer.**
 
-nap mx core `admixer-ssp:2.3.0` ships `kotlin-stdlib:2.2.10`, whose metadata version is 2.2.0. A
+nap mx core `admixer-ssp:2.5.1` ships `kotlin-stdlib:2.2.10`, whose metadata version is 2.2.0. A
 Kotlin 2.0 or older compiler cannot read it and the build fails with:
 
 ```
@@ -195,7 +195,8 @@ over the plugin's copy at merge time.
 
 ### 4-1. CocoaPods
 
-Autolinking adds the base pod. Add a subspec per adapter you use:
+Autolinking adds the base pod. Add a subspec per adapter you use. CocoaPods AdFit uses the 1.1.x
+adapter; its 2.x releases are SPM-only and require iOS 15 or later:
 
 ```ruby
 # ios/Podfile
@@ -218,9 +219,9 @@ cd ios && pod install --repo-update
 
 ### 4-2. Swift Package Manager
 
-`ios/Package.swift` pins the `AdMixerMediation` xcframework (2.5.0) with its checksum. Add the
-adapter packages you need from
-[the official list](https://napmx.github.io/#/ios/native/getting-started).
+The React Native plugin is installed through CocoaPods. Standalone Swift Package Manager
+integration of this React Native bridge is not currently supported. The native SDK itself offers
+SPM packages; see the [official guide](https://napmx.github.io/#/ios/native/getting-started).
 
 ### 4-3. App Tracking Transparency
 

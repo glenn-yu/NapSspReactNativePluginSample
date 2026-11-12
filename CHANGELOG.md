@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.0 - 2026-11-12
+
+> Validation: TypeScript and JavaScript smoke tests pass. Android native compilation could not complete because the React Native AAR was unavailable during dependency download; iOS build and device testing were not run.
+
+- Update Android core to 2.5.1 and BOM to 2026.11.02, with matching mediation adapters. Use the SDK-provided advertising identifier dependency. Android SDK native error numbers changed; rebuild and avoid hard-coded numeric comparisons.
+- Update iOS Mediation to 2.6.1 or later within the 2.x series, and make mediation adapters opt-in for the base pod.
+- Remove the unsupported standalone Swift Package Manager manifest for the React Native bridge; use CocoaPods for plugin installation.
+- Keep JavaScript readiness in sync when cancellation leaves an already-loaded ad intact.
+
 ## 0.5.0 - 2026-09-21
 
 > 네이티브 SDK 최신화(Android core 2.3.0 / iOS 2.5.0)와 함께, 디버그 빌드에서 실광고를 가로채던

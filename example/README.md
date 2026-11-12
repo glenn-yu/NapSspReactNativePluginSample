@@ -102,6 +102,8 @@ using the consuming project's repositories.
 
 ## Verification status
 
+The Android results below refer to the previous SDK 2.3.0 integration, not the current SDK update.
+
 | Check | Result |
 | :--- | :--- |
 | Android — plugin AAR assembles against nap mx core 2.3.0 with all 7 adapters | ✅ verified |

@@ -325,6 +325,22 @@ async function testCancelLoad() {
   ad.destroy();
 }
 
+async function testCancelKeepsReadyAd() {
+  const ad = new lib.InterstitialAd('1000010');
+  await ad.load();
+  emitNative('NapSspInterstitial', 'onAdLoaded', { adUnitId: '1000010' });
+  const native = mockReactNative.NativeModules.NapSspInterstitial;
+  const originalCancel = native.cancelLoad;
+  native.cancelLoad = async () => {};
+  try {
+    await ad.cancelLoad();
+    assert.strictEqual(ad.isLoaded(), true);
+  } finally {
+    native.cancelLoad = originalCancel;
+    ad.destroy();
+  }
+}
+
 async function testAdUnitIdValidation() {
   assert.throws(() => new lib.InterstitialAd(''), /non-empty adUnitId/);
   assert.throws(() => new lib.RewardedAd('   '), /non-empty adUnitId/);
@@ -364,6 +380,7 @@ async function main() {
     testShowPhaseFailureKeepsLoadedState,
     testRewardedPayload,
     testCancelLoad,
+    testCancelKeepsReadyAd,
     testAdUnitIdValidation,
     testInlineViews,
     testNormalizeAdError,

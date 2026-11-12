@@ -1,8 +1,8 @@
 # react-native-nap-ssp
 
 [![npm version](https://img.shields.io/npm/v/react-native-nap-ssp.svg?style=flat-square)](https://www.npmjs.com/package/react-native-nap-ssp)
-[![Android SDK](https://img.shields.io/badge/Android%20SDK-2.3.0-brightgreen.svg?style=flat-square)](https://napmx.github.io/#/android/)
-[![iOS SDK](https://img.shields.io/badge/iOS%20SDK-2.5.0-brightgreen.svg?style=flat-square)](https://napmx.github.io/#/ios/)
+[![Android SDK](https://img.shields.io/badge/Android%20SDK-2.5.1-brightgreen.svg?style=flat-square)](https://napmx.github.io/#/android/)
+[![iOS SDK](https://img.shields.io/badge/iOS%20SDK-2.6.1-brightgreen.svg?style=flat-square)](https://napmx.github.io/#/ios/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](./LICENSE)
 
 React Native bridge for **nap mx** (KT Nasmedia's AdMixer SSP) — banner, native, inline video,
@@ -12,6 +12,12 @@ native SDK.
 Official native guides: [Android](https://napmx.github.io/#/android/) · [iOS](https://napmx.github.io/#/ios/)
 
 ---
+
+## What's new in 0.6.0
+
+* **Native SDK update** — Android core `2.5.1` (BOM `2026.11.02`); iOS Mediation `2.6.1` or newer in the 2.x series with Core `1.5.1` or newer.
+* **iOS installation changes** — adapters are explicitly opt-in; install the React Native bridge with CocoaPods. The unsupported standalone SPM manifest was removed.
+* Android SDK error numbers changed; rebuild the app and use the documented string error codes.
 
 ## What's new in 0.5.0
 
@@ -36,7 +42,7 @@ Full details in the [CHANGELOG](./CHANGELOG.md).
 
 | Guide | Contents |
 | :--- | :--- |
-| 🚀 **[Setup](./docs/SETUP.md)** | Install, Android Gradle & mediation adapters, iOS CocoaPods/SPM, Kotlin and minSdk requirements, ATT. |
+| 🚀 **[Setup](./docs/SETUP.md)** | Install, Android Gradle & mediation adapters, iOS CocoaPods, Kotlin and minSdk requirements, ATT. |
 | 📖 **[API reference](./docs/API.md)** | Every export, option, event and error code. |
 | 🔄 **[Migration](./docs/MIGRATION.md)** | 0.4.x → 0.5.0 upgrade steps and the verified version matrix. |
 | ❓ **[FAQ](./docs/FAQ.md)** | Build and runtime troubleshooting, privacy compliance, known platform gaps. |
