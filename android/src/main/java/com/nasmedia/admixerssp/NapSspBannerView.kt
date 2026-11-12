@@ -1,6 +1,7 @@
 package com.nasmedia.admixerssp
 
 import android.content.Context
+import com.facebook.react.bridge.UiThreadUtil
 import android.util.TypedValue
 import android.widget.FrameLayout
 import com.facebook.react.bridge.LifecycleEventListener
@@ -26,6 +27,7 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
 
     private var currentState: NapSspLoadState = NapSspLoadState.IDLE
     private var attachedToWindow = false
+    private var generation = 0
 
     private val measureAndLayout = Runnable {
         measure(
@@ -39,8 +41,9 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
         set(value) {
             val normalized = value?.trim()?.takeIf { it.isNotEmpty() }
             if (normalized == field) return
+            field?.let { NapSspSdkBridge.clearBanner(it) }
             field = normalized
-            reload()
+            reload(force = false)
         }
 
     /** Layout hint only — the served size comes from the ad unit configuration. */
@@ -64,10 +67,10 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
     }
 
     /** Destroys the current ad and requests a fresh one. */
-    fun reload() {
+    fun reload(force: Boolean = true) {
         releaseAdView()
         currentState = NapSspLoadState.IDLE
-        maybeLoad()
+        maybeLoad(force)
     }
 
     fun destroyBanner() {
@@ -104,8 +107,8 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
 
     // ── internals ─────────────────────────────────────────────────────────────
 
-    private fun maybeLoad() {
-        if (!autoLoad || !attachedToWindow) return
+    private fun maybeLoad(force: Boolean = false) {
+        if ((!autoLoad && !force) || !attachedToWindow) return
         if (currentState == NapSspLoadState.LOADING || currentState == NapSspLoadState.LOADED) return
 
         val unit = adUnitId
@@ -124,9 +127,13 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
 
         val activityContext = (context as? ThemedReactContext)?.currentActivity ?: context
         val view = AMMBannerView(activityContext)
+        val listenerGeneration = generation
         val listener = NapAdListener(
+            dispatch = { callback -> UiThreadUtil.runOnUiThread { callback() } },
+            isActive = { generation == listenerGeneration && adView === view },
             onReceived = { _, _ -> handleReceived(unit) },
             onLoadFailed = { code, message -> handleFailure(unit, code, message) },
+            onShowFailed = { code, message -> handleFailure(unit, code, message, "show") },
             onDisplayed = {
                 emitViewEvent(NapSspContracts.VIEW_EVENT_AD_IMPRESSION, unit)
             },
@@ -157,13 +164,13 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
         emitViewEvent(NapSspContracts.VIEW_EVENT_AD_LOADED, unit, mapOf("size" to size))
     }
 
-    private fun handleFailure(unit: String, code: Int, message: String?) {
+    private fun handleFailure(unit: String, code: Int, message: String?, phase: String = "load") {
         currentState = NapSspLoadState.FAILED
         NapSspSdkBridge.markBannerState(unit, NapSspLoadState.FAILED)
         NapSspEventEmitter.emitViewEvent(
             this,
             NapSspContracts.VIEW_EVENT_AD_FAILED,
-            NapSspAdErrors.payload(unit, NapSspContracts.FORMAT_BANNER, code, message),
+            NapSspAdErrors.payload(unit, NapSspContracts.FORMAT_BANNER, code, message) + ("phase" to phase),
         )
     }
 
@@ -190,6 +197,10 @@ class NapSspBannerView(context: Context) : FrameLayout(context), LifecycleEventL
     }
 
     private fun releaseAdView() {
+        adUnitId?.let { NapSspSdkBridge.clearBanner(it) }
+        generation++
+        removeCallbacks(measureAndLayout)
+        currentState = NapSspLoadState.IDLE
         adView?.let { view ->
             runCatching { view.setAdViewListener(null) }
             runCatching { view.onPause() }

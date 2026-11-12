@@ -1,0 +1,2 @@
+# Test fixtures are repository-only and must not ship in the npm package.
+tests/

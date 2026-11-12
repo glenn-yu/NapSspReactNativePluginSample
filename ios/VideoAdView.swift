@@ -28,6 +28,7 @@ final class VideoAdView: UIView {
   @objc var onAdCompleted: RCTBubblingEventBlock?
   @objc var onAdSkipped: RCTBubblingEventBlock?
 
+  private var loadGeneration: UInt64 = 0
   private var isLoading = false
   private var isLoaded = false
   private var hasRetried = false
@@ -106,36 +107,48 @@ final class VideoAdView: UIView {
     }
 
     isLoading = true
-    let delegate = NapSspVideoDelegate(view: self, adUnitId: unit)
+    // Each SDK attempt has its own generation, including automatic retry.
+    loadGeneration &+= 1
+    let generation = loadGeneration
+    let delegate = NapSspVideoDelegate(view: self, adUnitId: unit, generation: generation)
     sdkDelegate = delegate
 
     AMMVideoView.loadAd(adUnitID: numericAdUnitId, rootViewController: rootVC) { [weak self] video, adapterType, error in
-      guard let self else { return }
-      self.isLoading = false
-
-      if let error {
-        if self.isRetry, !self.hasRetried, NapSspSdkErrorCode.from(error) == .loadFailed {
-          self.hasRetried = true
-          self.loadIfNeeded()
+      DispatchQueue.main.async { [weak self] in
+        guard let self else {
+          video?.stop()
           return
         }
-        self.emitFailure(adUnitId: unit, error: error)
-        return
-      }
-      guard let video else {
-        self.emitFailure(adUnitId: unit, code: "napssp_empty_ad", message: "The SDK returned no video ad and no error.")
-        return
-      }
+        guard self.isActiveRequest(generation), self.isLoading else {
+          if let video, self.videoView !== video { video.stop() }
+          return
+        }
+        self.isLoading = false
 
-      video.delegate = delegate
-      self.videoView = video
-      video.frame = self.bounds
-      video.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      self.addSubview(video)
-      self.isLoaded = true
-      self.setNeedsLayout()
+        if let error {
+          if self.isRetry, !self.hasRetried, NapSspSdkErrorCode.from(error) == .loadFailed {
+            self.hasRetried = true
+            self.loadIfNeeded()
+            return
+          }
+          self.emitFailure(adUnitId: unit, error: error)
+          return
+        }
+        guard let video else {
+          self.emitFailure(adUnitId: unit, code: "napssp_empty_ad", message: "The SDK returned no video ad and no error.")
+          return
+        }
 
-      self.onAdLoaded?(self.eventPayload(adUnitId: unit, extra: ["network": adapterType.adapterName]))
+        video.delegate = delegate
+        self.videoView = video
+        video.frame = self.bounds
+        video.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        self.addSubview(video)
+        self.isLoaded = true
+        self.setNeedsLayout()
+
+        self.onAdLoaded?(self.eventPayload(adUnitId: unit, extra: ["network": adapterType.adapterName]))
+      }
     }
     #else
     emitFailure(
@@ -147,6 +160,8 @@ final class VideoAdView: UIView {
   }
 
   private func release() {
+    // Invalidate in-flight loads and delegate callbacks before detaching the old view.
+    loadGeneration &+= 1
     #if canImport(AdMixerMediation)
     videoView?.stop()
     videoView?.removeFromSuperview()
@@ -155,6 +170,10 @@ final class VideoAdView: UIView {
     #endif
     isLoading = false
     isLoaded = false
+  }
+
+  fileprivate func isActiveRequest(_ generation: UInt64) -> Bool {
+    loadGeneration == generation && window != nil
   }
 
   private func registerForInitializationNotifications() {
@@ -198,26 +217,40 @@ final class VideoAdView: UIView {
 private final class NapSspVideoDelegate: NSObject, AMMVideoViewDelegate {
   private weak var host: VideoAdView?
   private let adUnitId: String
+  private let generation: UInt64
 
-  init(view: VideoAdView, adUnitId: String) {
+  init(view: VideoAdView, adUnitId: String, generation: UInt64) {
     self.host = view
     self.adUnitId = adUnitId
+    self.generation = generation
   }
 
   func onSuccessShowVideo() {
-    host?.emitImpression(adUnitId: adUnitId)
+    DispatchQueue.main.async { [weak self] in
+      guard let self, let host = self.host, host.isActiveRequest(self.generation) else { return }
+      host.emitImpression(adUnitId: self.adUnitId)
+    }
   }
 
   func onClickVideo() {
-    host?.emitClick(adUnitId: adUnitId)
+    DispatchQueue.main.async { [weak self] in
+      guard let self, let host = self.host, host.isActiveRequest(self.generation) else { return }
+      host.emitClick(adUnitId: self.adUnitId)
+    }
   }
 
   func onCompleteVideo() {
-    host?.emitCompleted(adUnitId: adUnitId)
+    DispatchQueue.main.async { [weak self] in
+      guard let self, let host = self.host, host.isActiveRequest(self.generation) else { return }
+      host.emitCompleted(adUnitId: self.adUnitId)
+    }
   }
 
   func onSkipVideo() {
-    host?.emitSkipped(adUnitId: adUnitId)
+    DispatchQueue.main.async { [weak self] in
+      guard let self, let host = self.host, host.isActiveRequest(self.generation) else { return }
+      host.emitSkipped(adUnitId: self.adUnitId)
+    }
   }
 }
 #endif

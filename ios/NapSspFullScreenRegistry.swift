@@ -1,55 +1,82 @@
 import Foundation
+import UIKit
 import React
 
-/// Thread-safe store for loaded full-screen ads and their delegates.
-///
-/// The SDK holds its delegate weakly, so the delegate has to be retained here for as long as the
-/// ad is alive.
+/// All registry and promise operations run on the main queue, alongside SDK access.
+/// Invalidating a request does not cancel the SDK's static load operation: no handle exists yet.
+final class NapSspFullScreenRequest {
+  let generation = UUID()
+  private var resolveBlock: RCTPromiseResolveBlock?
+  private var rejectBlock: RCTPromiseRejectBlock?
+
+  init(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    resolveBlock = resolve
+    rejectBlock = reject
+  }
+
+  func resolve(_ value: Any?) {
+    let callback = resolveBlock
+    resolveBlock = nil
+    rejectBlock = nil
+    callback?(value)
+  }
+
+  func reject(_ code: String?, _ message: String?, _ error: Error?) {
+    let callback = rejectBlock
+    resolveBlock = nil
+    rejectBlock = nil
+    callback?(code, message, error)
+  }
+}
+
+/// Retains weak SDK delegates and tracks loads before the SDK supplies an ad object.
 final class NapSspFullScreenRegistry<Ad: AnyObject> {
-  private let lock = NSLock()
   private var ads: [String: Ad] = [:]
   private var delegates: [String: NSObject] = [:]
+  private var generations: [String: UUID] = [:]
+  private var requests: [String: NapSspFullScreenRequest] = [:]
 
-  func store(_ ad: Ad, delegate: NSObject, for adUnitId: String) {
-    lock.lock()
-    defer { lock.unlock() }
-    ads[adUnitId] = ad
-    delegates[adUnitId] = delegate
+  func begin(_ request: NapSspFullScreenRequest, for key: String) {
+    generations[key] = request.generation
+    requests[key] = request
   }
 
-  func ad(for adUnitId: String) -> Ad? {
-    lock.lock()
-    defer { lock.unlock() }
-    return ads[adUnitId]
+  func isCurrent(_ generation: UUID, for key: String) -> Bool {
+    generations[key] == generation
   }
 
-  func delegate(for adUnitId: String) -> NSObject? {
-    lock.lock()
-    defer { lock.unlock() }
-    return delegates[adUnitId]
+  func isLoading(_ key: String) -> Bool { requests[key] != nil }
+
+  /// Claims a completion once. A stale or duplicate completion must discard its ad.
+  func complete(_ request: NapSspFullScreenRequest, for key: String) -> Bool {
+    guard requests[key] === request, isCurrent(request.generation, for: key) else { return false }
+    requests.removeValue(forKey: key)
+    return true
+  }
+
+  func store(_ ad: Ad, delegate: NSObject, for key: String) {
+    ads[key] = ad
+    delegates[key] = delegate
+  }
+
+  func ad(for key: String) -> Ad? { ads[key] }
+
+  /// Cancelling an idle unit preserves an already loaded or showing ad.
+  @discardableResult
+  func cancelLoad(_ key: String) -> Ad? {
+    guard isLoading(key) else { return nil }
+    return remove(key)
   }
 
   @discardableResult
-  func remove(_ adUnitId: String) -> Ad? {
-    lock.lock()
-    defer { lock.unlock() }
-    delegates.removeValue(forKey: adUnitId)
-    return ads.removeValue(forKey: adUnitId)
-  }
-
-  func removeAll() -> [Ad] {
-    lock.lock()
-    defer { lock.unlock() }
-    let values = Array(ads.values)
-    ads.removeAll()
-    delegates.removeAll()
-    return values
-  }
-
-  var loadedAdUnitIds: [String] {
-    lock.lock()
-    defer { lock.unlock() }
-    return Array(ads.keys)
+  func remove(_ key: String) -> Ad? {
+    // Invalidate before settling or stopping, since either may trigger callbacks.
+    generations.removeValue(forKey: key)
+    let request = requests.removeValue(forKey: key)
+    let ad = ads.removeValue(forKey: key)
+    delegates.removeValue(forKey: key)
+    request?.reject("napssp_load_cancelled", "The ad load was cancelled, destroyed, or superseded.", nil)
+    return ad
   }
 }
 

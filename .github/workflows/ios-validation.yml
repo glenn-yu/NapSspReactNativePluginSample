@@ -1,0 +1,62 @@
+name: iOS validation
+on:
+  workflow_dispatch:
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.4
+          cache: npm
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: example/ExampleHostApp
+      - run: npm install && npm run build
+      - run: npm install
+        working-directory: example/ExampleHostApp
+      - name: Install CocoaPods
+        run: bundle exec pod install
+        working-directory: example/ExampleHostApp/ios
+        env:
+          RCT_NEW_ARCH_ENABLED: '0'
+      - name: Verify plugin bridge sources are in the Pods target
+        run: |
+          test -f ../node_modules/react-native-nap-ssp/ios/NapSspFullScreenRegistry.swift
+          bundle exec ruby -rxcodeproj -e 'p=Xcodeproj::Project.open("Pods/Pods.xcodeproj"); t=p.targets.find { |x| x.name == "NapSspPlugin" }; abort "Missing NapSspPlugin target" unless t; files=t.source_build_phase.files_references.map(&:path).compact; %w[NapSspFullScreenRegistry.swift NapSspBridge.m].each { |name| abort "Missing bridge source: #{name}" unless files.any? { |f| f.end_with?(name) } }; puts "NapSspPlugin bridge sources included"'
+        working-directory: example/ExampleHostApp/ios
+      - name: Build iOS simulator app
+        run: xcodebuild -workspace ExampleHostApp.xcworkspace -scheme ExampleHostApp -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+        working-directory: example/ExampleHostApp/ios
+        env:
+          RCT_NEW_ARCH_ENABLED: '0'
+      - name: Verify core-only autolinking
+        working-directory: example/ExampleHostApp/ios
+        run: |
+          ruby <<'RUBY'
+          path = 'Podfile'
+          text = File.read(path)
+          pattern = /^  pod 'NapSspPlugin', :path => '[^']+',\r?\n      :subspecs => \['GAM', 'AdFit'\]\r?\n/
+          abort 'Expected exactly one adapter declaration' unless text.scan(pattern).length == 1
+          File.write(path, text.sub(pattern, ''))
+          RUBY
+          RCT_NEW_ARCH_ENABLED=0 bundle exec pod install
+          bundle exec ruby <<'RUBY'
+          require 'xcodeproj'
+          require 'yaml'
+          project = Xcodeproj::Project.open('Pods/Pods.xcodeproj')
+          target = project.targets.find { |t| t.name == 'NapSspPlugin' }
+          abort 'Missing native plugin target' unless target.is_a?(Xcodeproj::Project::Object::PBXNativeTarget)
+          files = target.source_build_phase.files_references
+          %w[NapSspFullScreenRegistry.swift RewardedModule.swift NapSspBridge.m].each do |name|
+            abort "Missing compiled source: #{name}" unless files.any? { |f| f.real_path.basename.to_s == name && f.real_path.file? }
+          end
+          pods = YAML.load_file('Podfile.lock').fetch('PODS').flat_map { |p| p.is_a?(Hash) ? p.keys : [p] }
+          abort 'Core subspec missing' unless pods.any? { |p| p.start_with?('NapSspPlugin/Core (') }
+          abort 'Unexpected plugin adapter' if pods.any? { |p| p.match?(%r{\ANapSspPlugin/(GAM|AdFit|Pangle|AppLovin|UnityAds|NAM|Teads) \(}) }
+          puts 'Core-only autolinking includes bridge sources'
+          RUBY

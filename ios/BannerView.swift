@@ -15,7 +15,8 @@ final class BannerView: UIView {
   @objc dynamic var adUnitId: NSString = "" {
     didSet {
       guard adUnitId != oldValue else { return }
-      reload()
+      release()
+      loadIfNeeded()
     }
   }
 
@@ -27,7 +28,11 @@ final class BannerView: UIView {
     }
   }
 
-  @objc var autoLoad: Bool = true
+  @objc var autoLoad: Bool = true {
+    didSet {
+      if autoLoad && !oldValue { loadIfNeeded() }
+    }
+  }
 
   @objc var onAdLoaded: RCTBubblingEventBlock?
   @objc var onAdFailedToLoad: RCTBubblingEventBlock?
@@ -36,6 +41,7 @@ final class BannerView: UIView {
   @objc var onAdClosed: RCTBubblingEventBlock?
   @objc var onAdImpression: RCTBubblingEventBlock?
 
+  private var loadGeneration: UInt64 = 0
   private var isLoading = false
   private var isLoaded = false
   private var didRegisterInitializeObserver = false
@@ -87,7 +93,7 @@ final class BannerView: UIView {
   /// Destroys the current ad and requests a fresh one.
   @objc func reload() {
     release()
-    loadIfNeeded()
+    loadIfNeeded(force: true)
   }
 
   @objc func destroyBanner() {
@@ -96,8 +102,8 @@ final class BannerView: UIView {
 
   // MARK: - internals
 
-  private func loadIfNeeded() {
-    guard autoLoad, window != nil, !isLoading, !isLoaded else { return }
+  private func loadIfNeeded(force: Bool = false) {
+    guard (autoLoad || force), window != nil, !isLoading, !isLoaded else { return }
 
     let unit = (adUnitId as String).trimmingCharacters(in: .whitespacesAndNewlines)
     guard !unit.isEmpty else { return }
@@ -118,31 +124,43 @@ final class BannerView: UIView {
     }
 
     isLoading = true
-    let delegate = NapSspBannerDelegate(view: self, adUnitId: unit)
+    // Each SDK attempt has its own generation, including automatic retry.
+    loadGeneration &+= 1
+    let generation = loadGeneration
+    let delegate = NapSspBannerDelegate(view: self, adUnitId: unit, generation: generation)
     sdkDelegate = delegate
 
     AMMBannerView.loadAd(adUnitID: numericAdUnitId, rootViewController: rootVC) { [weak self] banner, adapterType, error in
-      guard let self else { return }
-      self.isLoading = false
+      DispatchQueue.main.async { [weak self] in
+        guard let self else {
+          banner?.stop()
+          return
+        }
+        guard self.isActiveRequest(generation), self.isLoading else {
+          if let banner, self.bannerView !== banner { banner.stop() }
+          return
+        }
+        self.isLoading = false
 
-      if let error {
-        self.emitFailure(adUnitId: unit, error: error)
-        return
+        if let error {
+          self.emitFailure(adUnitId: unit, error: error)
+          return
+        }
+        guard let banner else {
+          self.emitFailure(adUnitId: unit, code: "napssp_empty_ad", message: "The SDK returned no banner and no error.")
+          return
+        }
+
+        banner.delegate = delegate
+        self.bannerView = banner
+        banner.frame = self.bounds
+        banner.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        self.addSubview(banner)
+        self.isLoaded = true
+        self.setNeedsLayout()
+
+        self.onAdLoaded?(self.eventPayload(adUnitId: unit, extra: ["network": adapterType.adapterName]))
       }
-      guard let banner else {
-        self.emitFailure(adUnitId: unit, code: "napssp_empty_ad", message: "The SDK returned no banner and no error.")
-        return
-      }
-
-      banner.delegate = delegate
-      self.bannerView = banner
-      banner.frame = self.bounds
-      banner.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      self.addSubview(banner)
-      self.isLoaded = true
-      self.setNeedsLayout()
-
-      self.onAdLoaded?(self.eventPayload(adUnitId: unit, extra: ["network": adapterType.adapterName]))
     }
     #else
     emitFailure(
@@ -154,6 +172,8 @@ final class BannerView: UIView {
   }
 
   private func release() {
+    // Invalidate in-flight loads and delegate callbacks before detaching the old view.
+    loadGeneration &+= 1
     #if canImport(AdMixerMediation)
     bannerView?.stop()
     bannerView?.removeFromSuperview()
@@ -162,6 +182,10 @@ final class BannerView: UIView {
     #endif
     isLoading = false
     isLoaded = false
+  }
+
+  fileprivate func isActiveRequest(_ generation: UInt64) -> Bool {
+    loadGeneration == generation && window != nil
   }
 
   private func registerForInitializationNotifications() {
@@ -218,18 +242,26 @@ final class BannerView: UIView {
 private final class NapSspBannerDelegate: NSObject, AMMBannerViewDelegate {
   private weak var bannerHost: BannerView?
   private let adUnitId: String
+  private let generation: UInt64
 
-  init(view: BannerView, adUnitId: String) {
+  init(view: BannerView, adUnitId: String, generation: UInt64) {
     self.bannerHost = view
     self.adUnitId = adUnitId
+    self.generation = generation
   }
 
   func onSuccessShowBanner() {
-    bannerHost?.emitImpression(adUnitId: adUnitId)
+    DispatchQueue.main.async { [weak self] in
+      guard let self, let bannerHost = self.bannerHost, bannerHost.isActiveRequest(self.generation) else { return }
+      bannerHost.emitImpression(adUnitId: self.adUnitId)
+    }
   }
 
   func onClickBanner() {
-    bannerHost?.emitClick(adUnitId: adUnitId)
+    DispatchQueue.main.async { [weak self] in
+      guard let self, let bannerHost = self.bannerHost, bannerHost.isActiveRequest(self.generation) else { return }
+      bannerHost.emitClick(adUnitId: self.adUnitId)
+    }
   }
 }
 #endif

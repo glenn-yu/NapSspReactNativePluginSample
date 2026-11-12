@@ -1,6 +1,6 @@
 # react-native-nap-ssp
 
-> **Known runtime issues in 0.6.0 and 0.6.1:** Android full-screen native events can reach JavaScript multiple times; do not grant rewards based solely on the callback without server-side transaction deduplication. Full-screen events can also reach the wrong format when an ad unit ID is reused. iOS full-screen `isLoading()` is not implemented. In-flight iOS cancellation and late callbacks need further validation. These issues are not fixed by 0.6.1. See [release notes](https://github.com/glenn-yu/NapSspReactNativePluginSample/releases/tag/v0.6.1).
+> **Known runtime issues in 0.6.0 and 0.6.1:** Android full-screen native events can reach JavaScript multiple times; do not grant rewards based solely on the callback without server-side transaction deduplication. Full-screen events can also reach the wrong format when an ad unit ID is reused. iOS CocoaPods installs with adapter subspecs may omit the bridge source, and full-screen `isLoading()` is not implemented. In-flight iOS cancellation and late callbacks need further validation. These issues are not fixed by 0.6.1. See [release notes](https://github.com/glenn-yu/NapSspReactNativePluginSample/releases/tag/v0.6.1).
 
 [![npm version](https://img.shields.io/npm/v/react-native-nap-ssp.svg?style=flat-square)](https://www.npmjs.com/package/react-native-nap-ssp)
 [![Android SDK](https://img.shields.io/badge/Android%20SDK-2.5.1-brightgreen.svg?style=flat-square)](https://napmx.github.io/#/android/)
@@ -14,6 +14,13 @@ native SDK.
 Official native guides: [Android](https://napmx.github.io/#/android/) · [iOS](https://napmx.github.io/#/ios/)
 
 ---
+
+## What's new in 0.6.2
+
+* Fix duplicate and cross-format full-screen events and harden ad load, cancellation and view lifecycles.
+* Fix CocoaPods subspecs so the iOS bridge source is included with or without mediation adapters.
+* Surface Android inline presentation failures and track iOS full-screen loading state.
+* Device ad flows still require validation with your own app and configured ad units.
 
 ## What's new in 0.6.1
 

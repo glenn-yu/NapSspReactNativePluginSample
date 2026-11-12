@@ -118,6 +118,8 @@ export interface AdError {
   /** Stable cross-platform code, e.g. `nap_ssp_no_ads` (Android) / `napssp_load_failed` (iOS). */
   code: string;
   message: string;
+  /** Whether the failure happened while loading or presenting, when provided by native code. */
+  phase?: 'load' | 'show';
   /** The raw SDK error code: an `AdMixer.AX_ERR_*` int on Android, `-1`…`-8` on iOS. */
   nativeCode?: number | string;
   nativeDomain?: string;
