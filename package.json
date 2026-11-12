@@ -1,6 +1,6 @@
 {
   "name": "react-native-nap-ssp",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "React Native plugin for the nap mx (KT Nasmedia AdMixer SSP) ad SDK — banner, native, video, interstitial, interstitial video and rewarded formats",
   "author": "gwangy",
   "license": "MIT",

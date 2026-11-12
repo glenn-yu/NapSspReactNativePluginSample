@@ -13,6 +13,10 @@ Official native guides: [Android](https://napmx.github.io/#/android/) · [iOS](h
 
 ---
 
+## What's new in 0.6.1
+
+* Correct CocoaPods adapter installation guidance and improve the initialization and upgrade examples.
+
 ## What's new in 0.6.0
 
 * **Native SDK update** — Android core `2.5.1` (BOM `2026.11.02`); iOS Mediation `2.6.1` or newer in the 2.x series with Core `1.5.1` or newer.
@@ -47,7 +51,7 @@ Full details in the [CHANGELOG](./CHANGELOG.md).
 | 🔄 **[Migration](./docs/MIGRATION.md)** | 0.5.0 → 0.6.0 and 0.4.x → 0.5.0 upgrade steps and validation limits. |
 | ❓ **[FAQ](./docs/FAQ.md)** | Build and runtime troubleshooting, privacy compliance, known platform gaps. |
 
-A runnable integration reference lives in [`example/ExampleHostApp`](./example/ExampleHostApp) — it exercises
+A runnable integration reference lives in [`example/ExampleHostApp`](https://github.com/glenn-yu/NapSspReactNativePluginSample/tree/main/example/ExampleHostApp) — it exercises
 initialize → load → callback → show → reload → cleanup for all six formats with a live event log.
 
 ---
@@ -94,26 +98,34 @@ import React, {useEffect, useState} from 'react';
 import {Platform} from 'react-native';
 import {NapSspAd} from 'react-native-nap-ssp';
 
-export default function App() {
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      // iOS: resolve tracking permission before the first ad request.
+// Share the startup promise across mounts, including React Strict Mode's development remount.
+let startup: Promise<unknown> | undefined;
+function startAds() {
+  if (!startup) {
+    startup = (async () => {
       if (Platform.OS === 'ios') {
         await NapSspAd.requestTrackingAuthorization();
       }
-
-      await NapSspAd.initialize({
+      return NapSspAd.initialize({
         mediaKey: '10771',
         adUnitIds: ['104701', '104703', '103722'],
         logLevel: __DEV__ ? 'verbose' : 'error',
         privacy: {childDirected: false},
         testMode: __DEV__, // Android only
       });
+    })();
+  }
+  return startup;
+}
+
+export default function App() {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    startAds().then(() => {
       if (active) setReady(true);
-    })().catch((error) => console.warn('nap mx init failed', error));
+    }).catch((error) => console.warn('nap mx init failed', error));
     return () => { active = false; };
   }, []);
 
@@ -121,6 +133,8 @@ export default function App() {
   return ready ? <YourAppRoot /> : null;
 }
 ```
+
+This startup example does not retry a failed initialization. Implement retry and error UI in your app.
 
 > `mediaKey` and `adUnitIds` are the **numeric** values issued on the
 > [partner site](https://publisher.admixer.co.kr). One media key per app.

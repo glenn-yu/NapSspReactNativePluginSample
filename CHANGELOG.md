@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1 - 2026-11-12
+
+- Correct CocoaPods adapter setup and improve initialization, migration and troubleshooting documentation.
+- Update the example Podfile and clarify Android CI and iOS validation status. No SDK or runtime API changes.
+
 ## 0.6.0 - 2026-11-12
 
 > Validation: TypeScript and JavaScript smoke tests pass. Local Android native compilation could not complete because the React Native AAR was unavailable during dependency download. Subsequently, [CI](https://github.com/glenn-yu/NapSspReactNativePluginSample/actions/runs/43151333114) built the Android library with `assembleDebug` at commit `3b02149` using the example configuration (GAM and AdFit). The full seven-adapter configuration, host APK and device flows were not verified by that run; iOS build and device testing were not run.
