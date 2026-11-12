@@ -8,7 +8,7 @@
 - Forward Android inline presentation failures, preserve readiness information on full-screen failures and refresh per-request options.
 - Add regression checks for event routing and lifecycle handling.
 
-Validation: JavaScript smoke tests and request/listener regression tests passed. [Android library CI](https://github.com/glenn-yu/NapSspReactNativePluginSample/actions/runs/43156117080) passed for the native changes. An iOS simulator app build completed but did not show the bridge source being compiled; iOS integration is under revalidation. Live ad delivery and reward flows still require device verification.
+Validation: JavaScript smoke tests and request/listener regression tests passed. [Android library CI](https://github.com/glenn-yu/NapSspReactNativePluginSample/actions/runs/43158230196) passed with GAM and AdFit. [iOS CI](https://github.com/glenn-yu/NapSspReactNativePluginSample/actions/runs/43158230182) verified bridge source inclusion, built the simulator app with GAM and AdFit, and checked core-only autolinking. Other adapter combinations and live ad delivery and reward flows still require device verification.
 
 ## 0.6.1 - 2026-11-12
 
